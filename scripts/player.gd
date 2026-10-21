@@ -2,7 +2,10 @@ extends CharacterBody2D
 ## Movement-facing normally; forward-arc target lock while firing.
 
 const ARROW_SCRIPT = preload("res://scripts/arrow.gd")
-const TARGET_ARC_DOT := 0.5 # 120 degree full arc
+const TARGET_ARC_DOT := 0.5 # 120-degree acquisition arc
+const RETAIN_ARC_DOT := -0.173648 # 200-degree retention arc
+const MAX_TARGET_RANGE := 450.0
+const RETAIN_RANGE := 490.0
 const FIRE_INTERVAL := 0.45
 @export var move_speed: float = 180.0
 
@@ -41,7 +44,7 @@ func _physics_process(delta: float) -> void:
         target = null
 
     if attacking:
-        if not is_instance_valid(target) or not target.is_in_group("enemies"):
+        if not _target_still_valid():
             target = _find_target(locked_facing)
         if is_instance_valid(target):
             facing_direction = global_position.direction_to(target.global_position)
@@ -58,13 +61,24 @@ func _physics_process(delta: float) -> void:
     _update_animation(delta)
     queue_redraw()
 
+func _target_still_valid() -> bool:
+    if not is_instance_valid(target):
+        return false
+    if not target.is_in_group("enemies"):
+        return false
+    var displacement: Vector2 = target.global_position - global_position
+    var distance: float = displacement.length()
+    if distance < 1.0 or distance > RETAIN_RANGE:
+        return false
+    return locked_facing.dot(displacement / distance) >= RETAIN_ARC_DOT
+
 func _find_target(aim_direction: Vector2) -> Node2D:
     var best: Node2D = null
     var best_distance := INF
     for candidate in get_tree().get_nodes_in_group("enemies"):
         var displacement: Vector2 = candidate.global_position - global_position
         var distance := displacement.length()
-        if distance < 1.0 or distance > 450.0:
+        if distance < 1.0 or distance > MAX_TARGET_RANGE:
             continue
         if aim_direction.dot(displacement / distance) < TARGET_ARC_DOT:
             continue
