@@ -15,6 +15,18 @@ script = ExtResource("1")
 position = Vector2(175, -85)
 script = ExtResource("4")
 
+[node name="GoblinNear" type="Node2D" parent="."]
+position = Vector2(100, 75)
+script = ExtResource("4")
+
+[node name="GoblinFar" type="Node2D" parent="."]
+position = Vector2(285, 135)
+script = ExtResource("4")
+
+[node name="GoblinFlank" type="Node2D" parent="."]
+position = Vector2(-220, -125)
+script = ExtResource("4")
+
 [node name="Camera2D" type="Camera2D" parent="."]
 enabled = true
 
