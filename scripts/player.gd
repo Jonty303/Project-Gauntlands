@@ -21,6 +21,11 @@ var gait_phase: float = 0.0
 var visual_facing: Vector2 = Vector2.DOWN
 var shot_recoil: float = 0.0
 var bow_draw: float = 0.0
+const MAX_HEALTH := 8
+const INVULNERABILITY_TIME := 0.7
+var health: int = MAX_HEALTH
+var invulnerability_timer: float = 0.0
+var defeated: bool = false
 
 func set_touch_direction(direction: Vector2) -> void:
     touch_direction = direction
@@ -28,7 +33,25 @@ func set_touch_direction(direction: Vector2) -> void:
 func set_touch_attack(pressed: bool) -> void:
     touch_attack = pressed
 
+func take_damage(amount: int) -> void:
+    if defeated or invulnerability_timer > 0.0:
+        return
+    health = maxi(0, health - amount)
+    invulnerability_timer = INVULNERABILITY_TIME
+    if health == 0:
+        defeated = true
+        attacking = false
+        touch_attack = false
+    queue_redraw()
+
 func _physics_process(delta: float) -> void:
+    invulnerability_timer = maxf(0.0, invulnerability_timer - delta)
+    if defeated:
+        velocity = Vector2.ZERO
+        queue_redraw()
+        if Input.is_action_just_pressed("ui_accept"):
+            get_tree().reload_current_scene()
+        return
     var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
     if touch_direction.length_squared() > 0.001:
         direction = touch_direction
@@ -144,6 +167,11 @@ func _update_animation(delta: float) -> void:
     shot_recoil = move_toward(shot_recoil, 0.0, delta * 5.0)
 
 func _draw() -> void:
+    draw_rect(Rect2(-28, -45, 56, 6), Color("#402b2b"))
+    draw_rect(Rect2(-28, -45, 56.0 * health / MAX_HEALTH, 6), Color("#c65d54"))
+    if defeated:
+        draw_string(ThemeDB.fallback_font, Vector2(-42, -60), "DEFEATED", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#f4d17d"))
+        draw_string(ThemeDB.fallback_font, Vector2(-75, 55), "Press Enter to restart", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color.WHITE)
     var forward := visual_facing.normalized()
     var side := Vector2(-forward.y, forward.x)
     var speed_ratio := clampf(velocity.length() / move_speed, 0.0, 1.0)
