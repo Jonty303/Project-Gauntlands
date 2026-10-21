@@ -15,6 +15,8 @@ var touch_attack: bool = false
 var locked_facing: Vector2 = Vector2.DOWN
 var attacking: bool = false
 var target: Node2D = null
+var soft_target: Node2D = null
+var attack_exhausted: bool = false
 var fire_cooldown: float = 0.0
 var gait_phase: float = 0.0
 var visual_facing: Vector2 = Vector2.DOWN
@@ -33,51 +35,60 @@ func _physics_process(delta: float) -> void:
         direction = touch_direction
     velocity = direction * move_speed
 
-    var attack_pressed := touch_attack or Input.is_action_pressed("attack")
-    if attack_pressed and not attacking:
-        attacking = true
-        locked_facing = facing_direction
-        target = _find_target(locked_facing)
-        fire_cooldown = 0.0
-    elif not attack_pressed and attacking:
+    if Input.is_action_just_pressed("target_previous"):
+        _cycle_target(-1)
+    elif Input.is_action_just_pressed("target_next"):
+        _cycle_target(1)
+
+    var attack_pressed: bool = touch_attack or Input.is_action_pressed("attack")
+    if not attack_pressed:
         attacking = false
+        attack_exhausted = false
         target = null
+        if direction.length_squared() > 0.001:
+            facing_direction = direction.normalized()
+        _refresh_soft_target()
+    elif not attacking and not attack_exhausted:
+        attacking = true
+        target = soft_target if _is_enemy_available(soft_target) else null
+        locked_facing = facing_direction
+        fire_cooldown = 0.0
 
     if attacking:
-        if not _target_still_valid():
-            target = _find_target(locked_facing)
-        if is_instance_valid(target):
+        if target != null and not _is_enemy_available(target):
+            attacking = false
+            attack_exhausted = true
+            target = null
+            _refresh_soft_target()
+        elif target != null:
             facing_direction = global_position.direction_to(target.global_position)
         else:
             facing_direction = locked_facing
-        fire_cooldown -= delta
-        if fire_cooldown <= 0.0:
-            _fire_arrow()
-            fire_cooldown = FIRE_INTERVAL
-    elif direction.length_squared() > 0.001:
-        facing_direction = direction.normalized()
+
+        if attacking:
+            fire_cooldown -= delta
+            if fire_cooldown <= 0.0:
+                _fire_arrow()
+                fire_cooldown = FIRE_INTERVAL
 
     move_and_slide()
     _update_animation(delta)
     queue_redraw()
 
-func _target_still_valid() -> bool:
-    if not is_instance_valid(target):
-        return false
-    if not target.is_in_group("enemies"):
-        return false
-    var displacement: Vector2 = target.global_position - global_position
-    var distance: float = displacement.length()
-    if distance < 1.0 or distance > RETAIN_RANGE:
-        return false
-    return locked_facing.dot(displacement / distance) >= RETAIN_ARC_DOT
+func _is_enemy_available(enemy: Node2D) -> bool:
+    return is_instance_valid(enemy) and enemy.is_in_group("enemies") and global_position.distance_to(enemy.global_position) <= RETAIN_RANGE
+
+func _refresh_soft_target() -> void:
+    if _is_enemy_available(soft_target):
+        return
+    soft_target = _find_target(facing_direction)
 
 func _find_target(aim_direction: Vector2) -> Node2D:
     var best: Node2D = null
-    var best_distance := INF
+    var best_distance: float = INF
     for candidate in get_tree().get_nodes_in_group("enemies"):
         var displacement: Vector2 = candidate.global_position - global_position
-        var distance := displacement.length()
+        var distance: float = displacement.length()
         if distance < 1.0 or distance > MAX_TARGET_RANGE:
             continue
         if aim_direction.dot(displacement / distance) < TARGET_ARC_DOT:
@@ -86,6 +97,22 @@ func _find_target(aim_direction: Vector2) -> Node2D:
             best = candidate
             best_distance = distance
     return best
+
+func _cycle_target(step: int) -> void:
+    var candidates: Array[Node2D] = []
+    for enemy in get_tree().get_nodes_in_group("enemies"):
+        if global_position.distance_to(enemy.global_position) <= MAX_TARGET_RANGE:
+            candidates.append(enemy)
+    if candidates.is_empty():
+        soft_target = null
+        return
+    candidates.sort_custom(func(a: Node2D, b: Node2D) -> bool:
+        return global_position.direction_to(a.global_position).angle() < global_position.direction_to(b.global_position).angle())
+    var index: int = candidates.find(soft_target)
+    if index < 0:
+        soft_target = candidates[0]
+    else:
+        soft_target = candidates[posmod(index + step, candidates.size())]
 
 func _fire_arrow() -> void:
     var arrow := Node2D.new()
@@ -140,6 +167,7 @@ func _draw() -> void:
     if attacking:
         draw_line(string_pull, bow_center + forward * 10.0, Color("#e6c786"), 2.0)
 
-    if attacking and is_instance_valid(target):
-        var local_target := to_local(target.global_position)
-        draw_arc(local_target, 23.0, 0.0, TAU, 32, Color("#efcc75"), 2.0)
+    var marked: Node2D = target if attacking and is_instance_valid(target) else soft_target
+    if is_instance_valid(marked):
+        var local_target: Vector2 = to_local(marked.global_position)
+        draw_arc(local_target, 23.0, 0.0, TAU, 32, Color("#efcc75") if attacking else Color("#91c7d6"), 2.0)
