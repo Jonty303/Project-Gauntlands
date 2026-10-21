@@ -103,9 +103,9 @@ func _draw() -> void:
     var bounce := absf(sin(gait_phase)) * speed_ratio * 1.4
 
     # Independent leg stepping: forward, backpedal, or strafe.
-    for foot_side in [-1.0, 1.0]:
-        var step := step_wave * foot_side
-        var foot_position := side * (foot_side * 6.5 + side_motion * step * 3.5)
+    for foot_side: float in [-1.0, 1.0]:
+        var step: float = step_wave * foot_side
+        var foot_position: Vector2 = side * (foot_side * 6.5 + side_motion * step * 3.5)
         foot_position += forward * (-7.0 + forward_motion * step * 5.0 - bounce * 0.5)
         draw_circle(foot_position, 4.5, Color("#403a32"))
         draw_line(foot_position, foot_position + forward * 5.0, Color("#665444"), 3.0)
