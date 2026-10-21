@@ -5,12 +5,15 @@ const WALL_THICKNESS := 24.0
 const FLOOR_COLOR := Color("#242832")
 const GRID_COLOR := Color("#343945")
 const WALL_COLOR := Color("#596171")
+const COVER_CENTER := Vector2(35.0, -95.0)
+const COVER_SIZE := Vector2(28.0, 210.0)
 
 func _ready() -> void:
     _create_wall("NorthWall", Vector2(0, -DUNGEON_SIZE.y / 2.0), Vector2(DUNGEON_SIZE.x + WALL_THICKNESS, WALL_THICKNESS))
     _create_wall("SouthWall", Vector2(0, DUNGEON_SIZE.y / 2.0), Vector2(DUNGEON_SIZE.x + WALL_THICKNESS, WALL_THICKNESS))
     _create_wall("WestWall", Vector2(-DUNGEON_SIZE.x / 2.0, 0), Vector2(WALL_THICKNESS, DUNGEON_SIZE.y + WALL_THICKNESS))
     _create_wall("EastWall", Vector2(DUNGEON_SIZE.x / 2.0, 0), Vector2(WALL_THICKNESS, DUNGEON_SIZE.y + WALL_THICKNESS))
+    _create_wall("CoverWall", COVER_CENTER, COVER_SIZE)
 
 func _create_wall(wall_name: String, wall_position: Vector2, wall_size: Vector2) -> void:
     var wall := StaticBody2D.new()
@@ -40,3 +43,5 @@ func _draw() -> void:
     draw_rect(Rect2(-half.x - t / 2.0, half.y - t / 2.0, DUNGEON_SIZE.x + t, t), WALL_COLOR)
     draw_rect(Rect2(-half.x - t / 2.0, -half.y - t / 2.0, t, DUNGEON_SIZE.y + t), WALL_COLOR)
     draw_rect(Rect2(half.x - t / 2.0, -half.y - t / 2.0, t, DUNGEON_SIZE.y + t), WALL_COLOR)
+    draw_rect(Rect2(COVER_CENTER - COVER_SIZE / 2.0, COVER_SIZE), WALL_COLOR)
+

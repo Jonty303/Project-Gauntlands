@@ -8,6 +8,9 @@ const FIRE_INTERVAL := 0.45
 @export var move_speed: float = 180.0
 
 var facing_direction: Vector2 = Vector2.DOWN
+
+func _ready() -> void:
+    add_to_group("player")
 var touch_direction: Vector2 = Vector2.ZERO
 var touch_attack: bool = false
 var locked_facing: Vector2 = Vector2.DOWN
