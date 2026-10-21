@@ -6,6 +6,14 @@ run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 
 [input]
+target_previous={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":81), Object(InputEventJoypadButton,"button_index":9)]
+}
+target_next={
+"deadzone": 0.2,
+"events": [Object(InputEventKey,"physical_keycode":69), Object(InputEventJoypadButton,"button_index":10)]
+}
 attack={
 "deadzone": 0.2,
 "events": [Object(InputEventKey,"physical_keycode":32), Object(InputEventMouseButton,"button_index":1), Object(InputEventJoypadButton,"button_index":0)]
