@@ -1,13 +1,18 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/main.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/player.tscn" id="2"]
 [ext_resource type="Script" path="res://scripts/touch_joystick.gd" id="3"]
+[ext_resource type="Script" path="res://scripts/goblin.gd" id="4"]
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1")
 
 [node name="Player" parent="." instance=ExtResource("2")]
+
+[node name="Goblin" type="Node2D" parent="."]
+position = Vector2(175, -85)
+script = ExtResource("4")
 
 [node name="Camera2D" type="Camera2D" parent="."]
 enabled = true
@@ -25,5 +30,9 @@ offset_bottom = -24.0
 grow_vertical = 0
 mouse_filter = 1
 script = ExtResource("3")
+
+[node name="AttackButton" type="TouchScreenButton" parent="TouchControls"]
+position = Vector2(0, 0)
+script = null
 
 [connection signal="direction_changed" from="TouchControls/Joystick" to="Player" method="set_touch_direction"]
