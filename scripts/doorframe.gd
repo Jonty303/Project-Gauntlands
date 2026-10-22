@@ -11,8 +11,8 @@ const MORTAR := Color("#45454a")
 
 func _draw() -> void:
     var rise := Vector2(0.0, -HEIGHT).rotated(-PI / 4.0)
-    for side in [-1.0, 1.0]:
-        var y := side * (HALF_OPENING + PILLAR_WIDTH * 0.5)
+    for side: float in [-1.0, 1.0]:
+        var y: float = side * (HALF_OPENING + PILLAR_WIDTH * 0.5)
         var base := Vector2(0.0, y)
         var left := base + Vector2(-PILLAR_WIDTH * 0.5, -PILLAR_WIDTH * 0.5)
         var right := base + Vector2(PILLAR_WIDTH * 0.5, PILLAR_WIDTH * 0.5)
@@ -22,8 +22,8 @@ func _draw() -> void:
         draw_colored_polygon(PackedVector2Array([front_a, front_b, front_b + rise, front_a + rise]), SHADE)
         draw_colored_polygon(PackedVector2Array([side_a, front_b, front_b + rise, side_a + rise]), STONE)
         draw_colored_polygon(PackedVector2Array([left + rise, side_a + rise, right + rise, front_a + rise]), LIGHT)
-        for band in [0.30, 0.62]:
-            var offset := rise * band
+        for band: float in [0.30, 0.62]:
+            var offset: Vector2 = rise * band
             draw_line(front_a + offset, front_b + offset, MORTAR, 1.5)
             draw_line(side_a + offset, front_b + offset, MORTAR, 1.5)
     # Threshold is a floor marking only: leave the entire portal open.
