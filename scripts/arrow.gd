@@ -4,7 +4,11 @@ const SFX = preload("res://scripts/combat_sfx.gd")
 
 var direction: Vector2 = Vector2.RIGHT
 var speed: float = 420.0
-var lifetime: float = 1.5
+var lifetime: float = 2.8
+
+func _ready() -> void:
+    modulate.a = 0.0 # IsometricView renders the projected arrow instead.
+
 
 func _physics_process(delta: float) -> void:
     var previous: Vector2 = global_position
@@ -40,7 +44,7 @@ func _physics_process(delta: float) -> void:
         return
 
     global_position = endpoint
-    if lifetime <= 0.0 or absf(global_position.x) >= 388.0 or absf(global_position.y) >= 258.0:
+    if lifetime <= 0.0:
         queue_free()
         return
     queue_redraw()
