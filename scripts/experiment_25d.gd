@@ -1,11 +1,18 @@
 extends Node3D
 ## Isolated 3D architecture test. Existing 2D scenes and combat remain untouched.
 const SPEED := 5.0
+const GOBLIN_SPEED := 3.5
+const GOBLIN_DETECTION := 12.0
+const GOBLIN_STOP := 1.15
 const DEBUG_OVERLAY = preload("res://scripts/debug_overlay_25d.gd")
 const WALL_HEIGHT := 3.1
 var hero: CharacterBody3D
 var camera: Camera3D
 var goblins: Array[CharacterBody3D] = []
+var wall_occluders: Array[StaticBody3D] = []
+var faded_walls: Dictionary = {}
+var goblin_state := "Idle"
+var goblin_distance := 0.0
 var light_enabled := true
 var camera_yaw := 45.0
 var camera_elevation := 24.0
@@ -79,6 +86,55 @@ func _physics_process(delta: float) -> void:
     hero.velocity = motion * SPEED
     hero.move_and_slide()
     _update_camera_transform(false, delta)
+    _update_goblin()
+    _update_wall_visibility()
+
+func _update_goblin() -> void:
+    if goblins.is_empty():
+        return
+    var goblin := goblins[0]
+    var displacement := hero.global_position - goblin.global_position
+    displacement.y = 0.0
+    goblin_distance = displacement.length()
+    if goblin_distance <= GOBLIN_DETECTION and goblin_distance > GOBLIN_STOP:
+        goblin_state = "Chasing"
+        goblin.velocity = displacement.normalized() * GOBLIN_SPEED
+    else:
+        goblin_state = "Idle" if goblin_distance > GOBLIN_DETECTION else "In range"
+        goblin.velocity = Vector3.ZERO
+    goblin.move_and_slide()
+
+func _update_wall_visibility() -> void:
+    # Raycast from the camera towards the hero, fading walls that block the view.
+    var space := get_world_3d().direct_space_state
+    var origin := camera.global_position
+    var destination := hero.global_position + Vector3(0,0.9,0)
+    var newly_faded: Dictionary = {}
+    for i in range(8):
+        var query := PhysicsRayQueryParameters3D.create(origin,destination)
+        query.collision_mask = 1
+        for body in newly_faded:
+            query.exclude.append(body.get_rid())
+        var hit := space.intersect_ray(query)
+        if hit.is_empty():
+            break
+        var wall: StaticBody3D = hit["collider"] as StaticBody3D
+        if wall == null or not wall_occluders.has(wall):
+            break
+        newly_faded[wall] = true
+    for wall in wall_occluders:
+        var mesh := wall.get_node_or_null("Visual") as MeshInstance3D
+        if mesh == null:
+            continue
+        var material := mesh.material_override as StandardMaterial3D
+        var should_fade := newly_faded.has(wall)
+        if should_fade == faded_walls.has(wall):
+            continue
+        material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if should_fade else BaseMaterial3D.TRANSPARENCY_DISABLED
+        var tint := material.albedo_color
+        tint.a = 0.18 if should_fade else 1.0
+        material.albedo_color = tint
+    faded_walls = newly_faded
 
 func _update_camera_transform(immediate: bool, delta: float = 0.0) -> void:
     var yaw := deg_to_rad(camera_yaw)
@@ -103,8 +159,10 @@ func _make_box(label: String, location: Vector3, size: Vector3, tint: Color, sol
     material.albedo_color = tint
     material.roughness = 1.0
     mesh.material_override = material
+    mesh.name = "Visual"
     body.add_child(mesh)
     if solid:
+        wall_occluders.append(body)
         var collider := CollisionShape3D.new()
         var box := BoxShape3D.new()
         box.size = size
