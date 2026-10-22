@@ -23,8 +23,8 @@ func _draw() -> void:
     draw_colored_polygon(PackedVector2Array([side_back, front_right, front_right + rise, side_back + rise]), STONE_SIDE)
     draw_colored_polygon(PackedVector2Array([back_left + rise, side_back + rise, front_right + rise, front_left + rise]), STONE_TOP)
     # Horizontal courses on both vertical faces.
-    for fraction in [0.25, 0.50, 0.75]:
-        var lift := rise * fraction
+    for fraction: float in [0.25, 0.50, 0.75]:
+        var lift: Vector2 = rise * fraction
         draw_line(front_left + lift, front_right + lift, MORTAR, 1.5)
         draw_line(side_back + lift, front_right + lift, MORTAR, 1.5)
     # Staggered vertical joints along the long side.
