@@ -6,6 +6,9 @@ const WALL_HEIGHT: float = 2.8
 const WALL_THICKNESS: float = 0.22
 var occupied: Dictionary = {}
 var room_by_cell: Dictionary = {}
+var discovered_rooms: Dictionary = {0:true}
+const ROOM_NEIGHBORS := {0:[1],1:[0,2],2:[1]}
+var last_room: int = -1
 var wall_records: Array[Dictionary] = []
 var hero: CharacterBody3D
 var camera: Camera3D
@@ -38,6 +41,7 @@ func _ready() -> void:
     _build_hero()
     _build_camera_and_light()
     _build_label()
+    _refresh_discovery_visuals()
     _update_camera()
     _update_visibility(1.0)
 
@@ -195,7 +199,7 @@ func _toggle_nearby_door() -> void:
         door["closed"] = now_closed
         var visual: MeshInstance3D = door["visual"]
         var collider: CollisionShape3D = door["collider"]
-        visual.visible = now_closed
+        visual.visible = now_closed and (discovered_rooms.has(door["rooms"][0]) or discovered_rooms.has(door["rooms"][1]))
         collider.set_deferred("disabled",not now_closed)
         return
 
@@ -244,7 +248,7 @@ func _build_label() -> void:
     add_child(ui)
     var label := Label.new()
     label.position = Vector2(16,16)
-    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nRoom-owned near walls 4%; closed doors 28%; 0.22s fade. Collision unchanged."
+    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nCurrent + discovered adjacent rooms fade; undiscovered hidden. Walls 4%, doors 28%."
     ui.add_child(label)
 
 func _material(color: Color) -> StandardMaterial3D:
@@ -261,6 +265,12 @@ func _physics_process(_delta: float) -> void:
     hero.velocity = (right.normalized()*input.x-forward.normalized()*input.y).normalized()*5.0
     hero.move_and_slide()
     _update_camera()
+    var room_now: int = _current_room()
+    if room_now >= 0 and room_now != last_room:
+        last_room = room_now
+        if not discovered_rooms.has(room_now):
+            discovered_rooms[room_now] = true
+            _refresh_discovery_visuals()
     _update_visibility(_delta)
 
 func _update_camera() -> void:
@@ -273,8 +283,36 @@ func _update_camera() -> void:
     camera.global_position = hero.global_position+Vector3(sin(angle)*cos(elevation),sin(elevation),cos(angle)*cos(elevation))*26.0
     camera.look_at(hero.global_position+Vector3(0,0.8,0))
 
+func _refresh_discovery_visuals() -> void:
+    # Discovery is permanent during this dungeon visit, independently of fading.
+    for key in occupied:
+        var cell: Vector2i = key
+        var room: int = room_by_cell[cell]
+        var grid_cell := Vector3i(cell.x,0,cell.y)
+        floor_grid.set_cell_item(grid_cell,0 if discovered_rooms.has(room) else -1)
+    for record in wall_records:
+        var visible_room: bool = false
+        for owner in record["owners"]:
+            if discovered_rooms.has(owner):
+                visible_room = true
+                break
+        var visual: MeshInstance3D = record["visual"]
+        visual.visible = visible_room
+    for door in doors:
+        var visible_room: bool = false
+        for room in door["rooms"]:
+            if discovered_rooms.has(room):
+                visible_room = true
+                break
+        var visual: MeshInstance3D = door["visual"]
+        visual.visible = visible_room and bool(door["closed"])
+
 func _update_visibility(delta: float) -> void:
     var current_room: int = _current_room()
+    var fade_rooms: Array = [current_room]
+    for adjacent in ROOM_NEIGHBORS.get(current_room,[]):
+        if discovered_rooms.has(adjacent):
+            fade_rooms.append(adjacent)
     var toward_camera := camera.global_position-hero.global_position
     toward_camera.y = 0.0
     toward_camera = toward_camera.normalized()
@@ -288,7 +326,12 @@ func _update_visibility(delta: float) -> void:
             if direction.dot(toward_camera)>0.1:
                 camera_facing = true
                 break
-        var fade: bool = cutaway and owners.has(current_room) and camera_facing
+        var eligible: bool = false
+        for owner in owners:
+            if fade_rooms.has(owner):
+                eligible = true
+                break
+        var fade: bool = cutaway and eligible and camera_facing
         var target: float = 0.04 if fade else 1.0
         var alpha: float = lerpf(float(record["alpha"]),target,blend)
         record["alpha"] = alpha
@@ -301,7 +344,12 @@ func _update_visibility(delta: float) -> void:
         var local_x: float = position.x-floor_origin.x
         var normal := Vector3(-1,0,0) if current_room == (0 if local_x<0 else 1) else Vector3(1,0,0)
         var front: bool = normal.dot(toward_camera)>0.1
-        var fade: bool = cutaway and door["rooms"].has(current_room) and front
+        var eligible: bool = false
+        for room in door["rooms"]:
+            if fade_rooms.has(room) and discovered_rooms.has(room):
+                eligible = true
+                break
+        var fade: bool = cutaway and eligible and front
         var target: float = 0.28 if fade else 1.0
         var alpha: float = lerpf(float(door["alpha"]),target,blend)
         door["alpha"] = alpha
