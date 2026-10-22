@@ -6,9 +6,12 @@ var clock := 0.0
 var attack_remaining := 0.0
 var hit_remaining := 0.0
 var bow: Node3D
+var previous_yaw := 0.0
+var turn_lean := 0.0
 
 func _ready() -> void:
     actor = get_parent() as CharacterBody3D
+    previous_yaw = actor.rotation.y
     if is_hero:
         _make_bow()
 
@@ -21,6 +24,10 @@ func play_hit() -> void:
 func _process(delta: float) -> void:
     if actor == null:
         return
+    var yaw_change := wrapf(actor.rotation.y - previous_yaw, -PI, PI)
+    previous_yaw = actor.rotation.y
+    var turning := clampf(yaw_change / maxf(delta, 0.001), -3.0, 3.0)
+    turn_lean = lerpf(turn_lean, turning * 0.065, minf(1.0, delta * 9.0))
     clock += delta
     attack_remaining = maxf(0.0, attack_remaining - delta)
     hit_remaining = maxf(0.0, hit_remaining - delta)
@@ -42,7 +49,7 @@ func _process(delta: float) -> void:
             part.rotation.x = swing * 0.65
         elif part.name == "Torso":
             part.position.y = 1.04 + sin(phase * 2.0) * 0.035 * stride + sin(clock * 2.1) * 0.012
-            part.rotation.z = (0.13 if hit_remaining > 0.0 else 0.0)
+            part.rotation.z = turn_lean + (0.13 if hit_remaining > 0.0 else 0.0)
     var right_arm := actor.get_node_or_null("RightArm") as MeshInstance3D
     var left_arm := actor.get_node_or_null("LeftArm") as MeshInstance3D
     if attack_remaining > 0.0:
