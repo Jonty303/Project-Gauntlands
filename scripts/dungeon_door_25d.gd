@@ -32,7 +32,7 @@ func _build() -> void:
         slab.size = Vector3(width - 0.06, 3.1, 0.17)
         mesh.mesh = slab
         var wood := StandardMaterial3D.new()
-        wood.albedo_color = Color("#63462e")
+        wood.albedo_color = Color("#49301e")
         wood.roughness = 0.95
         mesh.material_override = wood
         body.add_child(mesh)
@@ -52,6 +52,26 @@ func _build() -> void:
             metal.albedo_color = Color("#292c30")
             iron.material_override = metal
             body.add_child(iron)
+        # Raised timber boards and a central iron pull.
+        for j in range(3):
+            var plank := MeshInstance3D.new()
+            var plank_box := BoxMesh.new()
+            plank_box.size = Vector3((width - 0.10) / 3.0 - 0.035, 2.85, 0.035)
+            plank.mesh = plank_box
+            plank.position = Vector3((float(j) - 1.0) * (width - 0.10) / 3.0, 0, 0.105)
+            var plank_mat := StandardMaterial3D.new()
+            plank_mat.albedo_color = Color("#735038") if j % 2 == 0 else Color("#62412b")
+            plank.material_override = plank_mat
+            body.add_child(plank)
+        var handle := MeshInstance3D.new()
+        var handle_mesh := BoxMesh.new()
+        handle_mesh.size = Vector3(0.11, 0.3, 0.12)
+        handle.mesh = handle_mesh
+        handle.position = Vector3(width * (0.32 if i == 0 else -0.32), 0, 0.17)
+        var handle_mat := StandardMaterial3D.new()
+        handle_mat.albedo_color = Color("#b09b72")
+        handle.material_override = handle_mat
+        body.add_child(handle)
         panels.append(hinge)
 
 func _build_frame() -> void:
