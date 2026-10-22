@@ -242,7 +242,10 @@ func _draw() -> void:
         draw_circle(foot_position, 4.5, Color("#403a32"))
         draw_line(foot_position, foot_position + forward * 5.0, Color("#665444"), 3.0)
 
-    var torso_center := forward * (1.5 - shot_recoil * 2.5 - bounce)
+    draw_set_transform(Vector2(0, 9), 0.0, Vector2(1.0, 0.4))
+    draw_circle(Vector2.ZERO, 18.0, Color(0.03, 0.04, 0.05, 0.4))
+    draw_set_transform(Vector2.ZERO)
+    var torso_center := forward * (1.5 - shot_recoil * 2.5 - bounce) - Vector2(0, 5)
     draw_circle(torso_center, 11.0, Color("#64745a"))
     draw_line(torso_center - side * 7.0, torso_center + side * 7.0, Color("#394b3c"), 3.0)
     draw_circle(torso_center + forward * 5.0, 6.5, Color("#d6bd83"))
