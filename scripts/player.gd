@@ -1,6 +1,10 @@
 extends CharacterBody2D
 ## Persistent next selection, independent of the enemy committed to this hold.
 
+const SFX = preload("res://scripts/combat_sfx.gd")
+const INPUT_BUFFER := 0.14
+var input_buffer: float = 0.0
+var previous_attack_pressed: bool = false
 const ARROW_SCRIPT = preload("res://scripts/arrow.gd")
 const TARGET_ARC_DOT := 0.5 # 120-degree acquisition arc
 const MAX_TARGET_RANGE := 450.0
@@ -50,6 +54,7 @@ func take_damage(amount: int) -> void:
         defeated = true
         attacking = false
         touch_attack = false
+    SFX.play(self, "hurt")
     queue_redraw()
 
 func _physics_process(delta: float) -> void:
@@ -68,6 +73,11 @@ func _physics_process(delta: float) -> void:
     if Input.is_action_just_pressed("weapon_toggle"):
         toggle_weapon()
     var attack_pressed: bool = touch_attack or Input.is_action_pressed("attack")
+    fire_cooldown = maxf(0.0, fire_cooldown - delta)
+    input_buffer = maxf(0.0, input_buffer - delta)
+    if attack_pressed and not previous_attack_pressed:
+        input_buffer = INPUT_BUFFER
+    previous_attack_pressed = attack_pressed
     if not attack_pressed and direction.length_squared() > 0.001:
         facing_direction = direction.normalized()
     # Refresh before cycling/pressing, including the very first physics frame.
@@ -87,7 +97,6 @@ func _physics_process(delta: float) -> void:
         target = soft_target if weapon_mode == "bow" and _is_enemy_available(soft_target) else null
         attack_has_target = is_instance_valid(target)
         locked_facing = facing_direction
-        fire_cooldown = 0.0
 
     if attacking:
         # Range affects the next selection, never this hold's commitment.
@@ -102,8 +111,8 @@ func _physics_process(delta: float) -> void:
             facing_direction = locked_facing
 
         if attacking:
-            fire_cooldown -= delta
-            if fire_cooldown <= 0.0:
+            if fire_cooldown <= 0.0 and (attack_pressed or input_buffer > 0.0):
+                input_buffer = 0.0
                 if weapon_mode == "bow":
                     _fire_arrow()
                     fire_cooldown = FIRE_INTERVAL
@@ -171,6 +180,7 @@ func _cycle_target(step: int) -> void:
 
 func toggle_weapon() -> void:
     weapon_mode = "sword" if weapon_mode == "bow" else "bow"
+    SFX.play(self, "switch")
     # A held attack cannot silently acquire a new target after switching.
     if attacking:
         attacking = false
@@ -179,6 +189,7 @@ func toggle_weapon() -> void:
     queue_redraw()
 
 func _swing_sword() -> void:
+    SFX.play(self, "swing")
     swing_time = 0.22
     for enemy in get_tree().get_nodes_in_group("enemies"):
         if not _is_enemy_alive(enemy):
@@ -189,6 +200,7 @@ func _swing_sword() -> void:
                 enemy.take_hit(3, "slashing")
 
 func _fire_arrow() -> void:
+    SFX.play(self, "bow")
     var arrow := Node2D.new()
     arrow.set_script(ARROW_SCRIPT)
     get_parent().add_child(arrow)
