@@ -6,6 +6,9 @@ const GOBLIN_DETECTION := 12.0
 const GOBLIN_STOP := 1.15
 const DEBUG_OVERLAY = preload("res://scripts/debug_overlay_25d.gd")
 const DUNGEON_DOOR = preload("res://scripts/dungeon_door_25d.gd")
+const START_ROOM = preload("res://scenes/rooms/starting_chamber.tscn")
+const CORRIDOR_ROOM = preload("res://scenes/rooms/connecting_corridor.tscn")
+const ENCOUNTER_ROOM = preload("res://scenes/rooms/encounter_chamber.tscn")
 const WALL_HEIGHT := 3.1
 const WINDOW_FADE_SPEED := 5.0
 var hero: CharacterBody3D
@@ -28,25 +31,24 @@ var camera_distance := 24.0
 var camera_framing := 0.7
 
 func _ready() -> void:
-    # Enlarged interconnected layout: 26x19 main room, 6x5 corridor, 11x13 chamber.
-    _make_box("Floor", Vector3(0,-0.18,0), Vector3(26,0.35,19), Color("#343b43"), false)
-    _make_box("CorridorFloor", Vector3(16,-0.18,0), Vector3(6,0.35,5), Color("#343b43"), false)
-    _make_box("SecondFloor", Vector3(24.5,-0.18,0), Vector3(11,0.35,13), Color("#343b43"), false)
-    _make_box("NorthWall", Vector3(0,1.55,-9.5), Vector3(26.5,WALL_HEIGHT,0.45), Color("#77796f"))
-    _make_box("SouthWall", Vector3(0,1.55,9.5), Vector3(26.5,WALL_HEIGHT,0.45), Color("#77796f"))
-    _make_box("WestWall", Vector3(-13,1.55,0), Vector3(0.45,WALL_HEIGHT,19), Color("#77796f"))
-    for z in [-5.125,5.125]:
-        _make_box("EastDoorJamb", Vector3(13,1.55,z), Vector3(0.45,WALL_HEIGHT,8.75), Color("#77796f"))
+    # Each room owns its own geometry; adjoining sockets align exactly.
+    var start_room := START_ROOM.instantiate()
+    start_room.name = "StartingRoom"
+    add_child(start_room)
+    corridor_root = CORRIDOR_ROOM.instantiate()
+    corridor_root.name = "CorridorRoom"
+    corridor_root.position.x = 16.0
+    add_child(corridor_root)
+    chamber_root = ENCOUNTER_ROOM.instantiate()
+    chamber_root.name = "EncounterRoom"
+    chamber_root.position.x = 24.5
+    add_child(chamber_root)
+    for room in [start_room, corridor_root, chamber_root]:
+        for wall in room.get("occluding_walls"):
+            wall_occluders.append(wall)
     _place_door("MainDoor", Vector3(13,0,0), 1.5, false)
-    for z in [-2.7,2.7]:
-        _make_box("CorridorWall", Vector3(16,1.55,z), Vector3(6.2,WALL_HEIGHT,0.4), Color("#77796f"))
-    for z in [-4.0,4.0]:
-        _make_box("SecondDoorJamb", Vector3(19,1.55,z), Vector3(0.45,WALL_HEIGHT,5.0), Color("#77796f"))
     _place_door("HallDoubleDoor", Vector3(19,0,0), 3.0, true)
-    _make_box("SecondNorth", Vector3(24.5,1.55,-6.5), Vector3(11,WALL_HEIGHT,0.45), Color("#77796f"))
-    _make_box("SecondSouth", Vector3(24.5,1.55,6.5), Vector3(11,WALL_HEIGHT,0.45), Color("#77796f"))
-    _make_box("SecondEast", Vector3(30,1.55,0), Vector3(0.45,WALL_HEIGHT,13), Color("#77796f"))
-    _setup_room_concealment()
+    doors[1].reparent(corridor_root, true)
     _make_box("Pillar", Vector3(-3,1.15,-3), Vector3(1.1,2.3,1.1), Color("#666d6c"))
     _decorate_start_room()
     _decorate_chamber()
@@ -195,38 +197,13 @@ func _physics_process(delta: float) -> void:
     _update_wall_visibility()
     _animate_wall_windows(delta)
 
-func _setup_room_concealment() -> void:
-    # Room ownership, not a collection of unrelated visibility toggles.
-    # Keep entrance wall and first door in the visible starting room.
-    corridor_root = Node3D.new()
-    corridor_root.name = "CorridorRoom"
-    add_child(corridor_root)
-    chamber_root = Node3D.new()
-    chamber_root.name = "EncounterRoom"
-    add_child(chamber_root)
-    _move_room_parts(corridor_root, ["CorridorFloor", "CorridorWall", "SecondDoorJamb"])
-    _move_room_parts(chamber_root, ["SecondFloor", "SecondNorth", "SecondSouth", "SecondEast"])
-    # The second doorway is only known once the corridor is discovered.
-    doors[1].reparent(corridor_root, true)
-    corridor_root.visible = false
-    chamber_root.visible = false
-
-func _move_room_parts(destination: Node3D, prefixes: Array[String]) -> void:
-    for child in get_children():
-        if not child is Node3D or child == destination:
-            continue
-        for prefix in prefixes:
-            if child.name.begins_with(prefix):
-                child.reparent(destination, true)
-                break
-
 func _update_room_reveal() -> void:
     if not corridor_revealed and bool(doors[0].get("opened")):
         corridor_revealed = true
-        corridor_root.visible = true
+        corridor_root.call("reveal")
     if not chamber_revealed and corridor_revealed and bool(doors[1].get("opened")):
         chamber_revealed = true
-        chamber_root.visible = true
+        chamber_root.call("reveal")
 
 func _unhandled_key_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
