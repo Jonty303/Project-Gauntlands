@@ -66,13 +66,14 @@ func _ready() -> void:
     _decorate_chamber()
     hero = _make_actor("Hero", Vector3(-5,0,1), Color("#587b9c"))
     _decorate_actor(hero, true)
-    _place_spike_trap(Vector3(5.5, 0, 1.0))
+
     for position in [Vector3(1,0,-2),Vector3(3,0,2),Vector3(24,0,0)]:
         var goblin := _make_actor("Goblin",position,Color("#769557"))
         goblins.append(goblin)
         _decorate_actor(goblin, false)
         goblin_health[goblin] = 35
     goblins[2].reparent(chamber_root, true)
+    _place_spike_trap(Vector3(5.5, 0, 1.0))
     _make_target_marker()
     camera = Camera3D.new()
     camera.name = "IsometricCamera"
@@ -112,9 +113,29 @@ func _place_spike_trap(location: Vector3) -> void:
     trap.name = "SpikeTrap"
     trap.set_script(SPIKE_TRAP)
     trap.position = location
-    trap.call("configure", hero)
-    trap.connect("triggered", Callable(self, "_take_hero_damage"))
+    var victims: Array[CharacterBody3D] = [hero]
+    victims.append_array(goblins)
+    trap.call("configure", victims)
+    trap.connect("triggered", Callable(self, "_on_trap_triggered"))
     add_child(trap)
+
+func _on_trap_triggered(victim: CharacterBody3D, amount: int) -> void:
+    if victim == hero:
+        _take_hero_damage(amount)
+        return
+    if not goblin_health.has(victim):
+        return
+    goblin_health[victim] = int(goblin_health[victim]) - amount
+    combat_log = "Spike trap hit goblin! -%d HP" % amount
+    victim.get_node("Animator").call("play_hit")
+    if int(goblin_health[victim]) <= 0:
+        goblins.erase(victim)
+        goblin_health.erase(victim)
+        if target == victim:
+            target = null
+            attack_timer = INF
+        victim.queue_free()
+        combat_log = "Goblin killed by spike trap"
 
 func _take_hero_damage(amount: int) -> void:
     if hero_dead:
