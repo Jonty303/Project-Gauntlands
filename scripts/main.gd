@@ -42,7 +42,7 @@ func _ready() -> void:
         iso_camera.ignore_rotation = false
         iso_camera.rotation = -PI / 4.0
         # Non-uniform scale compresses the diamond vertical axis.
-        iso_camera.zoom = Vector2(0.92, 0.65)
+        iso_camera.zoom = Vector2(0.75, 0.56)
     _add_doorframe(Vector2(400.0, 0.0))
     _add_doorframe(Vector2(570.0, 0.0))
 
