@@ -1,4 +1,5 @@
 extends Node2D
+const SFX = preload("res://scripts/combat_sfx.gd")
 ## Swept projectile collision: walls and enemies compete for the earliest impact.
 
 var direction: Vector2 = Vector2.RIGHT
@@ -34,6 +35,7 @@ func _physics_process(delta: float) -> void:
         queue_free()
         return
     if not wall_hit.is_empty():
+        SFX.play(get_parent(), "wall")
         queue_free()
         return
 
