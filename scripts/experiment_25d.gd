@@ -6,6 +6,7 @@ const GOBLIN_DETECTION := 12.0
 const GOBLIN_STOP := 1.65
 const GOBLIN_ATTACK_COOLDOWN := 1.45
 const GOBLIN_WINDUP := 0.48
+const COMBAT_LOG_UI = preload("res://scripts/combat_log_25d.gd")
 const SPIKE_TRAP = preload("res://scripts/spike_trap_25d.gd")
 const CHARACTER_ANIMATION = preload("res://scripts/character_animation_25d.gd")
 const DEBUG_OVERLAY = preload("res://scripts/debug_overlay_25d.gd")
@@ -32,7 +33,12 @@ var target: CharacterBody3D
 var target_marker: MeshInstance3D
 var attack_held := false
 var attack_timer := 0.0
-var combat_log := "Ready"
+var combat_log := "Ready":
+    set(value):
+        combat_log = value
+        if is_instance_valid(combat_log_ui):
+            combat_log_ui.call("add_message", value)
+var combat_log_ui: CanvasLayer
 var goblin_health: Dictionary = {}
 var goblin_home: Dictionary = {}
 var goblin_ai: Dictionary = {}
@@ -93,6 +99,11 @@ func _ready() -> void:
     overlay.set_script(DEBUG_OVERLAY)
     overlay.call("configure", camera, hero, self)
     add_child(overlay)
+    combat_log_ui = CanvasLayer.new()
+    combat_log_ui.name = "CombatHistory"
+    combat_log_ui.set_script(COMBAT_LOG_UI)
+    add_child(combat_log_ui)
+    combat_log_ui.call("add_message", "Entered the dungeon. L: combat history")
     var sun := DirectionalLight3D.new()
     sun.rotation_degrees = Vector3(-55,-35,0)
     sun.light_energy = 0.5
