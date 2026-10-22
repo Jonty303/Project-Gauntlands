@@ -21,16 +21,16 @@ func reveal() -> void:
 
 func _build() -> void:
     _box("Floor", Vector3(0,-0.18,0), Vector3(room_width,0.35,room_depth), floor_color, false)
-    _box("NorthWall", Vector3(0,1.55,-room_depth*0.5), Vector3(room_width+0.45,WALL_HEIGHT,0.45), stone_color)
+    _box("NorthWall", Vector3(0,1.55,-room_depth*0.5), Vector3(room_width-0.45,WALL_HEIGHT,0.45), stone_color)
     _box("SouthWall", Vector3(0,1.55,room_depth*0.5), Vector3(room_width+0.45,WALL_HEIGHT,0.45), stone_color)
     _end_wall("West", -room_width*0.5, west_opening)
     _end_wall("East", room_width*0.5, east_opening)
 
 func _end_wall(side: String, x: float, opening: float) -> void:
     if opening <= 0.0:
-        _box(side+"Wall", Vector3(x,1.55,0), Vector3(0.45,WALL_HEIGHT,room_depth), stone_color)
+        _box(side+"Wall", Vector3(x,1.55,0), Vector3(0.45,WALL_HEIGHT,room_depth-0.45), stone_color)
         return
-    var segment := (room_depth-opening)*0.5
+    var segment := (room_depth - 0.45 - opening) * 0.5
     if segment <= 0.0:
         return
     for sign in [-1.0,1.0]:
