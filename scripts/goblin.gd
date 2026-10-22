@@ -163,7 +163,7 @@ func take_hit(base_damage: int = 2, damage_type: String = "piercing") -> void:
     queue_redraw()
 
 func _draw() -> void:
-    draw_set_transform(Vector2.ZERO, -PI / 4.0)
+    draw_set_transform(Vector2.ZERO, -PI / 4.0, Vector2(1.55, 1.55))
     if debug_ai and alive:
         var debug_color := Color("#72dca3") if state == "CHASE" else Color("#e3b76a") if state == "RETURN" else Color("#b3bac8")
         draw_string(ThemeDB.fallback_font, Vector2(-22, -55), state, HORIZONTAL_ALIGNMENT_LEFT, -1, 12, debug_color)
@@ -201,4 +201,4 @@ func _draw() -> void:
 func draw_ellipse_shadow() -> void:
     draw_set_transform(Vector2(0, 8), 0.0, Vector2(1.0, 0.38))
     draw_circle(Vector2.ZERO, 18.0, Color(0.03, 0.04, 0.05, 0.45))
-    draw_set_transform(Vector2.ZERO, -PI / 4.0)
+    draw_set_transform(Vector2.ZERO, -PI / 4.0, Vector2(1.55, 1.55))
