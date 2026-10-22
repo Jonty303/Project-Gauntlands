@@ -108,9 +108,12 @@ func _library_item(library: MeshLibrary, id: int, label: String, dimensions: Vec
     box.material = material
     library.set_item_mesh(id,box)
     if collision:
+        # Grid cell y=1 centres at 2m; offset 0.5m so wall base rests at y=0.
+        library.set_item_mesh_transform(id,Transform3D(Basis.IDENTITY,Vector3(0,-0.5,0)))
+    if collision:
         var shape := BoxShape3D.new()
         shape.size = dimensions
-        library.set_item_shapes(id,[shape,Transform3D.IDENTITY])
+        library.set_item_shapes(id,[shape,Transform3D(Basis.IDENTITY,Vector3(0,-0.5,0))])
 
 func _place_wall(x: int, z: int) -> void:
     var cell := Vector3i(x,1,z)
@@ -124,7 +127,7 @@ func _place_wall(x: int, z: int) -> void:
     top.size = Vector3(CELL,0.06,CELL)
     accent.mesh = top
     accent.material_override = _material(Color("#aeb0a4"))
-    accent.position = Vector3(x*CELL, CELL+WALL_HEIGHT*0.5+0.03,z*CELL)
+    accent.position = Vector3(x*CELL, WALL_HEIGHT+0.03,z*CELL)
     add_child(accent)
     wall_visuals.append({"accent":accent,"position":Vector3(x*CELL,0,z*CELL),"cell":cell})
 
