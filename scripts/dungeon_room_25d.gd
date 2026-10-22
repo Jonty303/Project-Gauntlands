@@ -22,7 +22,7 @@ func reveal() -> void:
 func _build() -> void:
     _box("Floor", Vector3(0,-0.18,0), Vector3(room_width,0.35,room_depth), floor_color, false)
     _box("NorthWall", Vector3(0,1.55,-room_depth*0.5), Vector3(room_width-0.45,WALL_HEIGHT,0.45), stone_color)
-    _box("SouthWall", Vector3(0,1.55,room_depth*0.5), Vector3(room_width-0.45,WALL_HEIGHT,0.45), stone_color)
+    _box("SouthWall", Vector3(0,1.55,room_depth*0.5), Vector3(room_width+0.45,WALL_HEIGHT,0.45), stone_color)
     _end_wall("West", -room_width*0.5, west_opening)
     _end_wall("East", room_width*0.5, east_opening)
 
@@ -55,7 +55,6 @@ uniform vec4 stone_color : source_color = vec4(0.47,0.48,0.44,1.0);
 uniform vec4 holes[4];
 uniform int hole_count = 0;
 uniform float fade_strength = 0.0;
-uniform float cutaway = 0.0;
 uniform float aspect_ratio = 1.77778;
 void fragment() {
     ALBEDO = stone_color.rgb;
@@ -67,7 +66,7 @@ void fragment() {
         delta.x *= aspect_ratio;
         reveal = max(reveal, 1.0 - smoothstep(holes[i].z*0.55,holes[i].z,length(delta)));
     }
-    ALPHA = mix(1.0 - 0.94 * reveal * fade_strength, 0.12, cutaway);
+    ALPHA = 1.0 - 0.94 * reveal * fade_strength;
 }
 """
         var wall_material := ShaderMaterial.new()
@@ -85,7 +84,7 @@ void fragment() {
         var edge := MeshInstance3D.new()
         edge.name = "StoneEdge"
         var cap := BoxMesh.new()
-        cap.size = Vector3(dimensions.x,0.09,dimensions.z)
+        cap.size = Vector3(dimensions.x+0.06,0.09,dimensions.z+0.06)
         edge.mesh = cap
         edge.position.y = dimensions.y*0.5+0.045
         var edge_material := StandardMaterial3D.new()
