@@ -1,16 +1,16 @@
 extends Node3D
 ## Prototype concealed pressure-plate spike trap. Red outline is a debug clue.
-signal triggered(damage: int)
+signal triggered(victim: CharacterBody3D, damage: int)
 @export var damage := 20
 @export var reset_seconds := 2.5
-var hero: CharacterBody3D
+var actors: Array[CharacterBody3D] = []
 var cooldown := 0.0
 var spikes: Node3D
 var active := false
 var elapsed := 0.0
 
-func configure(player: CharacterBody3D) -> void:
-    hero = player
+func configure(characters: Array[CharacterBody3D]) -> void:
+    actors = characters
 
 func _ready() -> void:
     var border_mat := StandardMaterial3D.new()
@@ -51,13 +51,17 @@ func _physics_process(delta: float) -> void:
             active = false
             var retract := create_tween()
             retract.tween_property(spikes, "position:y", -0.75, 0.25)
-    if hero == null or cooldown > 0.0:
+    if cooldown > 0.0:
         return
-    var offset := hero.global_position - global_position
-    if absf(offset.x) <= 0.95 and absf(offset.z) <= 0.95:
-        cooldown = reset_seconds
-        elapsed = 0.0
-        active = true
-        var rise := create_tween()
-        rise.tween_property(spikes, "position:y", 0.0, 0.12)
-        triggered.emit(damage)
+    for actor in actors:
+        if not is_instance_valid(actor) or not actor.is_inside_tree():
+            continue
+        var offset := actor.global_position - global_position
+        if absf(offset.x) <= 0.95 and absf(offset.z) <= 0.95:
+            cooldown = reset_seconds
+            elapsed = 0.0
+            active = true
+            var rise := create_tween()
+            rise.tween_property(spikes, "position:y", 0.0, 0.12)
+            triggered.emit(actor, damage)
+            break
