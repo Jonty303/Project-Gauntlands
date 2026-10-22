@@ -5,6 +5,11 @@ const ARROW_SCRIPT = preload("res://scripts/arrow.gd")
 const TARGET_ARC_DOT := 0.5 # 120-degree acquisition arc
 const MAX_TARGET_RANGE := 450.0
 const FIRE_INTERVAL := 0.45
+const SWORD_INTERVAL := 0.65
+const SWORD_RANGE := 54.0
+const SWORD_ARC_DOT := 0.35
+var weapon_mode: String = "bow"
+var swing_time: float = 0.0
 @export var move_speed: float = 180.0
 
 var facing_direction: Vector2 = Vector2.DOWN
@@ -60,6 +65,8 @@ func _physics_process(delta: float) -> void:
         direction = touch_direction
     velocity = direction * move_speed
 
+    if Input.is_action_just_pressed("weapon_toggle"):
+        toggle_weapon()
     var attack_pressed: bool = touch_attack or Input.is_action_pressed("attack")
     if not attack_pressed and direction.length_squared() > 0.001:
         facing_direction = direction.normalized()
@@ -77,7 +84,7 @@ func _physics_process(delta: float) -> void:
         target = null
     elif not attacking and not attack_exhausted:
         attacking = true
-        target = soft_target if _is_enemy_available(soft_target) else null
+        target = soft_target if weapon_mode == "bow" and _is_enemy_available(soft_target) else null
         attack_has_target = is_instance_valid(target)
         locked_facing = facing_direction
         fire_cooldown = 0.0
@@ -97,9 +104,14 @@ func _physics_process(delta: float) -> void:
         if attacking:
             fire_cooldown -= delta
             if fire_cooldown <= 0.0:
-                _fire_arrow()
-                fire_cooldown = FIRE_INTERVAL
+                if weapon_mode == "bow":
+                    _fire_arrow()
+                    fire_cooldown = FIRE_INTERVAL
+                else:
+                    _swing_sword()
+                    fire_cooldown = SWORD_INTERVAL
 
+    swing_time = maxf(0.0, swing_time - delta)
     move_and_slide()
     _refresh_soft_target()
     _update_animation(delta)
@@ -157,6 +169,25 @@ func _cycle_target(step: int) -> void:
     else:
         soft_target = candidates[posmod(index + step, candidates.size())]
 
+func toggle_weapon() -> void:
+    weapon_mode = "sword" if weapon_mode == "bow" else "bow"
+    # A held attack cannot silently acquire a new target after switching.
+    if attacking:
+        attacking = false
+        attack_exhausted = true
+        target = null
+    queue_redraw()
+
+func _swing_sword() -> void:
+    swing_time = 0.22
+    for enemy in get_tree().get_nodes_in_group("enemies"):
+        if not _is_enemy_alive(enemy):
+            continue
+        var offset: Vector2 = enemy.global_position - global_position
+        if offset.length() <= SWORD_RANGE and (offset.length_squared() < 0.01 or facing_direction.normalized().dot(offset.normalized()) >= SWORD_ARC_DOT):
+            if enemy.has_method("take_hit"):
+                enemy.take_hit(3, "slashing")
+
 func _fire_arrow() -> void:
     var arrow := Node2D.new()
     arrow.set_script(ARROW_SCRIPT)
@@ -205,6 +236,27 @@ func _draw() -> void:
     draw_circle(torso_center + forward * 5.0, 6.5, Color("#d6bd83"))
     draw_circle(torso_center + forward * 9.0, 2.2, Color("#614d39"))
 
+    if weapon_mode == "sword":
+        var blade_base := torso_center + forward * 12.0 + side * 5.0
+        draw_line(blade_base, blade_base + forward * 25.0, Color("#d6d9de"), 4.0)
+        draw_line(blade_base - side * 7.0, blade_base + side * 7.0, Color("#a77a45"), 3.0)
+        if swing_time > 0.0:
+            draw_arc(Vector2.ZERO, SWORD_RANGE, facing_direction.angle() - acos(SWORD_ARC_DOT), facing_direction.angle() + acos(SWORD_ARC_DOT), 20, Color("#e7d7a0"), 3.0)
+    else:
+        _draw_bow(torso_center, forward, side)
+    draw_string(ThemeDB.fallback_font, Vector2(-37, 42), "SWORD" if weapon_mode == "sword" else "BOW", HORIZONTAL_ALIGNMENT_LEFT, -1, 13, Color("#f4d17d"))
+
+    # Different radii and labels keep both roles visible on the same enemy.
+    if weapon_mode == "bow" and _is_enemy_available(soft_target):
+        var next_position: Vector2 = to_local(soft_target.global_position)
+        draw_arc(next_position, 28.0, 0.0, TAU, 32, Color("#91c7d6"), 2.0)
+        draw_string(ThemeDB.fallback_font, next_position + Vector2(-16, 42), "NEXT", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("#91c7d6"))
+    if weapon_mode == "bow" and attacking and _is_enemy_alive(target):
+        var active_position: Vector2 = to_local(target.global_position)
+        draw_arc(active_position, 22.0, 0.0, TAU, 32, Color("#efcc75"), 3.0)
+        draw_string(ThemeDB.fallback_font, active_position + Vector2(-23, -52), "ACTIVE", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("#efcc75"))
+
+func _draw_bow(torso_center: Vector2, forward: Vector2, side: Vector2) -> void:
     var bow_center := torso_center + forward * (15.0 - shot_recoil * 4.0) + side * 3.0
     var bow_start := bow_center - side * 10.0
     var bow_end := bow_center + side * 10.0
@@ -215,12 +267,3 @@ func _draw() -> void:
     if attacking:
         draw_line(string_pull, bow_center + forward * 10.0, Color("#e6c786"), 2.0)
 
-    # Different radii and labels keep both roles visible on the same enemy.
-    if _is_enemy_available(soft_target):
-        var next_position: Vector2 = to_local(soft_target.global_position)
-        draw_arc(next_position, 28.0, 0.0, TAU, 32, Color("#91c7d6"), 2.0)
-        draw_string(ThemeDB.fallback_font, next_position + Vector2(-16, 42), "NEXT", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("#91c7d6"))
-    if attacking and _is_enemy_alive(target):
-        var active_position: Vector2 = to_local(target.global_position)
-        draw_arc(active_position, 22.0, 0.0, TAU, 32, Color("#efcc75"), 3.0)
-        draw_string(ThemeDB.fallback_font, active_position + Vector2(-23, -52), "ACTIVE", HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color("#efcc75"))
