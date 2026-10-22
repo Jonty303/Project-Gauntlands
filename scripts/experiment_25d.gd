@@ -254,6 +254,8 @@ func _decorate_actor(actor: CharacterBody3D, is_hero: bool) -> void:
 
 func _physics_process(delta: float) -> void:
     if hero_dead:
+        if Input.is_key_pressed(KEY_R):
+            get_tree().reload_current_scene()
         return
     var direction := Input.get_vector("move_left","move_right","move_up","move_down")
     # Screen-relative movement: derive the ground-plane axes from the camera.
