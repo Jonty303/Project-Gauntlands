@@ -77,8 +77,8 @@ func _draw_wall(wall: Rect2) -> void:
     draw_colored_polygon(PackedVector2Array([b,c,c+rise,b+rise]), SIDE)
     draw_colored_polygon(PackedVector2Array([d,c,c+rise,d+rise]), STONE)
     draw_colored_polygon(PackedVector2Array([a+rise,b+rise,c+rise,d+rise]), TOP)
-    for course in [0.25, 0.50, 0.75]:
-        var lift := rise * course
+    for course: float in [0.25, 0.50, 0.75]:
+        var lift: Vector2 = rise * course
         draw_line(b+lift,c+lift,JOINT,1.5)
         draw_line(d+lift,c+lift,JOINT,1.5)
     draw_line(a+rise,b+rise,Color("#c0b9a9"),2.0)
