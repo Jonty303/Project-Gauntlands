@@ -2,6 +2,7 @@
 extends CharacterBody2D
 ## Goblin AI: sight, pursuit, melee, retreat and return home.
 
+const SFX = preload("res://scripts/combat_sfx.gd")
 const CombatResolver = preload("res://scripts/combat_resolver.gd")
 
 const MAX_HEALTH := 10
@@ -137,6 +138,8 @@ func take_hit(base_damage: int = 2, damage_type: String = "piercing") -> void:
     var damage: int = result["damage"]
     combat_text = result["result"] if damage == 0 else str(damage) + (" CRIT!" if result["result"] == "CRIT!" else "")
     combat_text_time = 0.7
+    if damage > 0:
+        SFX.play(self, "hit")
     health -= damage
 
     if health <= 0:
