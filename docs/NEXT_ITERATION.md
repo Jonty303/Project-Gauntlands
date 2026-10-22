@@ -1,28 +1,34 @@
 # Architecture lab: next iteration
 
-Continue this work on `experiment/architecture-lab`. Keep the architecture and visibility experiments isolated from the original playable combat prototype.
+Continue on `experiment/architecture-lab`. Keep experiments separate from the
+playable combat prototype and retain Godot 4.5.2 compatibility.
 
-## Starting point
+## Current state
 
-The branch tip inspected on 22 October 2026 was `c3bba4022e17f30d941775ab94d9e497939d9217` (`Fix GridMap floor collision shape registration`). This commit corrects MeshLibrary collision registration to use alternating Shape3D and Transform3D entries and adds `tests/grid_floor_collision_test.gd`.
+Iteration 2 implements modular graph-based discovery, owned foreground normals
+for walls and doors, stable logical floor-region ownership, and 0.22-second
+opacity transitions. The active lab is `scenes/grid_geometry_audit_25d.tscn`.
+See [iteration 2 results](ITERATION_2_RESULTS.md) for architecture, commands,
+regression coverage, version results and limitations; the earlier geometry work
+is recorded in [iteration 1 results](ITERATION_1_RESULTS.md).
 
-Recent preceding commits:
+Physical geometry and collision remain the tested iteration 1 system. The
+visibility module never changes collision. New room layouts must supply explicit
+reciprocal adjacency, unique room IDs, logical cell ownership, and matching
+room/normal pairs for shared surfaces; do not infer adjacency from distance.
 
-- `a5f5971`: Decouple floor discovery visuals from persistent GridMap collision.
-- `41b379c`: Ground hero on collidable GridMap tiles and build complete doorway partition returns.
-- `0108851`: Add persistent room discovery and one-hop discovered-adjacent visibility fading.
+## Remaining acceptance work
 
-The earlier `experiment/2point5d` branch ends at `b4588af` (`Remove faulty room-aware wall cutaway while retaining all gameplay and chest improvements`). The architecture lab is the branch for the remaining work below.
-
-## Remaining work and acceptance checks
-
-All items remain to be verified in Godot 4.5.2; this document does not certify runtime behavior.
-
-1. Confirm the floor collision fix remains reliable during movement. Run the existing floor collision test and move the hero across floor tile boundaries and door thresholds, including while room visibility changes. Confirm the hero remains supported without falling through floors.
-2. Verify walls and doorway returns align correctly. Inspect boundaries, corners, door openings, and return geometry using the same coordinate system as floors and character movement. Check for gaps, overlaps, and unintended obstruction.
-3. Keep undiscovered rooms hidden. Confirm their visuals remain hidden until discovery, and that discovered rooms retain their discovery state after leaving and returning.
-4. Make foreground walls approximately 4% opaque in the current room and discovered adjacent rooms. Verify the behavior across camera orientations and ensure it does not reveal undiscovered rooms.
-5. Make closed foreground doors approximately 28% opaque. Verify the foreground classification and opacity as the camera rotates and the hero changes rooms.
-6. Preserve wall and door collision regardless of visual transparency. Confirm faded walls and closed doors still block movement; opening a door should retain its intended gameplay behavior.
-7. Test transitions between rooms and camera rotations. Repeat movement, discovery, wall fading, door fading, and collision checks before, during, and after transitions and rotations. Record what passed and what remains unverified.
-8. Do not migrate the architecture into the playable combat scene until the lab is stable. Establish stability by completing the checks above and preserving existing gameplay.
+1. Inspect the lab interactively in Godot 4.5.2. Review hidden rooms, shared
+   boundaries, alpha sorting, corners, doorway returns and foreground readability
+   at every camera orientation. Automated headless checks do not certify rendered
+   appearance.
+2. Exercise diagonal and edge-of-opening movement in addition to the automated
+   center-line routes, including rotations during transitions and door toggles.
+3. Before supporting transformed or procedural layouts, extend the geometry and
+   visibility tests with those layouts and coordinate transforms.
+4. Keep all three regression suites passing: room visibility, architecture lab,
+   and GridMap floor collision. Preserve 4.5.2 compatibility and report behavior
+   differences on other engine versions.
+5. Do not migrate the architecture into the playable combat scene until the
+   remaining visual checks are completed. No new gameplay is part of this work.
