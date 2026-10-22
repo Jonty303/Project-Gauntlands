@@ -19,11 +19,10 @@ func check(condition: bool, description: String) -> void:
         push_error(description)
 
 func enemy(at: Vector2) -> Node2D:
-    var goblin := Node2D.new()
-    goblin.set_script(GOBLIN)
+    var goblin := GOBLIN.new()
     arena.add_child(goblin)
     goblin.position = at
-    goblin.set_process(false)
+    goblin.set_physics_process(false)
     return goblin
 
 func tick() -> void:
@@ -161,7 +160,7 @@ func _run() -> void:
     arena.add_child(projectile)
     projectile.position = Vector2(70, 0)
     projectile.direction = Vector2.RIGHT
-    projectile._process(0.1)
+    projectile._physics_process(0.1)
     check(projectile.is_queued_for_deletion() and victim.combat_text != "", "Swept projectile contact invokes goblin hit resolution")
 
     arena.free()

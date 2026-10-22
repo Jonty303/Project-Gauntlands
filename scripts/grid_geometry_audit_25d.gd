@@ -310,11 +310,11 @@ func _material(color: Color) -> StandardMaterial3D:
 
 func _physics_process(_delta: float) -> void:
     var input := Input.get_vector("move_left","move_right","move_up","move_down")
-    var right := camera.global_transform.basis.x
-    var forward := -camera.global_transform.basis.z
-    right.y = 0
-    forward.y = 0
-    var planar := (right.normalized()*input.x-forward.normalized()*input.y).normalized()*5.0
+    # Yaw defines screen-relative motion even when the camera looks straight down.
+    var angle := deg_to_rad(camera_yaw)
+    var right := Vector3(cos(angle),0,-sin(angle))
+    var back := Vector3(sin(angle),0,cos(angle))
+    var planar := (right*input.x+back*input.y).normalized()*5.0
     hero.velocity.x = planar.x
     hero.velocity.z = planar.z
     hero.velocity.y -= 20.0*_delta
@@ -326,11 +326,11 @@ func _physics_process(_delta: float) -> void:
     _update_visibility(_delta)
 
 func _update_camera() -> void:
-    if top_down:
-        camera.global_position = hero.global_position+Vector3(0,28,0.01)
-        camera.look_at(hero.global_position)
-        return
     var angle := deg_to_rad(camera_yaw)
+    if top_down:
+        camera.global_position = hero.global_position+Vector3(0,28,0)
+        camera.look_at(hero.global_position, Vector3(-sin(angle),0,-cos(angle)))
+        return
     var elevation := deg_to_rad(24.0)
     camera.global_position = hero.global_position+Vector3(sin(angle)*cos(elevation),sin(elevation),cos(angle)*cos(elevation))*26.0
     camera.look_at(hero.global_position+Vector3(0,0.8,0))
@@ -360,9 +360,10 @@ func _refresh_discovery_visuals() -> void:
         visual.visible = visible_room and bool(door["closed"])
 
 func _update_visibility(delta: float) -> void:
-    var toward_camera := camera.global_position-hero.global_position
-    toward_camera.y = 0.0
-    toward_camera = toward_camera.normalized()
+    # Top-down has no horizontal camera offset. Use the selected yaw in both
+    # views so rotating or toggling overhead cannot choose an arbitrary face.
+    var angle := deg_to_rad(camera_yaw)
+    var toward_camera := Vector3(sin(angle),0,cos(angle))
     for record in wall_records:
         var fade: bool = cutaway and visibility.faces_camera(record["owners"], record["normals"], toward_camera)
         _transition_opacity(record, 0.04 if fade else 1.0, delta)

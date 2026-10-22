@@ -21,23 +21,73 @@ func frame() -> void:
 func supported() -> bool:
     return lab.hero.is_on_floor() and absf(lab.hero.position.y - (lab.floor_origin.y + 0.09)) < 0.02
 
-func walk(direction: Vector3, frames: int) -> bool:
-    # Convert world direction to camera-relative input, exercising production physics.
-    var right: Vector3 = lab.camera.global_basis.x
-    var back: Vector3 = lab.camera.global_basis.z
-    right.y = 0
-    back.y = 0
-    var input := Vector2(direction.dot(right.normalized()), direction.dot(back.normalized()))
-    for entry in [["move_right", input.x], ["move_left", -input.x], ["move_down", input.y], ["move_up", -input.y]]:
-        if entry[1] > 0.0001:
-            Input.action_press(entry[0], entry[1])
+func walk(direction: Vector3, frames: int, rotate: bool = false) -> bool:
     var stable := true
     for i in range(frames):
+        if rotate and i % 4 == 0:
+            var event := InputEventKey.new()
+            event.pressed = true
+            event.keycode = KEY_E
+            lab._unhandled_key_input(event)
+            lab._update_camera()
+        set_walk_input(direction)
         await frame()
         stable = stable and supported()
     for action in ["move_right", "move_left", "move_down", "move_up"]:
         Input.action_release(action)
     return stable
+
+func set_walk_input(direction: Vector3) -> void:
+    # Convert world direction to camera-relative input, exercising production physics.
+    var right: Vector3 = lab.camera.global_basis.x
+    var back: Vector3 = lab.camera.global_basis.z
+    if lab.top_down:
+        back = -lab.camera.global_basis.y
+    right.y = 0
+    back.y = 0
+    var input := Vector2(direction.dot(right.normalized()), direction.dot(back.normalized()))
+    for action in ["move_right", "move_left", "move_down", "move_up"]:
+        Input.action_release(action)
+    for entry in [["move_right", input.x], ["move_left", -input.x], ["move_down", input.y], ["move_up", -input.y]]:
+        if entry[1] > 0.0001:
+            Input.action_press(entry[0], entry[1])
+
+func edge_routes() -> void:
+    # Capsule radius .34 leaves .035m clearance at +/- .50 in the 1.75m opening.
+    # Diagonals cross the opening center and approach opposite sides of the jamb.
+    for index in [0, 1]:
+        for direction in [-1.0, 1.0]:
+            for route in [-0.5, 0.5, -0.3, 0.3]:
+                lab = SCENE.instantiate()
+                root.add_child(lab)
+                var door: Dictionary = lab.doors[index]
+                lab.hero.position = Vector3(door.center.x - direction * 1.5, lab.floor_origin.y + 0.09, door.center.z + route)
+                for i in range(5):
+                    await frame()
+                var from_room: int = index if direction > 0 else index + 1
+                var to_room: int = index + 1 if direction > 0 else index
+                check(lab._current_room() == from_room, "Edge route starts in correct region")
+                var discovered_before: int = lab.discovered_rooms.size()
+                lab._toggle_nearby_door()
+                await frame()
+                check(not door.closed and door.collider.disabled, "Edge route opens door")
+                lab.top_down = route > 0
+                lab._update_camera()
+                var diagonal: float = -route / 1.5 if absf(route) < 0.4 else 0.0
+                check(await walk(Vector3(direction, 0, diagonal).normalized(), 38, true), "Supported while rotating through edge/diagonal route")
+                check((lab.hero.position.x - door.center.x) * direction > 1.2, "Edge/diagonal route clears jamb")
+                check(lab._current_room() == to_room, "Crossing while rotating changes region")
+                check(lab.discovered_rooms.has(from_room) and lab.discovered_rooms.has(to_room), "Both crossed regions remain discovered")
+                check(lab.discovered_rooms.size() >= discovered_before, "Rotation cannot revoke discovery")
+                for cell in lab.floor_visuals:
+                    check(lab.floor_visuals[cell].visible == lab.discovered_rooms.has(lab.room_by_cell[cell]), "Crossing updates discovered floor visibility")
+                lab._toggle_nearby_door()
+                await frame()
+                check(door.closed and not door.collider.disabled, "Door closes after rotated passage")
+                check(await walk(Vector3(-direction, 0, 0), 30, true), "Supported approaching closed door at edge")
+                check((lab.hero.position.x - door.center.x) * direction > 0.35, "Closed door still blocks after rotations")
+                lab.queue_free()
+                await process_frame
 
 func geometry() -> void:
     var bounds: Array[AABB] = []
@@ -126,5 +176,6 @@ func run() -> void:
         print("Completed movement and collision checks at yaw ", yaw)
         lab.queue_free()
         await process_frame
+    await edge_routes()
     print("Architecture lab: %d checks, %d failures" % [checks, failures])
     quit(1 if failures else 0)

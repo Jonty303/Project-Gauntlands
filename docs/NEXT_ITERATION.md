@@ -5,6 +5,10 @@ playable combat prototype and retain Godot 4.5.2 compatibility.
 
 ## Current state
 
+Iteration 3 adds isolated [lab Web export](WEB_ARCHITECTURE_LAB.md), consistent
+overhead yaw/movement/fading, and rotating edge/diagonal doorway regressions.
+See [iteration 3 results](ITERATION_3_RESULTS.md) for validation and limitations.
+
 Iteration 2 implements modular graph-based discovery, owned foreground normals
 for walls and doors, stable logical floor-region ownership, and 0.22-second
 opacity transitions. The active lab is `scenes/grid_geometry_audit_25d.tscn`.
@@ -23,8 +27,9 @@ room/normal pairs for shared surfaces; do not infer adjacency from distance.
    boundaries, alpha sorting, corners, doorway returns and foreground readability
    at every camera orientation. Automated headless checks do not certify rendered
    appearance.
-2. Exercise diagonal and edge-of-opening movement in addition to the automated
-   center-line routes, including rotations during transitions and door toggles.
+2. Visually review diagonal and edge-of-opening movement, including rotations
+   during transitions and door toggles. Iteration 3 automates these routes with
+   production physics; full interactive appearance review remains outstanding.
 3. Before supporting transformed or procedural layouts, extend the geometry and
    visibility tests with those layouts and coordinate transforms.
 4. Keep all three regression suites passing: room visibility, architecture lab,

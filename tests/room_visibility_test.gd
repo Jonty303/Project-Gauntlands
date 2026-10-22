@@ -117,6 +117,20 @@ func run() -> void:
                 var front := (expected_rooms.has(door.rooms[0]) and view.x > 0.1) or (expected_rooms.has(door.rooms[1]) and view.x < -0.1)
                 check(is_equal_approx(door.alpha, 0.28 if front else 1.0), "Closed door camera-facing opacity")
             check(collision_state(lab) == before, "All collision unchanged after rotation and fade")
+            var wall_alphas: Array = lab.wall_records.map(func(record): return record.alpha)
+            var door_alphas: Array = lab.doors.map(func(record): return record.alpha)
+            lab.top_down = true
+            lab._update_camera()
+            lab._update_visibility(0.0)
+            check(lab.wall_records.map(func(record): return record.alpha) == wall_alphas, "Overhead toggle has no alpha jump")
+            lab._update_visibility(0.22)
+            check(lab.wall_records.map(func(record): return record.alpha) == wall_alphas, "Overhead preserves selected wall facing")
+            check(lab.doors.map(func(record): return record.alpha) == door_alphas, "Overhead preserves selected door facing")
+            var expected_right := Vector3(cos(deg_to_rad(yaw)), 0, -sin(deg_to_rad(yaw)))
+            check(lab.camera.global_basis.x.is_equal_approx(expected_right), "Overhead camera follows selected yaw")
+            check(lab._current_room() == room and collision_state(lab) == before, "Overhead preserves ownership and collision")
+            lab.top_down = false
+            lab._update_camera()
         lab.cutaway = false
         lab._update_visibility(0.22)
         for wall in lab.wall_records:
