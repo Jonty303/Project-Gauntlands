@@ -24,10 +24,11 @@ func _build() -> void:
         var body := StaticBody3D.new()
         body.name = "Leaf%d" % i
         body.position.x = width * 0.5 if i == 0 else -width * 0.5
+        body.position.y = 1.55
         hinge.add_child(body)
         var mesh := MeshInstance3D.new()
         var slab := BoxMesh.new()
-        slab.size = Vector3(width - 0.06, 2.55, 0.17)
+        slab.size = Vector3(width - 0.06, 3.1, 0.17)
         mesh.mesh = slab
         var wood := StandardMaterial3D.new()
         wood.albedo_color = Color("#63462e")
