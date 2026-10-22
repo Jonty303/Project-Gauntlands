@@ -52,6 +52,7 @@ func _ready() -> void:
     hero = _make_actor("Hero", Vector3(-5,0,1), Color("#587b9c"))
     for position in [Vector3(1,0,-2),Vector3(3,0,2),Vector3(24,0,0)]:
         goblins.append(_make_actor("Goblin",position,Color("#769557")))
+    goblins[2].reparent(chamber_root, true)
     camera = Camera3D.new()
     camera.name = "IsometricCamera"
     camera.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -147,8 +148,6 @@ func _update_room_reveal() -> void:
     if not chamber_revealed and corridor_revealed and bool(doors[1].get("opened")):
         chamber_revealed = true
         chamber_root.visible = true
-    if goblins.size() > 2:
-        goblins[2].visible = chamber_revealed
 
 func _unhandled_key_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
@@ -198,7 +197,7 @@ func _update_wall_visibility() -> void:
     var newly_faded: Dictionary = {}
     _collect_camera_occluders(space, hero.global_position + Vector3(0,0.9,0), newly_faded)
     for goblin in goblins:
-        if not is_instance_valid(goblin) or not goblin.visible:
+        if not is_instance_valid(goblin) or not goblin.is_visible_in_tree():
             continue
         var from := hero.global_position + Vector3(0,0.9,0)
         var to := goblin.global_position + Vector3(0,0.9,0)
