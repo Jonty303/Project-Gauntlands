@@ -611,8 +611,8 @@ func _update_room_cutaway() -> void:
             var material := visual.material_override as ShaderMaterial
             if material == null:
                 continue
-            var side := wall.name
-            var foreground := (side.begins_with("North") and toward_camera.z < 0.0) or (side.begins_with("South") and toward_camera.z > 0.0) or (side.begins_with("East") and toward_camera.x > 0.0) or (side.begins_with("West") and toward_camera.x < 0.0)
+            var side: String = str(wall.name)
+            var foreground: bool = (side.begins_with("North") and toward_camera.z < 0.0) or (side.begins_with("South") and toward_camera.z > 0.0) or (side.begins_with("East") and toward_camera.x > 0.0) or (side.begins_with("West") and toward_camera.x < 0.0)
             material.set_shader_parameter("cutaway", 1.0 if room == current and foreground else 0.0)
 
 func _update_wall_visibility() -> void:
