@@ -37,7 +37,7 @@ func _ready() -> void:
     view.name = "IsometricView"
     view.set_script(ISO_VIEW)
     add_child(view)
-    view.configure([Rect2(-DUNGEON_SIZE * 0.5, DUNGEON_SIZE), CORRIDOR, CHAMBER], wall_rects)
+    view.call("configure", [Rect2(-DUNGEON_SIZE * 0.5, DUNGEON_SIZE), CORRIDOR, CHAMBER], wall_rects)
     for child in get_children():
         if child is CharacterBody2D:
             child.modulate.a = 0.0
