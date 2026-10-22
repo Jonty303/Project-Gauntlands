@@ -38,8 +38,11 @@ func _ready() -> void:
     # Camera-only diamond experiment: physics, collision and navigation stay in world coordinates.
     var iso_camera := get_node_or_null("Camera2D") as Camera2D
     if iso_camera != null:
+        # Camera2D ignores its rotation by default: explicitly enable it.
+        iso_camera.ignore_rotation = false
         iso_camera.rotation = -PI / 4.0
-        iso_camera.zoom = Vector2(0.92, 0.72)
+        # Non-uniform scale compresses the diamond vertical axis.
+        iso_camera.zoom = Vector2(0.92, 0.65)
     _add_doorframe(Vector2(400.0, 0.0))
     _add_doorframe(Vector2(570.0, 0.0))
 
