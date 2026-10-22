@@ -12,9 +12,13 @@ var projectiles: Array[Node2D] = []
 var wall_segments: Array[Rect2] = []
 var floor_rooms: Array[Rect2] = []
 
-func configure(room_rects: Array[Rect2], wall_rects: Array[Rect2]) -> void:
-    floor_rooms = room_rects
-    wall_segments = wall_rects
+func configure(room_rects: Array, wall_rects: Array) -> void:
+    floor_rooms.clear()
+    wall_segments.clear()
+    for room: Rect2 in room_rects:
+        floor_rooms.append(room)
+    for wall: Rect2 in wall_rects:
+        wall_segments.append(wall)
     queue_redraw()
 
 func _project(point: Vector2) -> Vector2:
