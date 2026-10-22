@@ -35,6 +35,11 @@ func _ready() -> void:
     _create_wall("SecondCoverWall", SECOND_COVER_CENTER, SECOND_COVER_SIZE)
     _build_navigation()
     _setup_depth_sorting()
+    # Camera-only diamond experiment: physics, collision and navigation stay in world coordinates.
+    var iso_camera := get_node_or_null("Camera2D") as Camera2D
+    if iso_camera != null:
+        iso_camera.rotation = -PI / 4.0
+        iso_camera.zoom = Vector2(0.92, 0.92)
     _add_doorframe(Vector2(400.0, 0.0))
     _add_doorframe(Vector2(570.0, 0.0))
 
