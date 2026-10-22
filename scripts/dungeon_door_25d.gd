@@ -12,6 +12,7 @@ var blockers: Array[CollisionShape3D] = []
 
 func _ready() -> void:
     _build()
+    _build_frame()
 
 func _build() -> void:
     var count := 2 if double_door else 1
@@ -52,6 +53,28 @@ func _build() -> void:
             iron.material_override = metal
             body.add_child(iron)
         panels.append(hinge)
+
+func _build_frame() -> void:
+    var stone := StandardMaterial3D.new()
+    stone.albedo_color = Color("#a1a094")
+    stone.roughness = 1.0
+    for side in [-1.0, 1.0]:
+        var jamb := MeshInstance3D.new()
+        jamb.name = "StoneJamb"
+        var block := BoxMesh.new()
+        block.size = Vector3(0.28, 3.1, 0.48)
+        jamb.mesh = block
+        jamb.position = Vector3(side * (opening_width * 0.5 + 0.13), 1.55, 0)
+        jamb.material_override = stone
+        add_child(jamb)
+    var lintel := MeshInstance3D.new()
+    lintel.name = "StoneLintel"
+    var beam := BoxMesh.new()
+    beam.size = Vector3(opening_width + 0.54, 0.26, 0.52)
+    lintel.mesh = beam
+    lintel.position.y = 3.1
+    lintel.material_override = stone
+    add_child(lintel)
 
 func interact(actor: Node3D) -> void:
     if actor.global_position.distance_to(global_position) > interaction_range:
