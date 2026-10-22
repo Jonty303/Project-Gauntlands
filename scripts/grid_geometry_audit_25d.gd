@@ -156,7 +156,9 @@ func _corner_fill(at: Vector3, owners: Array, normals: Array) -> void:
     _register_wall(visual,at,owners,normals)
 
 func _wall_piece(at: Vector3,along_x: bool,owner: int,outward: Vector3) -> void:
-    var size := Vector3(CELL,WALL_HEIGHT,WALL_THICKNESS) if along_x else Vector3(WALL_THICKNESS,WALL_HEIGHT,CELL)
+    # Each endpoint already owns a thickness-wide corner box. Stop at its face.
+    var span: float = CELL-WALL_THICKNESS
+    var size := Vector3(span,WALL_HEIGHT,WALL_THICKNESS) if along_x else Vector3(WALL_THICKNESS,WALL_HEIGHT,span)
     var solid := StaticBody3D.new()
     solid.position = at+Vector3(0,WALL_HEIGHT*0.5,0)
     add_child(solid)
@@ -185,7 +187,8 @@ func _build_doorway_returns() -> void:
     # Both returns terminate exactly at the jamb, without overlapping the door.
     for x in [-3.0,3.0]:
         for side in [-1.0,1.0]:
-            var length: float = (3.0-0.875)
+            # The exterior corner fills the final half-thickness at the junction.
+            var length: float = (3.0-WALL_THICKNESS*0.5-0.875)
             var z: float = side*(0.875+length*0.5)
             var at: Vector3 = floor_origin+Vector3(x,0,z)
             var owner: int = 0 if x < 0.0 else 2
