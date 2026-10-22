@@ -42,7 +42,7 @@ func _ready() -> void:
     for z in [-4.5,4.5]:
         _make_box("SecondDoorJamb", Vector3(19,1.55,z), Vector3(0.45,WALL_HEIGHT,4), Color("#77796f"))
     for z in [-2.0, 2.0]:
-        _make_box("DoubleDoorFrame", Vector3(19,1.55,z), Vector3(0.45,WALL_HEIGHT,2.0), Color("#77796f"))
+        _make_box("DoubleDoorFrame", Vector3(19,1.55,z), Vector3(0.45,WALL_HEIGHT,1.0), Color("#77796f"))
     _place_door("HallDoubleDoor", Vector3(19,0,0), 3.0, true)
     _make_box("SecondNorth", Vector3(24.5,1.55,-6.5), Vector3(11,WALL_HEIGHT,0.45), Color("#77796f"))
     _make_box("SecondSouth", Vector3(24.5,1.55,6.5), Vector3(11,WALL_HEIGHT,0.45), Color("#77796f"))
