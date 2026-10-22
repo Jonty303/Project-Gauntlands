@@ -344,21 +344,54 @@ func _update_combat(delta: float) -> void:
         attack_timer = INF
 
 func _spawn_arrow(destination: Vector3) -> void:
-    var arrow := MeshInstance3D.new()
+    # The arrow's local -Z axis is its forward direction.
+    var origin := hero.global_position + Vector3(0, 1.25, 0)
+    var flight_direction := destination - origin
+    if flight_direction.length_squared() < 0.001:
+        return
+    var arrow := Node3D.new()
     arrow.name = "Arrow"
-    var shaft := CylinderMesh.new()
-    shaft.top_radius = 0.025
-    shaft.bottom_radius = 0.025
-    shaft.height = 0.65
-    arrow.mesh = shaft
-    var wood := StandardMaterial3D.new()
-    wood.albedo_color = Color("#b58b55")
-    arrow.material_override = wood
     add_child(arrow)
-    var origin := hero.global_position + Vector3(0, 1.2, 0)
     arrow.global_position = origin
+    arrow.look_at(destination, Vector3.UP)
+    var wood := StandardMaterial3D.new()
+    wood.albedo_color = Color("#aa7c45")
+    var steel := StandardMaterial3D.new()
+    steel.albedo_color = Color("#c0c5c8")
+    steel.metallic = 0.55
+    var feather := StandardMaterial3D.new()
+    feather.albedo_color = Color("#d6d0bb")
+    var shaft := MeshInstance3D.new()
+    shaft.name = "Shaft"
+    var shaft_mesh := CylinderMesh.new()
+    shaft_mesh.top_radius = 0.022
+    shaft_mesh.bottom_radius = 0.022
+    shaft_mesh.height = 0.76
+    shaft.mesh = shaft_mesh
+    shaft.rotation.x = PI * 0.5
+    shaft.material_override = wood
+    arrow.add_child(shaft)
+    var tip := MeshInstance3D.new()
+    tip.name = "Arrowhead"
+    var tip_mesh := CylinderMesh.new()
+    tip_mesh.top_radius = 0.0
+    tip_mesh.bottom_radius = 0.085
+    tip_mesh.height = 0.2
+    tip.mesh = tip_mesh
+    tip.rotation.x = -PI * 0.5
+    tip.position.z = -0.47
+    tip.material_override = steel
+    arrow.add_child(tip)
+    for side in [-1.0, 1.0]:
+        var vane := MeshInstance3D.new()
+        var vane_mesh := BoxMesh.new()
+        vane_mesh.size = Vector3(0.12, 0.012, 0.18)
+        vane.mesh = vane_mesh
+        vane.position = Vector3(side * 0.065, 0, 0.29)
+        vane.material_override = feather
+        arrow.add_child(vane)
     var flight := create_tween()
-    flight.tween_property(arrow, "global_position", destination, 0.16)
+    flight.tween_property(arrow, "global_position", destination, 0.19)
     flight.tween_callback(arrow.queue_free)
 
 func _turn_actor(actor: CharacterBody3D, facing: Vector3, delta: float) -> void:
