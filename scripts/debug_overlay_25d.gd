@@ -105,6 +105,12 @@ func _refresh() -> void:
     var p := hero.global_position
     stats.text = "FPS: %d | Position: %.1f, %.1f, %.1f\nSpeed: %.2f m/s" % [Engine.get_frames_per_second(),p.x,p.y,p.z,hero.velocity.length()]
     stats.text += "\nGoblin: %s | Distance: %.1f | Speed: %.1f" % [str(experiment.get("goblin_state")),float(experiment.get("goblin_distance")),3.5]
+    var current_target: CharacterBody3D = experiment.get("target")
+    var target_text := "None"
+    if is_instance_valid(current_target):
+        var health: Dictionary = experiment.get("goblin_health")
+        target_text = "%s (%d HP)" % [current_target.name, int(health.get(current_target, 0))]
+    stats.text += "\nTarget: %s | %s" % [target_text, str(experiment.get("combat_log"))]
     var captions := {"size":"Zoom","camera_elevation":"Elevation","camera_yaw":"Rotation","camera_distance":"Distance","camera_framing":"Framing"}
     for property in captions:
         var label: Label = readouts[property]
