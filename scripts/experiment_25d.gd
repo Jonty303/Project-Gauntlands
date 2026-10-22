@@ -48,6 +48,7 @@ func _ready() -> void:
     _make_box("SecondEast", Vector3(30,1.55,0), Vector3(0.45,WALL_HEIGHT,13), Color("#77796f"))
     _setup_room_concealment()
     _make_box("Pillar", Vector3(-3,1.15,-3), Vector3(1.1,2.3,1.1), Color("#666d6c"))
+    _decorate_start_room()
     hero = _make_actor("Hero", Vector3(-5,0,1), Color("#587b9c"))
     for position in [Vector3(1,0,-2),Vector3(3,0,2),Vector3(24,0,0)]:
         goblins.append(_make_actor("Goblin",position,Color("#769557")))
@@ -83,6 +84,18 @@ func _ready() -> void:
     torch.light_energy = 2.2
     torch.omni_range = 8.0
     add_child(torch)
+
+func _decorate_start_room() -> void:
+    # Low-profile stone courses give the room a first masonry treatment.
+    for x in range(-11, 12, 3):
+        _make_box("NorthStoneCourse", Vector3(float(x), 0.5, -9.22), Vector3(2.75, 0.045, 0.07), Color("#969588"), false)
+        _make_box("SouthStoneCourse", Vector3(float(x), 0.5, 9.22), Vector3(2.75, 0.045, 0.07), Color("#969588"), false)
+    for x in range(-11, 12, 3):
+        for z in range(-7, 8, 3):
+            _make_box("FloorJoint", Vector3(float(x), 0.005, float(z)), Vector3(2.85, 0.012, 0.035), Color("#22282d"), false)
+    # A small stone plinth and an iron brazier beside the first doorway.
+    _make_box("BrazierPlinth", Vector3(10.6,0.24,-3.0), Vector3(0.9,0.48,0.9), Color("#66675f"))
+    _make_box("BrazierBowl", Vector3(10.6,0.58,-3.0), Vector3(0.7,0.2,0.7), Color("#292a29"), false)
 
 func _physics_process(delta: float) -> void:
     var direction := Input.get_vector("move_left","move_right","move_up","move_down")
