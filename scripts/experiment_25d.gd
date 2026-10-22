@@ -11,6 +11,8 @@ const CORRIDOR_ROOM = preload("res://scenes/rooms/connecting_corridor.tscn")
 const ENCOUNTER_ROOM = preload("res://scenes/rooms/encounter_chamber.tscn")
 const WALL_HEIGHT := 3.1
 const WINDOW_FADE_SPEED := 5.0
+const ATTACK_INTERVAL := 0.55
+const ATTACK_RANGE := 11.0
 var hero: CharacterBody3D
 var camera: Camera3D
 var goblins: Array[CharacterBody3D] = []
@@ -22,6 +24,12 @@ var corridor_revealed := false
 var chamber_revealed := false
 var corridor_root: Node3D
 var chamber_root: Node3D
+var target: CharacterBody3D
+var target_marker: MeshInstance3D
+var attack_held := false
+var attack_timer := 0.0
+var combat_log := "Ready"
+var goblin_health: Dictionary = {}
 var goblin_state := "Idle"
 var goblin_distance := 0.0
 var light_enabled := true
@@ -58,7 +66,9 @@ func _ready() -> void:
         var goblin := _make_actor("Goblin",position,Color("#769557"))
         goblins.append(goblin)
         _decorate_actor(goblin, false)
+        goblin_health[goblin] = 35
     goblins[2].reparent(chamber_root, true)
+    _make_target_marker()
     camera = Camera3D.new()
     camera.name = "IsometricCamera"
     camera.projection = Camera3D.PROJECTION_ORTHOGONAL
@@ -191,6 +201,7 @@ func _physics_process(delta: float) -> void:
     var motion: Vector3 = (right * direction.x - up * direction.y).normalized()
     hero.velocity = motion * SPEED
     hero.move_and_slide()
+    _update_combat(delta)
     _update_camera_transform(false, delta)
     _update_goblin()
     _update_room_reveal()
@@ -206,6 +217,9 @@ func _update_room_reveal() -> void:
         chamber_root.call("reveal")
 
 func _unhandled_key_input(event: InputEvent) -> void:
+    if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_TAB:
+        _cycle_target()
+        return
     if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
         var closest: Node3D = null
         var closest_distance := 2.5
@@ -230,10 +244,98 @@ func _place_door(label: String, location: Vector3, width: float, paired: bool) -
     add_child(instance)
     doors.append(instance)
 
+func _make_target_marker() -> void:
+    target_marker = MeshInstance3D.new()
+    target_marker.name = "TargetIndicator"
+    var ring := CylinderMesh.new()
+    ring.top_radius = 0.51
+    ring.bottom_radius = 0.51
+    ring.height = 0.045
+    target_marker.mesh = ring
+    var mat := StandardMaterial3D.new()
+    mat.albedo_color = Color("#e0bd55")
+    mat.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+    target_marker.material_override = mat
+    target_marker.visible = false
+    add_child(target_marker)
+
+func _eligible_targets() -> Array[CharacterBody3D]:
+    var candidates: Array[CharacterBody3D] = []
+    var space := get_world_3d().direct_space_state
+    for enemy in goblins:
+        if not is_instance_valid(enemy) or not enemy.is_visible_in_tree():
+            continue
+        if int(goblin_health.get(enemy, 0)) <= 0:
+            continue
+        if hero.global_position.distance_to(enemy.global_position) > ATTACK_RANGE:
+            continue
+        var query := PhysicsRayQueryParameters3D.create(hero.global_position + Vector3.UP, enemy.global_position + Vector3.UP)
+        query.collision_mask = 1
+        if not space.intersect_ray(query).is_empty():
+            continue
+        candidates.append(enemy)
+    candidates.sort_custom(func(a: CharacterBody3D, b: CharacterBody3D) -> bool:
+        return hero.global_position.distance_squared_to(a.global_position) < hero.global_position.distance_squared_to(b.global_position))
+    return candidates
+
+func _cycle_target() -> void:
+    var candidates := _eligible_targets()
+    if candidates.is_empty():
+        target = null
+        return
+    var index := candidates.find(target)
+    target = candidates[(index + 1) % candidates.size()]
+
+func _update_combat(delta: float) -> void:
+    var candidates := _eligible_targets()
+    if target == null or not candidates.has(target):
+        target = candidates[0] if not candidates.is_empty() else null
+    target_marker.visible = target != null
+    if target != null:
+        target_marker.global_position = target.global_position + Vector3(0, 0.05, 0)
+    var attacking := Input.is_key_pressed(KEY_SPACE) or Input.is_joy_button_pressed(0, JOY_BUTTON_A)
+    if not attacking:
+        attack_held = false
+        attack_timer = 0.0
+        return
+    if not attack_held:
+        attack_held = true
+        attack_timer = 0.0
+    if target == null:
+        return
+    var direction := target.global_position - hero.global_position
+    direction.y = 0.0
+    if direction.length_squared() > 0.001:
+        hero.rotation.y = atan2(-direction.x, -direction.z)
+    attack_timer -= delta
+    if attack_timer > 0.0:
+        return
+    attack_timer = ATTACK_INTERVAL
+    var roll := randf()
+    if roll < 0.15:
+        combat_log = "Miss!"
+        return
+    var critical := roll > 0.92
+    var damage := 15 if critical else 8
+    goblin_health[target] = int(goblin_health[target]) - damage
+    combat_log = ("Critical! " if critical else "Hit! ") + str(damage)
+    if int(goblin_health[target]) <= 0:
+        var fallen := target
+        goblins.erase(fallen)
+        goblin_health.erase(fallen)
+        fallen.queue_free()
+        target = null
+        target_marker.visible = false
+        combat_log = "Goblin defeated"
+        # Require button release before firing at a different target.
+        attack_timer = INF
+
 func _update_goblin() -> void:
     if goblins.is_empty():
         return
     var goblin := goblins[0]
+    if not is_instance_valid(goblin):
+        return
     var displacement := hero.global_position - goblin.global_position
     displacement.y = 0.0
     goblin_distance = displacement.length()
