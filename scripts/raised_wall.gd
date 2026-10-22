@@ -9,9 +9,10 @@ func _draw() -> void:
     var left := -wall_size.x * 0.5
     var right := wall_size.x * 0.5
     var back := -wall_size.y
+    var rise := Vector2(0, -HEIGHT).rotated(-PI / 4.0)
     draw_colored_polygon(PackedVector2Array([
         Vector2(left, 0), Vector2(right, 0),
-        Vector2(right, -HEIGHT), Vector2(left, -HEIGHT)
+        Vector2(right, 0) + rise, Vector2(left, 0) + rise
     ]), FACE)
-    draw_rect(Rect2(Vector2(left, back - HEIGHT), wall_size), TOP)
-    draw_line(Vector2(left, -HEIGHT), Vector2(right, -HEIGHT), Color("#9b9e9b"), 2.0)
+    draw_colored_polygon(PackedVector2Array([Vector2(left, back) + rise, Vector2(right, back) + rise, Vector2(right, 0) + rise, Vector2(left, 0) + rise]), TOP)
+    draw_line(Vector2(left, 0) + rise, Vector2(right, 0) + rise, Color("#9b9e9b"), 2.0)
