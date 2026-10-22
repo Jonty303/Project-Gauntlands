@@ -10,6 +10,9 @@ const COVER_SIZE := Vector2(28.0, 210.0)
 const SECOND_COVER_CENTER := Vector2(-115.0, 85.0)
 const SECOND_COVER_SIZE := Vector2(175.0, 28.0)
 const NAV_CELL := 20.0
+const CORRIDOR_RECT := Rect2(400.0, -48.0, 170.0, 96.0)
+const ROOM_RECT := Rect2(570.0, -165.0, 310.0, 330.0)
+const DOOR_HALF := 45.0
 const WALL_HEIGHT := 38.0
 const WALL_FACE_COLOR := Color("#353d4b")
 const WALL_TOP_COLOR := Color("#78818e")
@@ -19,7 +22,15 @@ func _ready() -> void:
     _create_wall("NorthWall", Vector2(0, -DUNGEON_SIZE.y / 2.0), Vector2(DUNGEON_SIZE.x + WALL_THICKNESS, WALL_THICKNESS))
     _create_wall("SouthWall", Vector2(0, DUNGEON_SIZE.y / 2.0), Vector2(DUNGEON_SIZE.x + WALL_THICKNESS, WALL_THICKNESS))
     _create_wall("WestWall", Vector2(-DUNGEON_SIZE.x / 2.0, 0), Vector2(WALL_THICKNESS, DUNGEON_SIZE.y + WALL_THICKNESS))
-    _create_wall("EastWall", Vector2(DUNGEON_SIZE.x / 2.0, 0), Vector2(WALL_THICKNESS, DUNGEON_SIZE.y + WALL_THICKNESS))
+    _create_wall("EastWallUpper", Vector2(400.0, -157.5), Vector2(WALL_THICKNESS, 225.0))
+    _create_wall("EastWallLower", Vector2(400.0, 157.5), Vector2(WALL_THICKNESS, 225.0))
+    _create_wall("CorridorNorth", Vector2(485.0, -48.0), Vector2(170.0, WALL_THICKNESS))
+    _create_wall("CorridorSouth", Vector2(485.0, 48.0), Vector2(170.0, WALL_THICKNESS))
+    _create_wall("RoomNorth", Vector2(725.0, -165.0), Vector2(310.0, WALL_THICKNESS))
+    _create_wall("RoomSouth", Vector2(725.0, 165.0), Vector2(310.0, WALL_THICKNESS))
+    _create_wall("RoomEast", Vector2(880.0, 0.0), Vector2(WALL_THICKNESS, 330.0))
+    _create_wall("RoomWestUpper", Vector2(570.0, -106.5), Vector2(WALL_THICKNESS, 117.0))
+    _create_wall("RoomWestLower", Vector2(570.0, 106.5), Vector2(WALL_THICKNESS, 117.0))
     _create_wall("CoverWall", COVER_CENTER, COVER_SIZE)
     _create_wall("SecondCoverWall", SECOND_COVER_CENTER, SECOND_COVER_SIZE)
     _build_navigation()
@@ -34,6 +45,20 @@ func _setup_depth_sorting() -> void:
             actor.z_index = 1
     _add_wall_visual(COVER_CENTER, COVER_SIZE)
     _add_wall_visual(SECOND_COVER_CENTER, SECOND_COVER_SIZE)
+    for segment in [
+        [Vector2(0.0, -270.0), Vector2(824.0, 24.0)],
+        [Vector2(0.0, 270.0), Vector2(824.0, 24.0)],
+        [Vector2(-400.0, 0.0), Vector2(24.0, 564.0)],
+        [Vector2(400.0, -157.5), Vector2(24.0, 225.0)],
+        [Vector2(400.0, 157.5), Vector2(24.0, 225.0)],
+        [Vector2(485.0, -48.0), Vector2(170.0, 24.0)],
+        [Vector2(485.0, 48.0), Vector2(170.0, 24.0)],
+        [Vector2(725.0, -165.0), Vector2(310.0, 24.0)],
+        [Vector2(725.0, 165.0), Vector2(310.0, 24.0)],
+        [Vector2(880.0, 0.0), Vector2(24.0, 330.0)],
+        [Vector2(570.0, -106.5), Vector2(24.0, 117.0)],
+        [Vector2(570.0, 106.5), Vector2(24.0, 117.0)]]:
+        _add_wall_visual(segment[0], segment[1])
 
 func _add_wall_visual(center: Vector2, size: Vector2) -> void:
     var visual := Node2D.new()
@@ -45,7 +70,7 @@ func _add_wall_visual(center: Vector2, size: Vector2) -> void:
 
 func _build_navigation() -> void:
     navigation_grid = AStarGrid2D.new()
-    navigation_grid.region = Rect2i(-19, -12, 39, 25)
+    navigation_grid.region = Rect2i(-19, -12, 64, 25)
     navigation_grid.cell_size = Vector2(NAV_CELL, NAV_CELL)
     navigation_grid.offset = Vector2.ZERO
     navigation_grid.diagonal_mode = AStarGrid2D.DIAGONAL_MODE_NEVER
@@ -53,7 +78,10 @@ func _build_navigation() -> void:
     for x in range(navigation_grid.region.position.x, navigation_grid.region.end.x):
         for y in range(navigation_grid.region.position.y, navigation_grid.region.end.y):
             var point := Vector2(x * NAV_CELL, y * NAV_CELL)
-            if _inside_cover(point, COVER_CENTER, COVER_SIZE) or _inside_cover(point, SECOND_COVER_CENTER, SECOND_COVER_SIZE):
+            var within_main := absf(point.x) < 378.0 and absf(point.y) < 248.0
+            var within_corridor := point.x >= 380.0 and point.x < 585.0 and absf(point.y) < 27.0
+            var within_room := point.x >= 585.0 and point.x < 858.0 and absf(point.y) < 143.0
+            if not (within_main or within_corridor or within_room) or _inside_cover(point, COVER_CENTER, COVER_SIZE) or _inside_cover(point, SECOND_COVER_CENTER, SECOND_COVER_SIZE):
                 navigation_grid.set_point_solid(Vector2i(x, y), true)
 
 func _inside_cover(point: Vector2, center: Vector2, size: Vector2) -> bool:
@@ -103,6 +131,12 @@ func _create_wall(wall_name: String, wall_position: Vector2, wall_size: Vector2)
 func _draw() -> void:
     var floor_rect := Rect2(-DUNGEON_SIZE / 2.0, DUNGEON_SIZE)
     draw_rect(floor_rect, FLOOR_COLOR)
+    draw_rect(CORRIDOR_RECT, FLOOR_COLOR)
+    draw_rect(ROOM_RECT, FLOOR_COLOR)
+    for x in range(400, 881, 40):
+        draw_line(Vector2(x, -165), Vector2(x, 165), GRID_COLOR)
+    for y in range(-160, 161, 40):
+        draw_line(Vector2(400, y), Vector2(880, y), GRID_COLOR)
     for x in range(-400, 401, 40):
         draw_line(Vector2(x, -270), Vector2(x, 270), GRID_COLOR)
     for y in range(-270, 271, 40):
@@ -113,5 +147,8 @@ func _draw() -> void:
     draw_rect(Rect2(-half.x - t / 2.0, -half.y - t / 2.0, DUNGEON_SIZE.x + t, t), WALL_COLOR)
     draw_rect(Rect2(-half.x - t / 2.0, half.y - t / 2.0, DUNGEON_SIZE.x + t, t), WALL_COLOR)
     draw_rect(Rect2(-half.x - t / 2.0, -half.y - t / 2.0, t, DUNGEON_SIZE.y + t), WALL_COLOR)
-    draw_rect(Rect2(half.x - t / 2.0, -half.y - t / 2.0, t, DUNGEON_SIZE.y + t), WALL_COLOR)
-    draw_rect(Rect2(COVER_CENTER - COVER_SIZE / 2.0, COVER_SIZE), WALL_COLOR)
+    # East side has a real doorway; its two sections are rendered as raised walls.
+    # Door threshold and frame remain visible while the opening stays traversable.
+    draw_line(Vector2(400, -DOOR_HALF), Vector2(400, DOOR_HALF), Color("#a58a5e"), 3.0)
+    draw_line(Vector2(570, -DOOR_HALF), Vector2(570, DOOR_HALF), Color("#a58a5e"), 3.0)
+    draw_string(ThemeDB.fallback_font, Vector2(624, -95), "CHAMBER II", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#aeb6b9"))
