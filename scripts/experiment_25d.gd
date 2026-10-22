@@ -92,7 +92,7 @@ func _ready() -> void:
     reward_chest = Node3D.new()
     reward_chest.name = "GuardroomChest"
     reward_chest.set_script(LOOT_CHEST)
-    reward_chest.position = Vector3(27.5, 0, 3.7)
+    reward_chest.position = Vector3(3.0, 0, 3.7)
     chamber_root.add_child(reward_chest)
     _make_target_marker()
     camera = Camera3D.new()
