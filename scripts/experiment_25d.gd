@@ -35,17 +35,13 @@ func _ready() -> void:
     _make_box("NorthWall", Vector3(0,1.55,-9.5), Vector3(26.5,WALL_HEIGHT,0.45), Color("#77796f"))
     _make_box("SouthWall", Vector3(0,1.55,9.5), Vector3(26.5,WALL_HEIGHT,0.45), Color("#77796f"))
     _make_box("WestWall", Vector3(-13,1.55,0), Vector3(0.45,WALL_HEIGHT,19), Color("#77796f"))
-    for z in [-6.0,6.0]:
-        _make_box("EastDoorJamb", Vector3(13,1.55,z), Vector3(0.45,WALL_HEIGHT,7), Color("#77796f"))
-    for z in [-1.65, 1.65]:
-        _make_box("NarrowDoorFrame", Vector3(13,1.55,z), Vector3(0.45,WALL_HEIGHT,1.7), Color("#77796f"))
+    for z in [-5.125,5.125]:
+        _make_box("EastDoorJamb", Vector3(13,1.55,z), Vector3(0.45,WALL_HEIGHT,8.75), Color("#77796f"))
     _place_door("MainDoor", Vector3(13,0,0), 1.5, false)
     for z in [-2.7,2.7]:
         _make_box("CorridorWall", Vector3(16,1.55,z), Vector3(6.2,WALL_HEIGHT,0.4), Color("#77796f"))
-    for z in [-4.5,4.5]:
-        _make_box("SecondDoorJamb", Vector3(19,1.55,z), Vector3(0.45,WALL_HEIGHT,4), Color("#77796f"))
-    for z in [-2.0, 2.0]:
-        _make_box("DoubleDoorFrame", Vector3(19,1.55,z), Vector3(0.45,WALL_HEIGHT,1.0), Color("#77796f"))
+    for z in [-4.0,4.0]:
+        _make_box("SecondDoorJamb", Vector3(19,1.55,z), Vector3(0.45,WALL_HEIGHT,5.0), Color("#77796f"))
     _place_door("HallDoubleDoor", Vector3(19,0,0), 3.0, true)
     _make_box("SecondNorth", Vector3(24.5,1.55,-6.5), Vector3(11,WALL_HEIGHT,0.45), Color("#77796f"))
     _make_box("SecondSouth", Vector3(24.5,1.55,6.5), Vector3(11,WALL_HEIGHT,0.45), Color("#77796f"))
@@ -118,16 +114,20 @@ func _setup_room_concealment() -> void:
             hidden_chamber.append(child)
     for item in hidden_corridor + hidden_chamber:
         item.visible = false
+    _make_box("UnexploredCorridor", Vector3(16,-0.01,0), Vector3(6,0.02,5), Color("#12171c"), false)
+    _make_box("UnexploredChamber", Vector3(24.5,-0.01,0), Vector3(11,0.02,13), Color("#12171c"), false)
 
 func _update_room_reveal() -> void:
     if not corridor_revealed and doors.size() > 0 and bool(doors[0].get("opened")):
         corridor_revealed = true
         for item in hidden_corridor:
             item.visible = true
+        get_node("UnexploredCorridor").visible = false
     if not chamber_revealed and doors.size() > 1 and bool(doors[1].get("opened")):
         chamber_revealed = true
         for item in hidden_chamber:
             item.visible = true
+        get_node("UnexploredChamber").visible = false
     if goblins.size() > 2:
         goblins[2].visible = chamber_revealed
 
