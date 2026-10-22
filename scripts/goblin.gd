@@ -129,11 +129,11 @@ func _can_see_player() -> bool:
     var hit: Dictionary = get_world_2d().direct_space_state.intersect_ray(query)
     return hit.is_empty() or hit.get("collider") == player
 
-func take_hit() -> void:
+func take_hit(base_damage: int = 2, damage_type: String = "piercing") -> void:
     if not alive:
         return
 
-    var result: Dictionary = CombatResolver.resolve()
+    var result: Dictionary = CombatResolver.resolve(base_damage, damage_type, {})
     var damage: int = result["damage"]
     combat_text = result["result"] if damage == 0 else str(damage) + (" CRIT!" if result["result"] == "CRIT!" else "")
     combat_text_time = 0.7
