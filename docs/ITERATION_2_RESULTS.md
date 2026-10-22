@@ -88,12 +88,17 @@ non-overlapping geometry. The floor suite raycasts all 69 cells, including hidde
 regions. Neither engine version showed a lab regression or version-specific
 behavior in these checks.
 
-Headless editor scans completed on both versions with sandbox socket-listen
-errors; the first 4.6.3 run also reported unwritable editor settings paths before
-writable XDG directories were supplied. Direct GDScript checks are reported
-separately: all 26 scripts passed on both versions. The earlier iteration 1
-mixed-indentation errors did not reproduce in this checkout. An editor exit code
-alone is not treated as proof of a clean run.
+Headless editor validation was rechecked on 22 October 2026. Both Godot 4.5.2
+and 4.6.3 completed `--headless --editor --quit` with exit code 0 and no errors
+or warnings when run outside the command sandbox, using writable XDG directories.
+The default command sandbox still reproduced socket-listen errors on 4.5.2;
+these are execution restrictions rather than project script failures. The initial
+4.6.3 run also encountered unwritable editor settings paths, addressed by the XDG
+directories. Direct parser validation passed for all 26 scripts on both versions;
+the earlier iteration 1 mixed-indentation errors did not reproduce.
+
+This follow-up changed documentation only. Editor validation was rerun; gameplay
+regression suites and interactive rendering were not rerun for this update.
 
 ## Remaining verification
 
