@@ -71,7 +71,8 @@ func _build_floor_grid() -> void:
     library.set_item_mesh(0,collision_tile)
     var floor_shape := BoxShape3D.new()
     floor_shape.size = Vector3(CELL,0.18,CELL)
-    library.set_item_shapes(0,[{"shape":floor_shape,"transform":Transform3D.IDENTITY}])
+    # MeshLibrary expects alternating Shape3D/Transform3D entries.
+    library.set_item_shapes(0,[floor_shape,Transform3D.IDENTITY])
     var grid := GridMap.new()
     floor_grid = grid
     grid.name = "AuthoritativeFloorGrid"
