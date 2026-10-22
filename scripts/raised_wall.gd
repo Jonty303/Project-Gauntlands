@@ -14,3 +14,4 @@ func _draw() -> void:
         Vector2(right, -HEIGHT), Vector2(left, -HEIGHT)
     ]), FACE)
     draw_rect(Rect2(Vector2(left, back - HEIGHT), wall_size), TOP)
+    draw_line(Vector2(left, -HEIGHT), Vector2(right, -HEIGHT), Color("#9b9e9b"), 2.0)
