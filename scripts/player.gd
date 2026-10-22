@@ -68,6 +68,11 @@ func _physics_process(delta: float) -> void:
     var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
     if touch_direction.length_squared() > 0.001:
         direction = touch_direction
+    # Screen-relative controls converted to logical world-space motion.
+    if direction.length_squared() > 0.001:
+        var screen_x: float = direction.x / 0.82
+        var screen_y: float = direction.y / 0.41
+        direction = Vector2((screen_x + screen_y) * 0.5, (screen_y - screen_x) * 0.5).normalized()
     velocity = direction * move_speed
 
     if Input.is_action_just_pressed("weapon_toggle"):
