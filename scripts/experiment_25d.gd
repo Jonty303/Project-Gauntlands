@@ -4,6 +4,7 @@ const SPEED := 5.0
 const GOBLIN_SPEED := 3.5
 const GOBLIN_DETECTION := 12.0
 const GOBLIN_STOP := 1.15
+const SPIKE_TRAP = preload("res://scripts/spike_trap_25d.gd")
 const CHARACTER_ANIMATION = preload("res://scripts/character_animation_25d.gd")
 const DEBUG_OVERLAY = preload("res://scripts/debug_overlay_25d.gd")
 const DUNGEON_DOOR = preload("res://scripts/dungeon_door_25d.gd")
@@ -31,6 +32,8 @@ var attack_held := false
 var attack_timer := 0.0
 var combat_log := "Ready"
 var goblin_health: Dictionary = {}
+var hero_health := 100
+var hero_dead := false
 var goblin_state := "Idle"
 var goblin_distance := 0.0
 var light_enabled := true
@@ -63,6 +66,7 @@ func _ready() -> void:
     _decorate_chamber()
     hero = _make_actor("Hero", Vector3(-5,0,1), Color("#587b9c"))
     _decorate_actor(hero, true)
+    _place_spike_trap(Vector3(5.5, 0, 1.0))
     for position in [Vector3(1,0,-2),Vector3(3,0,2),Vector3(24,0,0)]:
         var goblin := _make_actor("Goblin",position,Color("#769557"))
         goblins.append(goblin)
@@ -102,6 +106,26 @@ func _ready() -> void:
     torch.light_energy = 2.2
     torch.omni_range = 8.0
     add_child(torch)
+
+func _place_spike_trap(location: Vector3) -> void:
+    var trap := Node3D.new()
+    trap.name = "SpikeTrap"
+    trap.set_script(SPIKE_TRAP)
+    trap.position = location
+    trap.call("configure", hero)
+    trap.connect("triggered", Callable(self, "_take_hero_damage"))
+    add_child(trap)
+
+func _take_hero_damage(amount: int) -> void:
+    if hero_dead:
+        return
+    hero_health = maxi(0, hero_health - amount)
+    combat_log = "Spike trap! -%d HP" % amount
+    hero.get_node("Animator").call("play_hit")
+    if hero_health <= 0:
+        hero_dead = true
+        combat_log = "Hero defeated by trap"
+        hero.velocity = Vector3.ZERO
 
 func _decorate_start_room() -> void:
     # Low-profile stone courses give the room a first masonry treatment.
@@ -198,6 +222,8 @@ func _decorate_actor(actor: CharacterBody3D, is_hero: bool) -> void:
     actor.add_child(animator)
 
 func _physics_process(delta: float) -> void:
+    if hero_dead:
+        return
     var direction := Input.get_vector("move_left","move_right","move_up","move_down")
     # Screen-relative movement: derive the ground-plane axes from the camera.
     var right: Vector3 = camera.global_basis.x
