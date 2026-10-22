@@ -55,7 +55,7 @@ func _process(delta: float) -> void:
 func _add_doorframe(at: Vector2) -> void:
     var frame := Node2D.new()
     frame.set_script(preload("res://scripts/doorframe.gd"))
-    frame.position = at + Vector2(0, DOOR_HALF)
+    frame.position = at
     frame.z_index = 1
     add_child(frame)
 
@@ -172,6 +172,4 @@ func _draw() -> void:
     draw_rect(Rect2(-half.x - t / 2.0, -half.y - t / 2.0, t, DUNGEON_SIZE.y + t), WALL_COLOR)
     # East side has a real doorway; its two sections are rendered as raised walls.
     # Door threshold and frame remain visible while the opening stays traversable.
-    draw_line(Vector2(400, -DOOR_HALF), Vector2(400, DOOR_HALF), Color("#a58a5e"), 3.0)
-    draw_line(Vector2(570, -DOOR_HALF), Vector2(570, DOOR_HALF), Color("#a58a5e"), 3.0)
     draw_string(ThemeDB.fallback_font, Vector2(624, -95), "CHAMBER II", HORIZONTAL_ALIGNMENT_LEFT, -1, 15, Color("#aeb6b9"))
