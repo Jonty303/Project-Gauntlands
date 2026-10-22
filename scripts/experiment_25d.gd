@@ -14,6 +14,10 @@ var goblins: Array[CharacterBody3D] = []
 var wall_occluders: Array[StaticBody3D] = []
 var faded_walls: Dictionary = {}
 var wall_visual_heights: Dictionary = {}
+var door: StaticBody3D
+var door_open := false
+var door_progress := 0.0
+var door_collider: CollisionShape3D
 var goblin_state := "Idle"
 var goblin_distance := 0.0
 var light_enabled := true
@@ -32,6 +36,7 @@ func _ready() -> void:
     _make_box("WestWall", Vector3(-13,1.55,0), Vector3(0.45,WALL_HEIGHT,19), Color("#77796f"))
     for z in [-6.0,6.0]:
         _make_box("EastDoorJamb", Vector3(13,1.55,z), Vector3(0.45,WALL_HEIGHT,7), Color("#77796f"))
+    _make_door()
     for z in [-2.7,2.7]:
         _make_box("CorridorWall", Vector3(16,1.55,z), Vector3(6.2,WALL_HEIGHT,0.4), Color("#77796f"))
     for z in [-4.5,4.5]:
@@ -92,6 +97,60 @@ func _physics_process(delta: float) -> void:
     _update_goblin()
     _update_wall_visibility()
     _animate_cutaway_walls(delta)
+    _animate_door(delta)
+
+func _unhandled_key_input(event: InputEvent) -> void:
+    if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
+        if hero.global_position.distance_to(door.global_position) <= 3.4:
+            door_open = not door_open
+
+func _make_door() -> void:
+    # Hinged wooden door fills the main room's eastern doorway.
+    var hinge := Node3D.new()
+    hinge.name = "DoorHinge"
+    hinge.position = Vector3(13.0, 0.0, -2.4)
+    add_child(hinge)
+    door = StaticBody3D.new()
+    door.name = "OakDoor"
+    door.position = Vector3(0.0, 1.5, 2.4)
+    hinge.add_child(door)
+    var slab := MeshInstance3D.new()
+    slab.name = "DoorSlab"
+    var slab_mesh := BoxMesh.new()
+    slab_mesh.size = Vector3(0.32, 3.0, 4.8)
+    slab.mesh = slab_mesh
+    var wood := StandardMaterial3D.new()
+    wood.albedo_color = Color("#59402a")
+    slab.material_override = wood
+    door.add_child(slab)
+    door_collider = CollisionShape3D.new()
+    var solid := BoxShape3D.new()
+    solid.size = slab_mesh.size
+    door_collider.shape = solid
+    door.add_child(door_collider)
+    for offset in [-1.55, 1.55]:
+        var strap := MeshInstance3D.new()
+        var strap_mesh := BoxMesh.new()
+        strap_mesh.size = Vector3(0.4, 0.14, 0.55)
+        strap.mesh = strap_mesh
+        strap.position = Vector3(0, 0.9, offset)
+        var iron := StandardMaterial3D.new()
+        iron.albedo_color = Color("#292d31")
+        strap.material_override = iron
+        door.add_child(strap)
+    var handle := MeshInstance3D.new()
+    var knob := SphereMesh.new()
+    knob.radius = 0.13
+    knob.height = 0.26
+    handle.mesh = knob
+    handle.position = Vector3(-0.23, 0.0, 1.75)
+    door.add_child(handle)
+
+func _animate_door(delta: float) -> void:
+    door_progress = move_toward(door_progress, 1.0 if door_open else 0.0, delta * 1.8)
+    door.get_parent().rotation.y = door_progress * PI * 0.5
+    # Disable the door collider once sufficiently open; leave the frame solid.
+    door_collider.disabled = door_progress > 0.85
 
 func _update_goblin() -> void:
     if goblins.is_empty():
