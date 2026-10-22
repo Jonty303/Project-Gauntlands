@@ -49,9 +49,13 @@ func _ready() -> void:
     _setup_room_concealment()
     _make_box("Pillar", Vector3(-3,1.15,-3), Vector3(1.1,2.3,1.1), Color("#666d6c"))
     _decorate_start_room()
+    _decorate_chamber()
     hero = _make_actor("Hero", Vector3(-5,0,1), Color("#587b9c"))
+    _decorate_actor(hero, true)
     for position in [Vector3(1,0,-2),Vector3(3,0,2),Vector3(24,0,0)]:
-        goblins.append(_make_actor("Goblin",position,Color("#769557")))
+        var goblin := _make_actor("Goblin",position,Color("#769557"))
+        goblins.append(goblin)
+        _decorate_actor(goblin, false)
     goblins[2].reparent(chamber_root, true)
     camera = Camera3D.new()
     camera.name = "IsometricCamera"
@@ -97,6 +101,80 @@ func _decorate_start_room() -> void:
     # A small stone plinth and an iron brazier beside the first doorway.
     _make_box("BrazierPlinth", Vector3(10.6,0.24,-3.0), Vector3(0.9,0.48,0.9), Color("#66675f"))
     _make_box("BrazierBowl", Vector3(10.6,0.58,-3.0), Vector3(0.7,0.2,0.7), Color("#292a29"), false)
+
+func _decorate_chamber() -> void:
+    # Decorations belong to the room, so discovery hides them as a unit.
+    for x in [21.0, 25.0, 28.0]:
+        for z in [-4.0, 0.0, 4.0]:
+            _make_box("ChamberFloorJoint", Vector3(x, 0.005, z), Vector3(2.7, 0.012, 0.045), Color("#23282b"), false)
+            get_node("ChamberFloorJoint").reparent(chamber_root, true)
+    _make_box("ChamberAltar", Vector3(27,0.42,-3.4), Vector3(1.5,0.84,1.0), Color("#62655e"))
+    get_node("ChamberAltar").reparent(chamber_root, true)
+    _make_box("AltarTop", Vector3(27,0.88,-3.4), Vector3(1.65,0.13,1.15), Color("#989588"), false)
+    get_node("AltarTop").reparent(chamber_root, true)
+
+func _decorate_actor(actor: CharacterBody3D, is_hero: bool) -> void:
+    # Low-poly silhouettes: distinct head, torso, limbs, and equipment.
+    var visual := actor.get_node_or_null("Visual") as MeshInstance3D
+    if visual != null:
+        visual.visible = false
+    var torso := MeshInstance3D.new()
+    torso.name = "Torso"
+    var torso_mesh := BoxMesh.new()
+    torso_mesh.size = Vector3(0.62, 0.77, 0.42)
+    torso.mesh = torso_mesh
+    torso.position.y = 1.04
+    var torso_mat := StandardMaterial3D.new()
+    torso_mat.albedo_color = Color("#506c82") if is_hero else Color("#646b39")
+    torso.material_override = torso_mat
+    actor.add_child(torso)
+    var head := MeshInstance3D.new()
+    head.name = "Head"
+    var head_mesh := SphereMesh.new()
+    head_mesh.radius = 0.28 if is_hero else 0.31
+    head_mesh.height = 0.56 if is_hero else 0.62
+    head.mesh = head_mesh
+    head.position.y = 1.63
+    var skin := StandardMaterial3D.new()
+    skin.albedo_color = Color("#c29a76") if is_hero else Color("#73864c")
+    head.material_override = skin
+    actor.add_child(head)
+    for side in [-1.0, 1.0]:
+        var leg := MeshInstance3D.new()
+        var leg_mesh := BoxMesh.new()
+        leg_mesh.size = Vector3(0.23, 0.62, 0.29)
+        leg.mesh = leg_mesh
+        leg.position = Vector3(side * 0.18, 0.34, 0)
+        var cloth := StandardMaterial3D.new()
+        cloth.albedo_color = Color("#343b40") if is_hero else Color("#554634")
+        leg.material_override = cloth
+        actor.add_child(leg)
+        var arm := MeshInstance3D.new()
+        var arm_mesh := BoxMesh.new()
+        arm_mesh.size = Vector3(0.2, 0.65, 0.24)
+        arm.mesh = arm_mesh
+        arm.position = Vector3(side * 0.42, 1.04, 0)
+        arm.material_override = torso_mat
+        actor.add_child(arm)
+        if not is_hero:
+            var ear := MeshInstance3D.new()
+            var ear_mesh := SphereMesh.new()
+            ear_mesh.radius = 0.16
+            ear_mesh.height = 0.19
+            ear.mesh = ear_mesh
+            ear.position = Vector3(side * 0.36, 1.65, 0)
+            ear.material_override = skin
+            actor.add_child(ear)
+    if is_hero:
+        var pack := MeshInstance3D.new()
+        var pack_mesh := BoxMesh.new()
+        pack_mesh.size = Vector3(0.48, 0.62, 0.24)
+        pack.mesh = pack_mesh
+        pack.position = Vector3(0, 1.05, 0.34)
+        var leather := StandardMaterial3D.new()
+        leather.albedo_color = Color("#6b4b31")
+        pack.material_override = leather
+        actor.add_child(pack)
 
 func _physics_process(delta: float) -> void:
     var direction := Input.get_vector("move_left","move_right","move_up","move_down")
@@ -341,6 +419,7 @@ func _make_actor(label: String, location: Vector3, tint: Color) -> CharacterBody
     capsule_mesh.height = 1.8
     body.mesh = capsule_mesh
     body.position.y = 0.9
+    body.name = "Visual"
     var material := StandardMaterial3D.new()
     material.albedo_color = tint
     body.material_override = material
