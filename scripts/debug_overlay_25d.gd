@@ -104,6 +104,7 @@ func _refresh() -> void:
         return
     var p := hero.global_position
     stats.text = "FPS: %d | Position: %.1f, %.1f, %.1f\nSpeed: %.2f m/s" % [Engine.get_frames_per_second(),p.x,p.y,p.z,hero.velocity.length()]
+    stats.text += "\nGoblin: %s | Distance: %.1f | Speed: %.1f" % [str(experiment.get("goblin_state")),float(experiment.get("goblin_distance")),3.5]
     var captions := {"size":"Zoom","camera_elevation":"Elevation","camera_yaw":"Rotation","camera_distance":"Distance","camera_framing":"Framing"}
     for property in captions:
         var label: Label = readouts[property]
