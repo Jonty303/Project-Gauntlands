@@ -1,7 +1,7 @@
 extends Node2D
 ## Front foot of the door is the sorting origin. The opening has no collision.
 const OPENING := 90.0
-const HEIGHT := 43.0
+const HEIGHT := 82.0
 func _draw() -> void:
     var stone := Color("#8c8276")
     var shadow := Color("#37363c")
