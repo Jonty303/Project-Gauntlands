@@ -8,7 +8,7 @@ var camera: Camera3D
 var goblins: Array[CharacterBody3D] = []
 var light_enabled := true
 var camera_yaw := 45.0
-var camera_elevation := 45.0
+var camera_elevation := 24.0
 var camera_distance := 24.0
 var camera_framing := 0.7
 
