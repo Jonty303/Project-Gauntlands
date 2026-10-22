@@ -1,5 +1,4 @@
 extends Node2D
-const Projection = preload("res://scripts/iso_projection.gd")
 const TILE := 40.0
 const WALL_HEIGHT := 76.0
 const FLOOR := Color("#343b43")
@@ -18,6 +17,12 @@ func configure(room_rects: Array[Rect2], wall_rects: Array[Rect2]) -> void:
     wall_segments = wall_rects
     queue_redraw()
 
+func _project(point: Vector2) -> Vector2:
+    return Vector2((point.x - point.y) * 0.82, (point.x + point.y) * 0.41)
+
+func _project_direction(direction: Vector2) -> Vector2:
+    return _project(direction).normalized()
+
 func _ready() -> void:
     z_index = 1
 
@@ -34,12 +39,12 @@ func _process(_delta: float) -> void:
 
 func _diamond(a: Vector2, b: Vector2, c: Vector2, d: Vector2, color: Color) -> void:
     draw_colored_polygon(PackedVector2Array([
-        Projection.project(a), Projection.project(b),
-        Projection.project(c), Projection.project(d)
+        _project(a), _project(b),
+        _project(c), _project(d)
     ]), color)
 
 func _draw() -> void:
-    for room in floor_rooms:
+    for room: Rect2 in floor_rooms:
         var x := room.position.x
         while x < room.end.x - 0.01:
             var y := room.position.y
@@ -52,12 +57,12 @@ func _draw() -> void:
             x += TILE
     # Sort raised architecture and figures by their projected floor depth.
     var items: Array[Dictionary] = []
-    for wall in wall_segments:
-        items.append({"depth": Projection.project(wall.end).y, "kind": "wall", "wall": wall})
-    for actor in actors:
-        items.append({"depth": Projection.project(actor.global_position).y, "kind": "actor", "actor": actor})
-    for arrow in projectiles:
-        items.append({"depth": Projection.project(arrow.global_position).y, "kind": "arrow", "actor": arrow})
+    for wall: Rect2 in wall_segments:
+        items.append({"depth": _project(wall.end).y, "kind": "wall", "wall": wall})
+    for actor: Node2D in actors:
+        items.append({"depth": _project(actor.global_position).y, "kind": "actor", "actor": actor})
+    for arrow: Node2D in projectiles:
+        items.append({"depth": _project(arrow.global_position).y, "kind": "arrow", "actor": arrow})
     items.sort_custom(func(a: Dictionary, b: Dictionary) -> bool: return a["depth"] < b["depth"])
     for item in items:
         match item["kind"]:
@@ -69,10 +74,10 @@ func _draw() -> void:
                 _draw_arrow(item["actor"])
 
 func _draw_wall(wall: Rect2) -> void:
-    var a := Projection.project(wall.position)
-    var b := Projection.project(Vector2(wall.end.x, wall.position.y))
-    var c := Projection.project(wall.end)
-    var d := Projection.project(Vector2(wall.position.x, wall.end.y))
+    var a := _project(wall.position)
+    var b := _project(Vector2(wall.end.x, wall.position.y))
+    var c := _project(wall.end)
+    var d := _project(Vector2(wall.position.x, wall.end.y))
     var rise := Vector2(0, -WALL_HEIGHT)
     draw_colored_polygon(PackedVector2Array([b,c,c+rise,b+rise]), SIDE)
     draw_colored_polygon(PackedVector2Array([d,c,c+rise,d+rise]), STONE)
@@ -85,7 +90,7 @@ func _draw_wall(wall: Rect2) -> void:
     draw_line(b+rise,c+rise,Color("#c0b9a9"),2.0)
 
 func _draw_actor(actor: Node2D) -> void:
-    var foot := Projection.project(actor.global_position)
+    var foot := _project(actor.global_position)
     var is_hero: bool = actor.is_in_group("player")
     var skin := Color("#bca07c") if is_hero else Color("#718f53")
     var cloth := Color("#64736e") if is_hero else Color("#65543b")
@@ -113,7 +118,7 @@ func _draw_actor(actor: Node2D) -> void:
     draw_set_transform(Vector2.ZERO)
 
 func _draw_arrow(arrow: Node2D) -> void:
-    var foot := Projection.project(arrow.global_position) + Vector2(0,-20)
-    var direction := Projection.projected_direction(arrow.direction)
+    var foot := _project(arrow.global_position) + Vector2(0,-20)
+    var direction: Vector2 = _project_direction(arrow.get("direction") as Vector2)
     draw_line(foot-direction*12,foot+direction*14,Color("#e4ca8e"),3)
     draw_line(foot+direction*12,foot+direction*19,Color("#f9f6e4"),4)
