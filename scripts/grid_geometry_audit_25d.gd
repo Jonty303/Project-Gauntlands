@@ -37,6 +37,7 @@ func _ready() -> void:
     _define_layout()
     _build_floor_grid()
     _build_boundary_walls()
+    _build_doorway_returns()
     _build_doors()
     _build_hero()
     _build_camera_and_light()
@@ -62,6 +63,9 @@ func _build_floor_grid() -> void:
     tile.size = Vector3(CELL,0.18,CELL)
     tile.material = floor_material
     library.set_item_mesh(0,tile)
+    var floor_shape := BoxShape3D.new()
+    floor_shape.size = Vector3(CELL,0.18,CELL)
+    library.set_item_shapes(0,[{"shape":floor_shape,"transform":Transform3D.IDENTITY}])
     var grid := GridMap.new()
     floor_grid = grid
     grid.name = "AuthoritativeFloorGrid"
@@ -162,8 +166,37 @@ func _register_wall(visual: MeshInstance3D,at: Vector3,owners: Array,normals: Ar
     visual.material_override = material
     wall_records.append({"visual":visual,"center":at,"owners":owners,"normals":normals,"material":material,"alpha":1.0})
 
+func _build_doorway_returns() -> void:
+    # Internal partitions belong to the room graph, not the exterior boundary.
+    # Door opening: z=-0.875..+0.875; corridor spans z=-3..+3.
+    # Both returns terminate exactly at the jamb, without overlapping the door.
+    for x in [-3.0,3.0]:
+        for side in [-1.0,1.0]:
+            var length: float = (3.0-0.875)
+            var z: float = side*(0.875+length*0.5)
+            var at: Vector3 = floor_origin+Vector3(x,0,z)
+            var owner: int = 0 if x < 0.0 else 2
+            _partition_piece(at,Vector3(WALL_THICKNESS,WALL_HEIGHT,length),[owner,1])
+
+func _partition_piece(at: Vector3,size: Vector3,owners: Array) -> void:
+    var solid := StaticBody3D.new()
+    solid.position = at+Vector3(0,WALL_HEIGHT*0.5,0)
+    add_child(solid)
+    var shape := CollisionShape3D.new()
+    var box := BoxShape3D.new()
+    box.size = size
+    shape.shape = box
+    solid.add_child(shape)
+    var visual := MeshInstance3D.new()
+    var mesh := BoxMesh.new()
+    mesh.size = size
+    visual.mesh = mesh
+    solid.add_child(visual)
+    _register_wall(visual,at,owners,[Vector3(-1,0,0),Vector3(1,0,0)])
+
 func _build_doors() -> void:
     # Both door centres use the measured GridMap origin, as do the walls.
+    # Interior partitions on either side leave exactly a 1.75m opening.
     for x in [-3.0,3.0]:
         var root := StaticBody3D.new()
         root.position = floor_origin+Vector3(x,1.18,0)
@@ -205,7 +238,8 @@ func _toggle_nearby_door() -> void:
 
 func _build_hero() -> void:
     hero = CharacterBody3D.new()
-    hero.position = Vector3(-10,0,0)
+    hero.position = floor_origin+Vector3(-10,0.12,0)
+    hero.floor_snap_length = 0.3
     add_child(hero)
     var visual := MeshInstance3D.new()
     var capsule := CapsuleMesh.new()
@@ -248,7 +282,7 @@ func _build_label() -> void:
     add_child(ui)
     var label := Label.new()
     label.position = Vector2(16,16)
-    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nCurrent + discovered adjacent rooms fade; undiscovered hidden. Walls 4%, doors 28%."
+    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nDiscovered adjacent walls fade; floor collision and doorway returns enabled."
     ui.add_child(label)
 
 func _material(color: Color) -> StandardMaterial3D:
@@ -262,7 +296,10 @@ func _physics_process(_delta: float) -> void:
     var forward := -camera.global_transform.basis.z
     right.y = 0
     forward.y = 0
-    hero.velocity = (right.normalized()*input.x-forward.normalized()*input.y).normalized()*5.0
+    var planar := (right.normalized()*input.x-forward.normalized()*input.y).normalized()*5.0
+    hero.velocity.x = planar.x
+    hero.velocity.z = planar.z
+    hero.velocity.y -= 20.0*_delta
     hero.move_and_slide()
     _update_camera()
     var room_now: int = _current_room()
