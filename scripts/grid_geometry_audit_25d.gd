@@ -46,9 +46,9 @@ func _build_floor_grid() -> void:
     grid.name = "AuthoritativeFloorGrid"
     grid.mesh_library = library
     grid.cell_size = Vector3(CELL,CELL,CELL)
-    grid.cell_center_x = true
+    grid.cell_center_x = false
     grid.cell_center_y = true
-    grid.cell_center_z = true
+    grid.cell_center_z = false
     add_child(grid)
     for key in occupied:
         var cell: Vector2i = key
