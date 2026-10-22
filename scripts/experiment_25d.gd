@@ -315,7 +315,6 @@ func _physics_process(delta: float) -> void:
     _update_room_reveal()
     _update_wall_visibility()
     _animate_wall_windows(delta)
-    _update_room_cutaway()
 
 func _update_room_reveal() -> void:
     if not corridor_revealed and bool(doors[0].get("opened")):
@@ -585,35 +584,6 @@ func _update_goblin(delta: float) -> void:
         if goblin == goblins[0]:
             goblin_state = state
             goblin_distance = distance
-
-func _update_room_cutaway() -> void:
-    var rooms: Array[Node3D] = []
-    for name in ["StartingRoom", "CorridorRoom", "EncounterRoom"]:
-        var room := get_node_or_null(name) as Node3D
-        if room != null:
-            rooms.append(room)
-    var current: Node3D = null
-    for room in rooms:
-        if not room.visible:
-            continue
-        var local := room.to_local(hero.global_position)
-        var width: float = room.get("room_width")
-        var depth: float = room.get("room_depth")
-        if absf(local.x) < width * 0.5 and absf(local.z) < depth * 0.5:
-            current = room
-            break
-    for room in rooms:
-        var toward_camera := camera.global_position - room.global_position
-        for wall in room.get("occluding_walls"):
-            var visual := wall.get_node_or_null("Visual") as MeshInstance3D
-            if visual == null:
-                continue
-            var material := visual.material_override as ShaderMaterial
-            if material == null:
-                continue
-            var side: String = str(wall.name)
-            var foreground: bool = (side.begins_with("North") and toward_camera.z < 0.0) or (side.begins_with("South") and toward_camera.z > 0.0) or (side.begins_with("East") and toward_camera.x > 0.0) or (side.begins_with("West") and toward_camera.x < 0.0)
-            material.set_shader_parameter("cutaway", 1.0 if room == current and foreground else 0.0)
 
 func _update_wall_visibility() -> void:
     # Fade foreground walls for the hero and for enemies with a clear
