@@ -56,9 +56,14 @@ func _ready() -> void:
 
 func _physics_process(delta: float) -> void:
     var direction := Input.get_vector("move_left","move_right","move_up","move_down")
-    var forward := Vector3(1,0,-1).normalized()
-    var right := Vector3(1,0,1).normalized()
-    var motion := (right * direction.x - forward * direction.y).normalized()
+    # Screen-relative movement: derive the ground-plane axes from the camera.
+    var right: Vector3 = camera.global_basis.x
+    var up: Vector3 = -camera.global_basis.z
+    right.y = 0.0
+    up.y = 0.0
+    right = right.normalized()
+    up = up.normalized()
+    var motion: Vector3 = (right * direction.x - up * direction.y).normalized()
     hero.velocity = motion * SPEED
     hero.move_and_slide()
     var target := hero.global_position + Vector3(12,17,12)
