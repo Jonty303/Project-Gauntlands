@@ -7,6 +7,10 @@ var hero: CharacterBody3D
 var camera: Camera3D
 var goblins: Array[CharacterBody3D] = []
 var light_enabled := true
+var camera_yaw := 45.0
+var camera_elevation := 45.0
+var camera_distance := 24.0
+var camera_framing := 0.7
 
 func _ready() -> void:
     # Enlarged interconnected layout: 26x19 main room, 6x5 corridor, 11x13 chamber.
@@ -35,12 +39,11 @@ func _ready() -> void:
     camera.size = 13.0
     camera.current = true
     add_child(camera)
-    camera.position = hero.global_position + Vector3(12,17,12)
-    camera.look_at(hero.global_position + Vector3(0,0.7,0), Vector3.UP)
+    _update_camera_transform(true)
     var overlay := CanvasLayer.new()
     overlay.name = "DeveloperOverlay"
     overlay.set_script(DEBUG_OVERLAY)
-    overlay.call("configure", camera, hero)
+    overlay.call("configure", camera, hero, self)
     add_child(overlay)
     var sun := DirectionalLight3D.new()
     sun.rotation_degrees = Vector3(-55,-35,0)
@@ -75,8 +78,17 @@ func _physics_process(delta: float) -> void:
     var motion: Vector3 = (right * direction.x - up * direction.y).normalized()
     hero.velocity = motion * SPEED
     hero.move_and_slide()
-    var target := hero.global_position + Vector3(12,17,12)
-    camera.global_position = camera.global_position.lerp(target, minf(1.0,delta*7.0))
+    _update_camera_transform(false, delta)
+
+func _update_camera_transform(immediate: bool, delta: float = 0.0) -> void:
+    var yaw := deg_to_rad(camera_yaw)
+    var elevation := deg_to_rad(camera_elevation)
+    var horizontal := cos(elevation) * camera_distance
+    var offset := Vector3(sin(yaw) * horizontal, sin(elevation) * camera_distance, cos(yaw) * horizontal)
+    var focus := hero.global_position + Vector3(0,camera_framing,0)
+    var desired := focus + offset
+    camera.global_position = desired if immediate else camera.global_position.lerp(desired, minf(1.0, delta * 7.0))
+    camera.look_at(camera.global_position - offset, Vector3.UP)
 
 func _make_box(label: String, location: Vector3, size: Vector3, tint: Color, solid: bool = true) -> void:
     var body := StaticBody3D.new()
