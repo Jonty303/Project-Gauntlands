@@ -10,6 +10,7 @@ var hero: CharacterBody3D
 var camera: Camera3D
 var camera_yaw: float = 45.0
 var cutaway: bool = false
+var top_down: bool = false
 var floor_material: StandardMaterial3D
 var wall_material: StandardMaterial3D
 
@@ -51,27 +52,53 @@ func _build_floor_grid() -> void:
         grid.set_cell_item(Vector3i(cell.x,0,cell.y),0)
 
 func _build_boundary_walls() -> void:
-    # Each outer edge is emitted once. Interior edges are empty except
-    # doorway partitions: a 2m centre opening and solid side spans.
+    # An edge exists if and only if one side is occupied and the other is void.
+    # Adjacent floor cells NEVER receive a separating wall. This removes the
+    # previous hard-coded doorway partitions that obstructed the corridor.
+    var unique_edges: Dictionary = {}
+    var vertices: Dictionary = {}
     for key in occupied:
         var cell: Vector2i = key
         for offset in [Vector2i(-1,0),Vector2i(1,0),Vector2i(0,-1),Vector2i(0,1)]:
             var neighbor: Vector2i = cell+offset
-            var is_outer: bool = not occupied.has(neighbor)
-            var doorway_partition: bool = false
-            if offset == Vector2i(1,0) and (cell.x == -2 or cell.x == 1):
-                doorway_partition = cell.y != 0
-            if offset == Vector2i(-1,0) and (cell.x == -1 or cell.x == 2):
-                doorway_partition = cell.y != 0
-            if not is_outer and not doorway_partition:
+            if occupied.has(neighbor):
                 continue
-            # Only the chamber side emits the shared partition.
-            if doorway_partition and (cell.x == -1 or cell.x == 2):
-                continue
-            var center := Vector3(float(cell.x)*CELL,0,float(cell.y)*CELL)
+            var edge_x: int = cell.x*2+offset.x
+            var edge_z: int = cell.y*2+offset.y
             var along_x: bool = offset.y != 0
-            var edge_center := center+Vector3(float(offset.x)*CELL*0.5,0,float(offset.y)*CELL*0.5)
-            _wall_piece(edge_center,along_x)
+            var edge_key := "%d:%d:%d" % [edge_x,edge_z,int(along_x)]
+            assert(not unique_edges.has(edge_key),"Duplicate boundary edge")
+            unique_edges[edge_key] = true
+            var midpoint := Vector3(float(edge_x)*CELL*0.5,0,float(edge_z)*CELL*0.5)
+            _wall_piece(midpoint,along_x)
+            # Corners are derived from wall edges, not independently placed.
+            var tangent := Vector3(CELL*0.5,0,0) if along_x else Vector3(0,0,CELL*0.5)
+            for endpoint in [midpoint-tangent,midpoint+tangent]:
+                var vertex_key := "%0.2f:%0.2f" % [endpoint.x,endpoint.z]
+                vertices[vertex_key] = endpoint
+    for key in vertices:
+        var point: Vector3 = vertices[key]
+        _corner_fill(point)
+    print("Geometry audit: %d floor cells, %d unique exposed edges, %d corner joins" % [occupied.size(),unique_edges.size(),vertices.size()])
+
+func _corner_fill(at: Vector3) -> void:
+    # Fills the thickness-sized square at an edge intersection.
+    # A single box at each unique vertex prevents cracks without overshooting.
+    var solid := StaticBody3D.new()
+    solid.position = at+Vector3(0,WALL_HEIGHT*0.5,0)
+    add_child(solid)
+    var shape := CollisionShape3D.new()
+    var box := BoxShape3D.new()
+    box.size = Vector3(WALL_THICKNESS,WALL_HEIGHT,WALL_THICKNESS)
+    shape.shape = box
+    solid.add_child(shape)
+    var visual := MeshInstance3D.new()
+    var mesh := BoxMesh.new()
+    mesh.size = box.size
+    visual.mesh = mesh
+    visual.material_override = wall_material
+    solid.add_child(visual)
+    wall_records.append({"visual":visual,"center":at})
 
 func _wall_piece(at: Vector3,along_x: bool) -> void:
     var size := Vector3(CELL,WALL_HEIGHT,WALL_THICKNESS) if along_x else Vector3(WALL_THICKNESS,WALL_HEIGHT,CELL)
@@ -114,7 +141,7 @@ func _build_hero() -> void:
 func _build_camera_and_light() -> void:
     camera = Camera3D.new()
     camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-    camera.size = 21.0
+    camera.size = 19.0
     camera.current = true
     add_child(camera)
     var sun := DirectionalLight3D.new()
@@ -156,6 +183,10 @@ func _physics_process(_delta: float) -> void:
     _update_visibility()
 
 func _update_camera() -> void:
+    if top_down:
+        camera.global_position = hero.global_position+Vector3(0,28,0.01)
+        camera.look_at(hero.global_position)
+        return
     var angle := deg_to_rad(camera_yaw)
     var elevation := deg_to_rad(24.0)
     camera.global_position = hero.global_position+Vector3(sin(angle)*cos(elevation),sin(elevation),cos(angle)*cos(elevation))*26.0
@@ -177,3 +208,5 @@ func _unhandled_key_input(event: InputEvent) -> void:
         camera_yaw += 45.0
     elif event.keycode == KEY_C:
         cutaway = not cutaway
+    elif event.keycode == KEY_T:
+        top_down = not top_down
