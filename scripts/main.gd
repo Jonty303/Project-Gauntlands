@@ -10,6 +10,9 @@ const COVER_SIZE := Vector2(28.0, 210.0)
 const SECOND_COVER_CENTER := Vector2(-115.0, 85.0)
 const SECOND_COVER_SIZE := Vector2(175.0, 28.0)
 const NAV_CELL := 20.0
+const WALL_HEIGHT := 38.0
+const WALL_FACE_COLOR := Color("#353d4b")
+const WALL_TOP_COLOR := Color("#78818e")
 var navigation_grid: AStarGrid2D
 
 func _ready() -> void:
@@ -93,5 +96,14 @@ func _draw() -> void:
     draw_rect(Rect2(-half.x - t / 2.0, -half.y - t / 2.0, t, DUNGEON_SIZE.y + t), WALL_COLOR)
     draw_rect(Rect2(half.x - t / 2.0, -half.y - t / 2.0, t, DUNGEON_SIZE.y + t), WALL_COLOR)
     draw_rect(Rect2(COVER_CENTER - COVER_SIZE / 2.0, COVER_SIZE), WALL_COLOR)
-    draw_rect(Rect2(SECOND_COVER_CENTER - SECOND_COVER_SIZE / 2.0, SECOND_COVER_SIZE), WALL_COLOR)
+    _draw_raised_wall(COVER_CENTER, COVER_SIZE)
+    _draw_raised_wall(SECOND_COVER_CENTER, SECOND_COVER_SIZE)
+
+func _draw_raised_wall(center: Vector2, size: Vector2) -> void:
+    # Raised wall is visual only; existing 2D collision and navigation are unchanged.
+    var footprint := Rect2(center - size / 2.0, size)
+    var elevated := footprint.position - Vector2(0, WALL_HEIGHT)
+    draw_colored_polygon(PackedVector2Array([Vector2(footprint.position.x, footprint.end.y), footprint.end, footprint.end - Vector2(0, WALL_HEIGHT), Vector2(footprint.position.x, footprint.end.y - WALL_HEIGHT)]), WALL_FACE_COLOR)
+    draw_rect(Rect2(elevated, size), WALL_TOP_COLOR)
+
 
