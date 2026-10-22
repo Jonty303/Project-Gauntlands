@@ -250,34 +250,36 @@ func _draw() -> void:
     draw_set_transform(Vector2(0, 9), 0.0, Vector2(1.0, 0.4))
     draw_circle(Vector2.ZERO, 18.0, Color(0.03, 0.04, 0.05, 0.4))
     draw_set_transform(Vector2.ZERO, -PI / 4.0, Vector2(1.55, 1.55))
-    var torso_center := forward * (1.5 - shot_recoil * 2.5 - bounce) - Vector2(0, 5)
-    # Three-quarter fantasy miniature: cloak, leather belt, metal cuirass and helm.
+    var torso_center := Vector2(0, -20) - forward * shot_recoil * 2.0
+    # Upright miniature: boots at the floor, shaded cloak and three-quarter armour.
+    draw_line(Vector2(-8, -5), Vector2(-9, 7), Color("#3d332c"), 8.0)
+    draw_line(Vector2(8, -5), Vector2(9, 7), Color("#3d332c"), 8.0)
     draw_colored_polygon(PackedVector2Array([
-        Vector2(-15, -5), Vector2(15, -5), Vector2(17, -24),
-        Vector2(0, -34), Vector2(-17, -24)
-    ]), Color("#343c35"))
+        Vector2(-16, -9), Vector2(-17, -29), Vector2(0, -37),
+        Vector2(17, -29), Vector2(16, -9), Vector2(8, -3), Vector2(-8, -3)
+    ]), Color("#353f39"))
     draw_colored_polygon(PackedVector2Array([
-        Vector2(-12, -20), Vector2(0, -29), Vector2(12, -20),
-        Vector2(9, -7), Vector2(-9, -7)
-    ]), Color("#697968"))
+        Vector2(-12, -11), Vector2(-12, -30), Vector2(0, -34),
+        Vector2(11, -29), Vector2(12, -11), Vector2(0, -7)
+    ]), Color("#65766c"))
     draw_colored_polygon(PackedVector2Array([
-        Vector2(-12, -20), Vector2(0, -29), Vector2(0, -7), Vector2(-9, -7)
-    ]), Color("#94a08c"))
-    draw_line(Vector2(-10, -11), Vector2(10, -11), Color("#513e2d"), 3.0)
-    draw_rect(Rect2(-3, -14, 6, 5), Color("#c1a16a"))
-    draw_line(Vector2(-7, -5), Vector2(-8, 8), Color("#55473a"), 6.0)
-    draw_line(Vector2(7, -5), Vector2(8, 8), Color("#55473a"), 6.0)
-    draw_circle(Vector2(0, -32), 9.0, Color("#aeb1a4"))
+        Vector2(-12, -30), Vector2(0, -34), Vector2(0, -7), Vector2(-12, -11)
+    ]), Color("#9ca89a"))
+    draw_line(Vector2(-12, -13), Vector2(12, -13), Color("#493a2b"), 4.0)
+    draw_rect(Rect2(-3, -16, 6, 6), Color("#c4a26b"))
+    # Distinct raised head, cheek shadow and metal cap.
+    draw_circle(Vector2(0, -38), 10.0, Color("#c6aa7b"))
+    draw_circle(Vector2(4, -38), 8.0, Color("#a48a65"))
     draw_colored_polygon(PackedVector2Array([
-        Vector2(-10, -33), Vector2(-7, -41), Vector2(7, -41),
-        Vector2(11, -33), Vector2(7, -29), Vector2(-7, -29)
-    ]), Color("#565e63"))
-    draw_line(Vector2(-6, -33), Vector2(6, -33), Color("#20282c"), 3.0)
-    draw_circle(torso_center, 4.0, Color("#b9a47d"))
-    draw_line(torso_center - side * 7.0, torso_center + side * 7.0, Color("#394b3c"), 3.0)
-    draw_circle(torso_center + forward * 5.0, 6.5, Color("#d6bd83"))
-    draw_circle(torso_center + forward * 9.0, 2.2, Color("#614d39"))
-
+        Vector2(-11, -39), Vector2(-9, -47), Vector2(-3, -51),
+        Vector2(8, -48), Vector2(11, -39), Vector2(5, -36), Vector2(-7, -36)
+    ]), Color("#677078"))
+    draw_line(Vector2(-7, -40), Vector2(8, -40), Color("#c2c6bf"), 2.0)
+    draw_circle(Vector2(-4, -36), 1.6, Color("#2a2826"))
+    draw_circle(Vector2(4, -36), 1.6, Color("#2a2826"))
+    # Arms sit in front of the breastplate, leaving weapon silhouettes visible.
+    draw_line(Vector2(-12, -28), Vector2(-17, -15), Color("#6d776f"), 7.0)
+    draw_line(Vector2(12, -28), Vector2(17, -15), Color("#515d55"), 7.0)
     if weapon_mode == "sword":
         var blade_base := torso_center + forward * 12.0 + side * 5.0
         draw_line(blade_base, blade_base + forward * 25.0, Color("#d6d9de"), 4.0)
