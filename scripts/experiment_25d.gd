@@ -106,8 +106,9 @@ func _decorate_chamber() -> void:
     # Decorations belong to the room, so discovery hides them as a unit.
     for x in [21.0, 25.0, 28.0]:
         for z in [-4.0, 0.0, 4.0]:
-            _make_box("ChamberFloorJoint", Vector3(x, 0.005, z), Vector3(2.7, 0.012, 0.045), Color("#23282b"), false)
-            get_node("ChamberFloorJoint").reparent(chamber_root, true)
+            var joint_name := "ChamberJoint_%d_%d" % [int(x), int(z)]
+            _make_box(joint_name, Vector3(x, 0.005, z), Vector3(2.7, 0.012, 0.045), Color("#23282b"), false)
+            get_node(joint_name).reparent(chamber_root, true)
     _make_box("ChamberAltar", Vector3(27,0.42,-3.4), Vector3(1.5,0.84,1.0), Color("#62655e"))
     get_node("ChamberAltar").reparent(chamber_root, true)
     _make_box("AltarTop", Vector3(27,0.88,-3.4), Vector3(1.65,0.13,1.15), Color("#989588"), false)
