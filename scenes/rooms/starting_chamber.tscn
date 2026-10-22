@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3]
+[ext_resource type="Script" path="res://scripts/dungeon_room_25d.gd" id="1"]
+[node name="starting_chamber" type="Node3D"]
+script = ExtResource("1")
+room_width = 26.0
+room_depth = 19.0
+west_opening = 0.0
+east_opening = 1.5
+discovered = true
