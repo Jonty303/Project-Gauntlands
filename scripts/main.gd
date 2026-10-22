@@ -10,12 +10,14 @@ const COVER_SIZE := Vector2(28.0, 210.0)
 const SECOND_COVER_CENTER := Vector2(-115.0, 85.0)
 const SECOND_COVER_SIZE := Vector2(175.0, 28.0)
 const NAV_CELL := 20.0
-const Projection = preload("res://scripts/iso_projection.gd")
 const ISO_VIEW = preload("res://scripts/iso_view.gd")
 const CORRIDOR := Rect2(400.0, -45.0, 170.0, 90.0)
 const CHAMBER := Rect2(570.0, -165.0, 310.0, 330.0)
 var wall_rects: Array[Rect2] = []
 var navigation_grid: AStarGrid2D
+
+func _project(point: Vector2) -> Vector2:
+    return Vector2((point.x - point.y) * 0.82, (point.x + point.y) * 0.41)
 
 func _ready() -> void:
     _create_wall("NorthWall", Vector2(0, -DUNGEON_SIZE.y / 2.0), Vector2(DUNGEON_SIZE.x + WALL_THICKNESS, WALL_THICKNESS))
@@ -51,7 +53,7 @@ func _process(delta: float) -> void:
     var hero := get_node_or_null("Player") as Node2D
     var camera := get_node_or_null("Camera2D") as Camera2D
     if hero != null and camera != null:
-        camera.global_position = camera.global_position.lerp(Projection.project(hero.global_position), minf(1.0, delta * 6.0))
+        camera.global_position = camera.global_position.lerp(_project(hero.global_position), minf(1.0, delta * 6.0))
 
 
 func _build_navigation() -> void:
