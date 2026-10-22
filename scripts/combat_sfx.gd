@@ -44,8 +44,8 @@ static func _make_sound(kind: String) -> AudioStreamWAV:
         var frequency := pitch * (1.0 - 0.45 * progress)
         phase += TAU * frequency / SAMPLE_RATE
         var noise := randf_range(-1.0, 1.0)
-        var signal := sin(phase) * 0.55 + noise * (0.65 if kind in ["swing", "hit", "wall"] else 0.15)
-        var sample := clampi(roundi(signal * envelope * 11000.0), -32768, 32767)
+        var waveform := sin(phase) * 0.55 + noise * (0.65 if kind in ["swing", "hit", "wall"] else 0.15)
+        var sample := clampi(roundi(waveform * envelope * 11000.0), -32768, 32767)
         bytes.encode_s16(i * 2, sample)
     var wav := AudioStreamWAV.new()
     wav.format = AudioStreamWAV.FORMAT_16_BITS
