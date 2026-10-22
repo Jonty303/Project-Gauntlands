@@ -67,6 +67,7 @@ python3 -m http.server 8000 --bind 0.0.0.0 --directory build/web
 
 ```sh
 godot --headless --path . --editor --quit
+godot --headless --path . --script res://tests/wall_occlusion_test.gd
 godot --headless --path . --script res://tests/room_visibility_test.gd
 godot --headless --path . --script res://tests/architecture_lab_test.gd
 godot --headless --path . --script res://tests/grid_floor_collision_test.gd

@@ -45,6 +45,7 @@ func discover_current() -> bool:
     rooms[current_room]["discovered"] = true
     return true
 
+# Graph query retained for discovery consumers; it does not decide occlusion.
 func eligible_rooms() -> Array:
     var eligible: Array = []
     if not rooms.has(current_room):
@@ -53,11 +54,3 @@ func eligible_rooms() -> Array:
         if discovered.has(id):
             eligible.append(id)
     return eligible
-
-func faces_camera(owners: Array, normals: Array, toward_camera: Vector3) -> bool:
-    var eligible := eligible_rooms()
-    for index in range(normals.size()):
-        var owner: int = owners[0] if owners.size() == 1 else owners[index]
-        if eligible.has(owner) and normals[index].dot(toward_camera) > 0.1:
-            return true
-    return false

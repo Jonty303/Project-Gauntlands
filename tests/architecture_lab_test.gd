@@ -151,18 +151,27 @@ func run() -> void:
         for cutaway in [true, false]:
             lab.cutaway = cutaway
             lab._update_visibility(1.0)
-            var faded := 0
             for record in lab.wall_records:
                 var body: StaticBody3D = record.visual.get_parent()
                 check(body.collision_layer == 1, "Visibility must preserve wall collision layer")
                 for child in body.get_children():
                     if child is CollisionShape3D:
                         check(not child.disabled, "Visibility must preserve wall shape")
-                if record.alpha < 0.05:
+            # Point the camera toward the boundary we are pushing, independently
+            # of the movement yaw under test. Far-side walls should no longer fade.
+            lab.camera_yaw = 180.0
+            lab._update_camera()
+            lab._update_visibility(1.0)
+            var faded := 0
+            for record in lab.wall_records:
+                if record.alpha < 0.25:
                     faded += 1
-            check(not cutaway or faded > 0, "Exercise translucent walls")
+            check(faded > 0 if cutaway else faded == 0, "Exercise actual obstructing wall fades")
+            lab._update_camera()
             check(await walk(Vector3.FORWARD, 12), "Support while pushing wall")
             check(lab.hero.position.distance_to(stopped) < 0.02, "Wall blocks regardless of transparency")
+        lab.camera_yaw = yaw
+        lab._update_camera()
         # Return through both doors to confirm discovery persists across reverse transitions.
         check(await walk(Vector3.BACK, 48), "Support returning to door center line")
         for index in [1, 0]:

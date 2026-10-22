@@ -7,6 +7,10 @@ const WALL_THICKNESS: float = 0.22
 var occupied: Dictionary = {}
 var room_by_cell: Dictionary = {}
 const RoomVisibility = preload("res://scripts/room_visibility_25d.gd")
+const RenderVisibility = preload("res://scripts/room_render_visibility_25d.gd")
+const Occlusion = preload("res://scripts/wall_occlusion_25d.gd")
+const WALL_OCCLUDED_ALPHA := 0.20
+const DOOR_OCCLUDED_ALPHA := 0.28
 const FADE_SECONDS := 0.22
 var visibility := RoomVisibility.new()
 var discovered_rooms: Dictionary = {}
@@ -19,8 +23,6 @@ var cutaway: bool = true
 var top_down: bool = false
 var floor_material: StandardMaterial3D
 var wall_material: StandardMaterial3D
-var faded_wall_material: StandardMaterial3D
-var faded_door_material: StandardMaterial3D
 var door_material: StandardMaterial3D
 var doors: Array[Dictionary] = []
 var floor_grid: GridMap
@@ -30,13 +32,7 @@ var floor_origin: Vector3 = Vector3.ZERO
 func _ready() -> void:
     floor_material = _material(Color("#51524d"))
     wall_material = _material(Color("#8a8980"))
-    faded_wall_material = _material(Color(0.54,0.53,0.50,0.04))
-    faded_wall_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-    faded_wall_material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
     door_material = _material(Color("#5c4430"))
-    faded_door_material = _material(Color(0.36,0.27,0.19,0.28))
-    faded_door_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-    faded_door_material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
     _define_layout()
     visibility.configure(room_by_cell, ROOM_NEIGHBORS, 0)
     discovered_rooms = visibility.discovered
@@ -250,7 +246,7 @@ func _toggle_nearby_door() -> void:
         door["closed"] = now_closed
         var visual: MeshInstance3D = door["visual"]
         var collider: CollisionShape3D = door["collider"]
-        visual.visible = now_closed and (discovered_rooms.has(door["rooms"][0]) or discovered_rooms.has(door["rooms"][1]))
+        visual.visible = now_closed and RenderVisibility.can_render(door["rooms"], discovered_rooms)
         collider.set_deferred("disabled",not now_closed)
         return
 
@@ -300,7 +296,7 @@ func _build_label() -> void:
     add_child(ui)
     var label := Label.new()
     label.position = Vector2(16,16)
-    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nDiscovered adjacent walls fade; floor collision and doorway returns enabled."
+    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nOnly walls obstructing the player fade; discovery and collision stay independent."
     ui.add_child(label)
 
 func _material(color: Color) -> StandardMaterial3D:
@@ -336,40 +332,23 @@ func _update_camera() -> void:
     camera.look_at(hero.global_position+Vector3(0,0.8,0))
 
 func _refresh_discovery_visuals() -> void:
-    # Discovery is permanent during this dungeon visit, independently of fading.
-    for key in occupied:
-        var cell: Vector2i = key
-        var room: int = room_by_cell[cell]
-        var floor_visual: MeshInstance3D = floor_visuals[cell]
-        floor_visual.visible = discovered_rooms.has(room)
+    # Rendering policy consumes discovery; neither opacity nor camera can reveal rooms.
+    for cell in floor_visuals:
+        floor_visuals[cell].visible = RenderVisibility.can_render([room_by_cell[cell]], discovered_rooms)
     for record in wall_records:
-        var visible_room: bool = false
-        for owner in record["owners"]:
-            if discovered_rooms.has(owner):
-                visible_room = true
-                break
-        var visual: MeshInstance3D = record["visual"]
-        visual.visible = visible_room
+        record["visual"].visible = RenderVisibility.can_render(record["owners"], discovered_rooms)
     for door in doors:
-        var visible_room: bool = false
-        for room in door["rooms"]:
-            if discovered_rooms.has(room):
-                visible_room = true
-                break
-        var visual: MeshInstance3D = door["visual"]
-        visual.visible = visible_room and bool(door["closed"])
+        door["visual"].visible = bool(door["closed"]) and RenderVisibility.can_render(door["rooms"], discovered_rooms)
 
 func _update_visibility(delta: float) -> void:
-    # Top-down has no horizontal camera offset. Use the selected yaw in both
-    # views so rotating or toggling overhead cannot choose an arbitrary face.
-    var angle := deg_to_rad(camera_yaw)
-    var toward_camera := Vector3(sin(angle),0,cos(angle))
+    var targets := Occlusion.player_targets(camera, hero.global_position)
+    var segments := Occlusion.sight_segments(camera, targets)
     for record in wall_records:
-        var fade: bool = cutaway and visibility.faces_camera(record["owners"], record["normals"], toward_camera)
-        _transition_opacity(record, 0.04 if fade else 1.0, delta)
+        var fade: bool = cutaway and Occlusion.obstructs(record["visual"], segments)
+        _transition_opacity(record, WALL_OCCLUDED_ALPHA if fade else 1.0, delta)
     for door in doors:
-        var fade: bool = cutaway and door["closed"] and visibility.faces_camera(door["rooms"], door["normals"], toward_camera)
-        _transition_opacity(door, 0.28 if fade else 1.0, delta)
+        var fade: bool = cutaway and door["closed"] and Occlusion.obstructs(door["visual"], segments)
+        _transition_opacity(door, DOOR_OCCLUDED_ALPHA if fade else 1.0, delta)
 
 func _transition_opacity(record: Dictionary, target: float, delta: float) -> void:
     # Restart from the displayed alpha when a rotation or room transition interrupts.
