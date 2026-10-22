@@ -5,6 +5,7 @@ const CELL: float = 2.0
 const WALL_HEIGHT: float = 2.8
 const WALL_THICKNESS: float = 0.22
 var occupied: Dictionary = {}
+var room_by_cell: Dictionary = {}
 var wall_records: Array[Dictionary] = []
 var hero: CharacterBody3D
 var camera: Camera3D
@@ -38,7 +39,7 @@ func _ready() -> void:
     _build_camera_and_light()
     _build_label()
     _update_camera()
-    _update_visibility()
+    _update_visibility(1.0)
 
 func _define_layout() -> void:
     # Chamber cells -7..-2 and 2..7; corridor -1..1.
@@ -47,6 +48,7 @@ func _define_layout() -> void:
         for z in range(-2,3):
             if x <= -2 or x >= 2 or absi(z) <= 1:
                 occupied[Vector2i(x,z)] = true
+                room_by_cell[Vector2i(x,z)] = 0 if x <= -2 else (2 if x >= 2 else 1)
 
 func _build_floor_grid() -> void:
     var library := MeshLibrary.new()
@@ -95,18 +97,25 @@ func _build_boundary_walls() -> void:
             assert(not unique_edges.has(edge_key),"Duplicate boundary edge")
             unique_edges[edge_key] = true
             var midpoint := floor_origin+Vector3(float(edge_x)*CELL*0.5,0,float(edge_z)*CELL*0.5)
-            _wall_piece(midpoint,along_x)
+            var owner: int = room_by_cell[cell]
+            var outward := Vector3(float(offset.x),0,float(offset.y))
+            _wall_piece(midpoint,along_x,owner,outward)
             # Corners are derived from wall edges, not independently placed.
             var tangent := Vector3(CELL*0.5,0,0) if along_x else Vector3(0,0,CELL*0.5)
             for endpoint in [midpoint-tangent,midpoint+tangent]:
                 var vertex_key := "%0.2f:%0.2f" % [endpoint.x,endpoint.z]
-                vertices[vertex_key] = endpoint
+                if not vertices.has(vertex_key):
+                    vertices[vertex_key] = {"point":endpoint,"owners":[],"normals":[]}
+                var vertex: Dictionary = vertices[vertex_key]
+                if not vertex["owners"].has(owner):
+                    vertex["owners"].append(owner)
+                vertex["normals"].append(outward)
     for key in vertices:
-        var point: Vector3 = vertices[key]
-        _corner_fill(point)
+        var vertex: Dictionary = vertices[key]
+        _corner_fill(vertex["point"],vertex["owners"],vertex["normals"])
     print("Geometry audit: %d floor cells, %d unique exposed edges, %d corner joins" % [occupied.size(),unique_edges.size(),vertices.size()])
 
-func _corner_fill(at: Vector3) -> void:
+func _corner_fill(at: Vector3, owners: Array, normals: Array) -> void:
     # Fills the thickness-sized square at an edge intersection.
     # A single box at each unique vertex prevents cracks without overshooting.
     var solid := StaticBody3D.new()
@@ -123,9 +132,9 @@ func _corner_fill(at: Vector3) -> void:
     visual.mesh = mesh
     visual.material_override = wall_material
     solid.add_child(visual)
-    wall_records.append({"visual":visual,"center":at})
+    _register_wall(visual,at,owners,normals)
 
-func _wall_piece(at: Vector3,along_x: bool) -> void:
+func _wall_piece(at: Vector3,along_x: bool,owner: int,outward: Vector3) -> void:
     var size := Vector3(CELL,WALL_HEIGHT,WALL_THICKNESS) if along_x else Vector3(WALL_THICKNESS,WALL_HEIGHT,CELL)
     var solid := StaticBody3D.new()
     solid.position = at+Vector3(0,WALL_HEIGHT*0.5,0)
@@ -141,7 +150,13 @@ func _wall_piece(at: Vector3,along_x: bool) -> void:
     visual.mesh = mesh
     visual.material_override = wall_material
     solid.add_child(visual)
-    wall_records.append({"visual":visual,"center":at})
+    _register_wall(visual,at,[owner],[outward])
+
+func _register_wall(visual: MeshInstance3D,at: Vector3,owners: Array,normals: Array) -> void:
+    var material := _material(Color(0.54,0.53,0.50,1.0))
+    material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    visual.material_override = material
+    wall_records.append({"visual":visual,"center":at,"owners":owners,"normals":normals,"material":material,"alpha":1.0})
 
 func _build_doors() -> void:
     # Both door centres use the measured GridMap origin, as do the walls.
@@ -154,22 +169,22 @@ func _build_doors() -> void:
         var mesh := BoxMesh.new()
         mesh.size = Vector3(0.13,2.36,1.75)
         visual.mesh = mesh
-        visual.material_override = door_material
+        var instance_material := _material(Color(0.36,0.27,0.19,1.0))
+        instance_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+        visual.material_override = instance_material
         root.add_child(visual)
         var collider := CollisionShape3D.new()
         var box := BoxShape3D.new()
         box.size = mesh.size
         collider.shape = box
         root.add_child(collider)
-        doors.append({"body":root,"visual":visual,"collider":collider,"closed":true,"center":root.position})
+        doors.append({"body":root,"visual":visual,"collider":collider,"closed":true,"center":root.position,"material":instance_material,"alpha":1.0,"rooms":[0,1] if x < 0.0 else [1,2]})
 
-func _room_index(x: float) -> int:
-    var local_x := x-floor_origin.x
-    if local_x < -3.0:
-        return 0
-    if local_x > 3.0:
-        return 2
-    return 1
+func _current_room() -> int:
+    var local := floor_grid.to_local(hero.global_position)
+    var cell := floor_grid.local_to_map(local)
+    var key := Vector2i(cell.x,cell.z)
+    return int(room_by_cell.get(key,-1))
 
 func _toggle_nearby_door() -> void:
     for door in doors:
@@ -229,7 +244,7 @@ func _build_label() -> void:
     add_child(ui)
     var label := Label.new()
     label.position = Vector2(16,16)
-    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nNear walls 4% opacity; closed near doors 28%. Wall collision unchanged."
+    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nRoom-owned near walls 4%; closed doors 28%; 0.22s fade. Collision unchanged."
     ui.add_child(label)
 
 func _material(color: Color) -> StandardMaterial3D:
@@ -246,7 +261,7 @@ func _physics_process(_delta: float) -> void:
     hero.velocity = (right.normalized()*input.x-forward.normalized()*input.y).normalized()*5.0
     hero.move_and_slide()
     _update_camera()
-    _update_visibility()
+    _update_visibility(_delta)
 
 func _update_camera() -> void:
     if top_down:
@@ -258,22 +273,42 @@ func _update_camera() -> void:
     camera.global_position = hero.global_position+Vector3(sin(angle)*cos(elevation),sin(elevation),cos(angle)*cos(elevation))*26.0
     camera.look_at(hero.global_position+Vector3(0,0.8,0))
 
-func _update_visibility() -> void:
-    var room: int = _room_index(hero.position.x)
-    var camera_direction := camera.global_position-hero.global_position
-    camera_direction.y = 0.0
+func _update_visibility(delta: float) -> void:
+    var current_room: int = _current_room()
+    var toward_camera := camera.global_position-hero.global_position
+    toward_camera.y = 0.0
+    toward_camera = toward_camera.normalized()
+    var blend: float = clampf(delta/0.22,0.0,1.0)
     for record in wall_records:
-        var position: Vector3 = record["center"]
-        var visual: MeshInstance3D = record["visual"]
-        var same_room: bool = _room_index(position.x) == room
-        var in_front: bool = (position-hero.global_position).dot(camera_direction)>0.0
-        visual.material_override = faded_wall_material if cutaway and same_room and in_front else wall_material
+        var owners: Array = record["owners"]
+        var normals: Array = record["normals"]
+        var camera_facing: bool = false
+        for normal in normals:
+            var direction: Vector3 = normal
+            if direction.dot(toward_camera)>0.1:
+                camera_facing = true
+                break
+        var fade: bool = cutaway and owners.has(current_room) and camera_facing
+        var target: float = 0.04 if fade else 1.0
+        var alpha: float = lerpf(float(record["alpha"]),target,blend)
+        record["alpha"] = alpha
+        var material: StandardMaterial3D = record["material"]
+        var color := material.albedo_color
+        color.a = alpha
+        material.albedo_color = color
     for door in doors:
         var position: Vector3 = door["center"]
-        var visual: MeshInstance3D = door["visual"]
-        var near_side: bool = (position-hero.global_position).dot(camera_direction)>0.0
-        var nearby_room: bool = absf(position.x-hero.position.x)<8.0
-        visual.material_override = faded_door_material if cutaway and near_side and nearby_room else door_material
+        var local_x: float = position.x-floor_origin.x
+        var normal := Vector3(-1,0,0) if current_room == (0 if local_x<0 else 1) else Vector3(1,0,0)
+        var front: bool = normal.dot(toward_camera)>0.1
+        var fade: bool = cutaway and door["rooms"].has(current_room) and front
+        var target: float = 0.28 if fade else 1.0
+        var alpha: float = lerpf(float(door["alpha"]),target,blend)
+        door["alpha"] = alpha
+        var material: StandardMaterial3D = door["material"]
+        var color := material.albedo_color
+        color.a = alpha
+        material.albedo_color = color
 
 func _unhandled_key_input(event: InputEvent) -> void:
     if not event is InputEventKey or not event.pressed or event.echo:
