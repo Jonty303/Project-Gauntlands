@@ -68,6 +68,10 @@ func _physics_process(delta: float) -> void:
     var direction := Input.get_vector("move_left", "move_right", "move_up", "move_down")
     if touch_direction.length_squared() > 0.001:
         direction = touch_direction
+    # Map screen-relative joystick/WASD directions back into rotated world space.
+    var iso_camera := get_parent().get_node_or_null("Camera2D") as Camera2D
+    if iso_camera != null:
+        direction = direction.rotated(iso_camera.rotation)
     velocity = direction * move_speed
 
     if Input.is_action_just_pressed("weapon_toggle"):
