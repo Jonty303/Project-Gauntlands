@@ -8,6 +8,7 @@ var cutaway_enabled := true
 var camera: Camera3D
 var hero: CharacterBody3D
 var camera_yaw := 45.0
+var faded_material: StandardMaterial3D
 
 func _ready() -> void:
     _setup_materials()
@@ -28,6 +29,7 @@ func _ready() -> void:
     _wall(Vector3(2,0,-5), Vector3(14,0,-5))
     _wall(Vector3(2,0,5), Vector3(14,0,5))
     _wall(Vector3(14,0,-5), Vector3(14,0,5))
+    _build_junctions()
     _door_marker(Vector3(-2,0,0))
     _door_marker(Vector3(2,0,0))
     hero = CharacterBody3D.new()
@@ -71,6 +73,10 @@ func _ready() -> void:
     _update_cutaway()
 
 func _setup_materials() -> void:
+    faded_material = StandardMaterial3D.new()
+    faded_material.albedo_color = Color(0.55,0.58,0.57,0.12)
+    faded_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    faded_material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
     for entry in [["floor","#3c4650"],["wall","#7d817b"],["cap","#c6c3a9"],["hero","#5e9bb9"],["door","#80512d"]]:
         var material := StandardMaterial3D.new()
         material.albedo_color = Color(entry[1])
@@ -109,6 +115,31 @@ func _wall(a: Vector3, b: Vector3) -> void:
     cap.material_override = materials["cap"]
     solid.add_child(cap)
     walls.append({"node":solid,"face":mesh,"a":a,"b":b,"center":midpoint})
+
+func _build_junctions() -> void:
+    # Cover each unique perpendicular corner with one thickness-sized column.
+    # Wall centre lines end at the joint; caps do not extend past endpoints.
+    var junctions: Dictionary = {}
+    for wall in walls:
+        for point in [wall["a"], wall["b"]]:
+            var position: Vector3 = point
+            var key := "%0.3f:%0.3f" % [position.x, position.z]
+            if not junctions.has(key):
+                junctions[key] = {"position":position,"horizontal":false,"vertical":false}
+            var record: Dictionary = junctions[key]
+            var a: Vector3 = wall["a"]
+            var b: Vector3 = wall["b"]
+            if absf(a.x-b.x) > absf(a.z-b.z):
+                record["horizontal"] = true
+            else:
+                record["vertical"] = true
+    for key in junctions:
+        var record: Dictionary = junctions[key]
+        if not (bool(record["horizontal"]) and bool(record["vertical"])):
+            continue
+        var point: Vector3 = record["position"]
+        _mesh_box("CornerJunction", point + Vector3(0,HEIGHT*0.5,0), Vector3(THICKNESS,HEIGHT,THICKNESS), materials["wall"], true)
+        _mesh_box("CornerCap", point + Vector3(0,HEIGHT+0.035,0), Vector3(THICKNESS,0.07,THICKNESS), materials["cap"], false)
 
 func _mesh_box(label: String, center: Vector3, size: Vector3, material: Material, solid: bool) -> void:
     var root: Node3D = StaticBody3D.new() if solid else Node3D.new()
@@ -154,11 +185,7 @@ func _update_cutaway() -> void:
         var foreground := toward_view > 0.0 and absf(normal.dot(view.normalized())) > 0.15
         var face: MeshInstance3D = wall["face"]
         if cutaway_enabled and foreground:
-            var faded := StandardMaterial3D.new()
-            faded.albedo_color = Color(0.55,0.58,0.57,0.12)
-            faded.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
-            faded.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
-            face.material_override = faded
+            face.material_override = faded_material
         else:
             face.material_override = materials["wall"]
 
