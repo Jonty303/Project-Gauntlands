@@ -6,6 +6,7 @@ const GOBLIN_DETECTION := 12.0
 const GOBLIN_STOP := 1.65
 const GOBLIN_ATTACK_COOLDOWN := 1.45
 const GOBLIN_WINDUP := 0.48
+const LOOT_CHEST = preload("res://scripts/loot_chest_25d.gd")
 const COMBAT_LOG_UI = preload("res://scripts/combat_log_25d.gd")
 const SPIKE_TRAP = preload("res://scripts/spike_trap_25d.gd")
 const CHARACTER_ANIMATION = preload("res://scripts/character_animation_25d.gd")
@@ -43,6 +44,8 @@ var goblin_health: Dictionary = {}
 var goblin_home: Dictionary = {}
 var goblin_ai: Dictionary = {}
 var hero_health := 100
+var gold := 0
+var reward_chest: Node3D
 var hero_dead := false
 var goblin_state := "Idle"
 var goblin_distance := 0.0
@@ -86,6 +89,11 @@ func _ready() -> void:
         goblin_ai[goblin] = {"state":"Idle", "cooldown":0.5, "windup":-1.0, "last_seen":-100.0}
     goblins[2].reparent(chamber_root, true)
     _place_spike_trap(Vector3(5.5, 0, 1.0))
+    reward_chest = Node3D.new()
+    reward_chest.name = "GuardroomChest"
+    reward_chest.set_script(LOOT_CHEST)
+    reward_chest.position = Vector3(27.5, 0, 3.7)
+    chamber_root.add_child(reward_chest)
     _make_target_marker()
     camera = Camera3D.new()
     camera.name = "IsometricCamera"
@@ -321,6 +329,12 @@ func _unhandled_key_input(event: InputEvent) -> void:
         _cycle_target()
         return
     if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
+        if is_instance_valid(reward_chest) and reward_chest.is_visible_in_tree() and hero.global_position.distance_to(reward_chest.global_position) <= 2.0:
+            if reward_chest.call("interact", hero):
+                gold += 25
+                combat_log = "Found 25 gold! Total: %d" % gold
+                _floating_combat_text(reward_chest.global_position, "+25 GOLD", Color("#ffd36b"))
+                return
         var closest: Node3D = null
         var closest_distance := 2.5
         for candidate in doors:
