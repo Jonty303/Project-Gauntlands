@@ -7,14 +7,13 @@ const GOBLIN_STOP := 1.15
 const DEBUG_OVERLAY = preload("res://scripts/debug_overlay_25d.gd")
 const DUNGEON_DOOR = preload("res://scripts/dungeon_door_25d.gd")
 const WALL_HEIGHT := 3.1
-const CUTAWAY_HEIGHT := 0.65
-const CUTAWAY_SPEED := 7.0
+const WINDOW_FADE_SPEED := 5.0
 var hero: CharacterBody3D
 var camera: Camera3D
 var goblins: Array[CharacterBody3D] = []
 var wall_occluders: Array[StaticBody3D] = []
-var faded_walls: Dictionary = {}
-var wall_visual_heights: Dictionary = {}
+var wall_windows: Dictionary = {}
+var window_strengths: Dictionary = {}
 var doors: Array[Node3D] = []
 var goblin_state := "Idle"
 var goblin_distance := 0.0
@@ -99,7 +98,7 @@ func _physics_process(delta: float) -> void:
     _update_camera_transform(false, delta)
     _update_goblin()
     _update_wall_visibility()
-    _animate_cutaway_walls(delta)
+    _animate_wall_windows(delta)
 
 func _unhandled_key_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
@@ -155,23 +154,27 @@ func _update_wall_visibility() -> void:
         sight.collision_mask = 1
         if space.intersect_ray(sight).is_empty():
             _collect_camera_occluders(space,to,newly_faded)
-    faded_walls = newly_faded
+    wall_windows = newly_faded
 
-func _animate_cutaway_walls(delta: float) -> void:
-    # Keep the physics collider unchanged; lower only the visual geometry.
+func _animate_wall_windows(delta: float) -> void:
     for wall in wall_occluders:
         var visual := wall.get_node_or_null("Visual") as MeshInstance3D
-        var edge := wall.get_node_or_null("StoneEdge") as MeshInstance3D
-        if visual == null or edge == null:
+        if visual == null:
             continue
-        var full_height: float = wall_visual_heights[wall]
-        var target_height := minf(CUTAWAY_HEIGHT, full_height) if faded_walls.has(wall) else full_height
-        var current_height := visual.scale.y * full_height
-        var height := move_toward(current_height, target_height, CUTAWAY_SPEED * delta)
-        visual.scale.y = height / full_height
-        visual.position.y = (height - full_height) * 0.5
-        edge.position.y = height - full_height * 0.5 + 0.045
-
+        var shader_material := visual.material_override as ShaderMaterial
+        var positions: Array = wall_windows.get(wall, [])
+        var strength: float = window_strengths.get(wall, 0.0)
+        strength = move_toward(strength, 1.0 if not positions.is_empty() else 0.0, delta * WINDOW_FADE_SPEED)
+        window_strengths[wall] = strength
+        shader_material.set_shader_parameter("fade_strength", strength)
+        if not positions.is_empty():
+            var holes := PackedVector4Array()
+            for i in range(4):
+                holes.append(positions[i] if i < positions.size() else Vector4(-10.0, -10.0, 0.0, 0.0))
+            shader_material.set_shader_parameter("holes", holes)
+            shader_material.set_shader_parameter("hole_count", mini(positions.size(), 4))
+        elif strength <= 0.001:
+            shader_material.set_shader_parameter("hole_count", 0)
 
 func _collect_camera_occluders(space: PhysicsDirectSpaceState3D, target: Vector3, result: Dictionary) -> void:
     var origin := camera.global_position
@@ -186,7 +189,12 @@ func _collect_camera_occluders(space: PhysicsDirectSpaceState3D, target: Vector3
         var wall := hit["collider"] as StaticBody3D
         if wall == null or not wall_occluders.has(wall):
             break
-        result[wall] = true
+        if not result.has(wall):
+            result[wall] = []
+        var uv := camera.unproject_position(target) / get_viewport().get_visible_rect().size
+        var positions: Array = result[wall]
+        if positions.size() < 4:
+            positions.append(Vector4(uv.x, uv.y, 1.35 / camera.size, 0.0))
         excluded.append(wall.get_rid())
 
 func _update_camera_transform(immediate: bool, delta: float = 0.0) -> void:
@@ -208,15 +216,43 @@ func _make_box(label: String, location: Vector3, size: Vector3, tint: Color, sol
     var shape := BoxMesh.new()
     shape.size = size
     mesh.mesh = shape
-    var material := StandardMaterial3D.new()
-    material.albedo_color = tint
-    material.roughness = 1.0
-    mesh.material_override = material
+    if solid:
+        var shader := Shader.new()
+        shader.code = """shader_type spatial;
+render_mode blend_mix, depth_draw_opaque, cull_back;
+uniform vec4 stone_color : source_color = vec4(0.47, 0.48, 0.44, 1.0);
+uniform vec4 holes[4];
+uniform int hole_count = 0;
+uniform float fade_strength = 0.0;
+uniform float aspect_ratio = 1.77778;
+void fragment() {
+    ALBEDO = stone_color.rgb;
+    ROUGHNESS = 1.0;
+    float reveal = 0.0;
+    for (int i = 0; i < 4; i++) {
+        if (i >= hole_count) { break; }
+        vec2 delta = SCREEN_UV - holes[i].xy;
+        delta.x *= aspect_ratio;
+        float distance_to_target = length(delta);
+        reveal = max(reveal, 1.0 - smoothstep(holes[i].z * 0.55, holes[i].z, distance_to_target));
+    }
+    ALPHA = 1.0 - 0.94 * reveal * fade_strength;
+}
+"""
+        var wall_material := ShaderMaterial.new()
+        wall_material.shader = shader
+        wall_material.set_shader_parameter("stone_color", tint)
+        wall_material.set_shader_parameter("aspect_ratio", get_viewport().get_visible_rect().size.aspect())
+        mesh.material_override = wall_material
+    else:
+        var material := StandardMaterial3D.new()
+        material.albedo_color = tint
+        material.roughness = 1.0
+        mesh.material_override = material
     mesh.name = "Visual"
     body.add_child(mesh)
     if solid:
         wall_occluders.append(body)
-        wall_visual_heights[body] = size.y
         var edge := MeshInstance3D.new()
         edge.name = "StoneEdge"
         var cap := BoxMesh.new()
