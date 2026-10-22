@@ -30,7 +30,7 @@ func _physics_process(delta: float) -> void:
 
     if nearest_enemy != null:
         global_position = previous + segment * enemy_fraction
-        nearest_enemy.take_hit()
+        nearest_enemy.take_hit(2, "piercing")
         queue_free()
         return
     if not wall_hit.is_empty():
