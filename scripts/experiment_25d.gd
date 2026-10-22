@@ -9,29 +9,30 @@ var goblins: Array[CharacterBody3D] = []
 var light_enabled := true
 
 func _ready() -> void:
-    _make_box("Floor", Vector3(0,-0.18,0), Vector3(18,0.35,13), Color("#343b43"), false)
-    _make_box("CorridorFloor", Vector3(11,-0.18,0), Vector3(4,0.35,3), Color("#343b43"), false)
-    _make_box("SecondFloor", Vector3(16,-0.18,0), Vector3(7,0.35,9), Color("#343b43"), false)
-    _make_box("NorthWall", Vector3(0,1.55,-6.5), Vector3(18.5,WALL_HEIGHT,0.45), Color("#77796f"))
-    _make_box("SouthWall", Vector3(0,1.55,6.5), Vector3(18.5,WALL_HEIGHT,0.45), Color("#77796f"))
-    _make_box("WestWall", Vector3(-9,1.55,0), Vector3(0.45,WALL_HEIGHT,13), Color("#77796f"))
-    for z in [-4.25,4.25]:
-        _make_box("EastDoorJamb", Vector3(9,1.55,z), Vector3(0.45,WALL_HEIGHT,4.5), Color("#77796f"))
-    for z in [-1.7,1.7]:
-        _make_box("CorridorWall", Vector3(11,1.55,z), Vector3(4.2,WALL_HEIGHT,0.4), Color("#77796f"))
-    for z in [-3.0,3.0]:
-        _make_box("SecondDoorJamb", Vector3(13,1.55,z), Vector3(0.45,WALL_HEIGHT,3), Color("#77796f"))
-    _make_box("SecondNorth", Vector3(16,1.55,-4.5), Vector3(7,WALL_HEIGHT,0.45), Color("#77796f"))
-    _make_box("SecondSouth", Vector3(16,1.55,4.5), Vector3(7,WALL_HEIGHT,0.45), Color("#77796f"))
-    _make_box("SecondEast", Vector3(19.5,1.55,0), Vector3(0.45,WALL_HEIGHT,9), Color("#77796f"))
-    _make_box("Pillar", Vector3(-2,1.15,-2), Vector3(1.1,2.3,1.1), Color("#666d6c"))
+    # Enlarged interconnected layout: 26x19 main room, 6x5 corridor, 11x13 chamber.
+    _make_box("Floor", Vector3(0,-0.18,0), Vector3(26,0.35,19), Color("#343b43"), false)
+    _make_box("CorridorFloor", Vector3(16,-0.18,0), Vector3(6,0.35,5), Color("#343b43"), false)
+    _make_box("SecondFloor", Vector3(24.5,-0.18,0), Vector3(11,0.35,13), Color("#343b43"), false)
+    _make_box("NorthWall", Vector3(0,1.55,-9.5), Vector3(26.5,WALL_HEIGHT,0.45), Color("#77796f"))
+    _make_box("SouthWall", Vector3(0,1.55,9.5), Vector3(26.5,WALL_HEIGHT,0.45), Color("#77796f"))
+    _make_box("WestWall", Vector3(-13,1.55,0), Vector3(0.45,WALL_HEIGHT,19), Color("#77796f"))
+    for z in [-6.0,6.0]:
+        _make_box("EastDoorJamb", Vector3(13,1.55,z), Vector3(0.45,WALL_HEIGHT,7), Color("#77796f"))
+    for z in [-2.7,2.7]:
+        _make_box("CorridorWall", Vector3(16,1.55,z), Vector3(6.2,WALL_HEIGHT,0.4), Color("#77796f"))
+    for z in [-4.5,4.5]:
+        _make_box("SecondDoorJamb", Vector3(19,1.55,z), Vector3(0.45,WALL_HEIGHT,4), Color("#77796f"))
+    _make_box("SecondNorth", Vector3(24.5,1.55,-6.5), Vector3(11,WALL_HEIGHT,0.45), Color("#77796f"))
+    _make_box("SecondSouth", Vector3(24.5,1.55,6.5), Vector3(11,WALL_HEIGHT,0.45), Color("#77796f"))
+    _make_box("SecondEast", Vector3(30,1.55,0), Vector3(0.45,WALL_HEIGHT,13), Color("#77796f"))
+    _make_box("Pillar", Vector3(-3,1.15,-3), Vector3(1.1,2.3,1.1), Color("#666d6c"))
     hero = _make_actor("Hero", Vector3(-5,0,1), Color("#587b9c"))
     for position in [Vector3(1,0,-2),Vector3(3,0,2),Vector3(16,0,0)]:
         goblins.append(_make_actor("Goblin",position,Color("#769557")))
     camera = Camera3D.new()
     camera.name = "IsometricCamera"
     camera.projection = Camera3D.PROJECTION_ORTHOGONAL
-    camera.size = 19.0
+    camera.size = 13.0
     camera.current = true
     add_child(camera)
     camera.position = hero.global_position + Vector3(12,17,12)
