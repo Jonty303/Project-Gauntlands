@@ -4,7 +4,7 @@ const SFX = preload("res://scripts/combat_sfx.gd")
 
 var direction: Vector2 = Vector2.RIGHT
 var speed: float = 420.0
-var lifetime: float = 1.5
+var lifetime: float = 2.8
 
 func _physics_process(delta: float) -> void:
     var previous: Vector2 = global_position
@@ -40,11 +40,12 @@ func _physics_process(delta: float) -> void:
         return
 
     global_position = endpoint
-    if lifetime <= 0.0 or absf(global_position.x) >= 388.0 or absf(global_position.y) >= 258.0:
+    if lifetime <= 0.0:
         queue_free()
         return
     queue_redraw()
 
 func _draw() -> void:
-    draw_line(-direction * 9.0, direction * 9.0, Color("#e6c786"), 3.0)
-    draw_line(direction * 9.0, direction * 14.0, Color("#e8e8e8"), 2.0)
+    draw_line(-direction * 13.0, direction * 14.0, Color("#33271f"), 7.0)
+    draw_line(-direction * 13.0, direction * 14.0, Color("#f4d28b"), 4.0)
+    draw_line(direction * 12.0, direction * 21.0, Color("#f4f4e6"), 5.0)
