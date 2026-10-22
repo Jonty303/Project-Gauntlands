@@ -15,6 +15,10 @@ var wall_occluders: Array[StaticBody3D] = []
 var wall_windows: Dictionary = {}
 var window_strengths: Dictionary = {}
 var doors: Array[Node3D] = []
+var corridor_revealed := false
+var chamber_revealed := false
+var hidden_corridor: Array[Node3D] = []
+var hidden_chamber: Array[Node3D] = []
 var goblin_state := "Idle"
 var goblin_distance := 0.0
 var light_enabled := true
@@ -46,9 +50,10 @@ func _ready() -> void:
     _make_box("SecondNorth", Vector3(24.5,1.55,-6.5), Vector3(11,WALL_HEIGHT,0.45), Color("#77796f"))
     _make_box("SecondSouth", Vector3(24.5,1.55,6.5), Vector3(11,WALL_HEIGHT,0.45), Color("#77796f"))
     _make_box("SecondEast", Vector3(30,1.55,0), Vector3(0.45,WALL_HEIGHT,13), Color("#77796f"))
+    _setup_room_concealment()
     _make_box("Pillar", Vector3(-3,1.15,-3), Vector3(1.1,2.3,1.1), Color("#666d6c"))
     hero = _make_actor("Hero", Vector3(-5,0,1), Color("#587b9c"))
-    for position in [Vector3(1,0,-2),Vector3(3,0,2),Vector3(16,0,0)]:
+    for position in [Vector3(1,0,-2),Vector3(3,0,2),Vector3(24,0,0)]:
         goblins.append(_make_actor("Goblin",position,Color("#769557")))
     camera = Camera3D.new()
     camera.name = "IsometricCamera"
@@ -97,8 +102,34 @@ func _physics_process(delta: float) -> void:
     hero.move_and_slide()
     _update_camera_transform(false, delta)
     _update_goblin()
+    _update_room_reveal()
     _update_wall_visibility()
     _animate_wall_windows(delta)
+
+func _setup_room_concealment() -> void:
+    # Hide the unexplored corridor and chamber while retaining their collisions.
+    for label in ["CorridorFloor", "CorridorWall", "SecondDoorJamb", "DoubleDoorFrame"]:
+        for child in get_children():
+            if child is Node3D and child.name.begins_with(label):
+                hidden_corridor.append(child)
+    for label in ["SecondFloor", "SecondNorth", "SecondSouth", "SecondEast"]:
+        var child := get_node_or_null(label) as Node3D
+        if child != null:
+            hidden_chamber.append(child)
+    for item in hidden_corridor + hidden_chamber:
+        item.visible = false
+
+func _update_room_reveal() -> void:
+    if not corridor_revealed and doors.size() > 0 and bool(doors[0].get("opened")):
+        corridor_revealed = true
+        for item in hidden_corridor:
+            item.visible = true
+    if not chamber_revealed and doors.size() > 1 and bool(doors[1].get("opened")):
+        chamber_revealed = true
+        for item in hidden_chamber:
+            item.visible = true
+    if goblins.size() > 2:
+        goblins[2].visible = chamber_revealed
 
 func _unhandled_key_input(event: InputEvent) -> void:
     if event is InputEventKey and event.pressed and not event.echo and event.keycode == KEY_E:
@@ -146,7 +177,7 @@ func _update_wall_visibility() -> void:
     var newly_faded: Dictionary = {}
     _collect_camera_occluders(space, hero.global_position + Vector3(0,0.9,0), newly_faded)
     for goblin in goblins:
-        if not is_instance_valid(goblin):
+        if not is_instance_valid(goblin) or not goblin.visible:
             continue
         var from := hero.global_position + Vector3(0,0.9,0)
         var to := goblin.global_position + Vector3(0,0.9,0)
