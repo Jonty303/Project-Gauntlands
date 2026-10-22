@@ -18,7 +18,7 @@ script = ExtResource("1")
 position = Vector2(175, -85)
 script = ExtResource("4")
 collision_layer = 2
-collision_mask = 1
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Goblin"]
 shape = SubResource("GoblinCollision")
@@ -27,7 +27,7 @@ shape = SubResource("GoblinCollision")
 position = Vector2(100, 75)
 script = ExtResource("4")
 collision_layer = 2
-collision_mask = 1
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoblinNear"]
 shape = SubResource("GoblinCollision")
@@ -36,7 +36,7 @@ shape = SubResource("GoblinCollision")
 position = Vector2(285, 135)
 script = ExtResource("4")
 collision_layer = 2
-collision_mask = 1
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoblinFar"]
 shape = SubResource("GoblinCollision")
@@ -45,7 +45,7 @@ shape = SubResource("GoblinCollision")
 position = Vector2(-220, -125)
 script = ExtResource("4")
 collision_layer = 2
-collision_mask = 1
+collision_mask = 3
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="GoblinFlank"]
 shape = SubResource("GoblinCollision")
