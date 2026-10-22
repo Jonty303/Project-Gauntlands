@@ -110,7 +110,7 @@ func _refresh() -> void:
     if is_instance_valid(current_target):
         var health: Dictionary = experiment.get("goblin_health")
         target_text = "%s (%d HP)" % [current_target.name, int(health.get(current_target, 0))]
-    stats.text += "\nTarget: %s | %s" % [target_text, str(experiment.get("combat_log"))]
+    stats.text += "\nHero HP: %d / 100 | Target: %s | %s" % [int(experiment.get("hero_health")), target_text, str(experiment.get("combat_log"))]
     var captions := {"size":"Zoom","camera_elevation":"Elevation","camera_yaw":"Rotation","camera_distance":"Distance","camera_framing":"Framing"}
     for property in captions:
         var label: Label = readouts[property]
