@@ -109,7 +109,12 @@ func _is_enemy_alive(enemy: Variant) -> bool:
     return is_instance_valid(enemy) and not enemy.is_queued_for_deletion() and enemy.is_in_group("enemies")
 
 func _is_enemy_available(enemy: Variant) -> bool:
-    return _is_enemy_alive(enemy) and global_position.distance_to(enemy.global_position) <= MAX_TARGET_RANGE
+    return _is_enemy_alive(enemy) and global_position.distance_to(enemy.global_position) <= MAX_TARGET_RANGE and _has_clear_shot(enemy)
+
+func _has_clear_shot(enemy: Node2D) -> bool:
+    var query := PhysicsRayQueryParameters2D.create(global_position, enemy.global_position, 1)
+    query.exclude = [get_rid()]
+    return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
 
 func _refresh_soft_target() -> void:
     if _is_enemy_available(soft_target):
