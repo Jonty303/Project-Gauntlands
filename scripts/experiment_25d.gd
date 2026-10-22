@@ -207,6 +207,8 @@ func _physics_process(delta: float) -> void:
     right = right.normalized()
     up = up.normalized()
     var motion: Vector3 = (right * direction.x - up * direction.y).normalized()
+    if motion.length_squared() > 0.001 and not attack_held:
+        _turn_actor(hero, motion, delta)
     hero.velocity = motion * SPEED
     hero.move_and_slide()
     _update_combat(delta)
@@ -314,7 +316,7 @@ func _update_combat(delta: float) -> void:
     var direction := target.global_position - hero.global_position
     direction.y = 0.0
     if direction.length_squared() > 0.001:
-        hero.rotation.y = atan2(-direction.x, -direction.z)
+        _turn_actor(hero, direction, delta)
     attack_timer -= delta
     if attack_timer > 0.0:
         return
@@ -359,6 +361,12 @@ func _spawn_arrow(destination: Vector3) -> void:
     flight.tween_property(arrow, "global_position", destination, 0.16)
     flight.tween_callback(arrow.queue_free)
 
+func _turn_actor(actor: CharacterBody3D, facing: Vector3, delta: float) -> void:
+    if facing.length_squared() < 0.0001:
+        return
+    var desired := atan2(-facing.x, -facing.z)
+    actor.rotation.y = rotate_toward(actor.rotation.y, desired, delta * 8.0)
+
 func _update_goblin() -> void:
     if goblins.is_empty():
         return
@@ -375,6 +383,8 @@ func _update_goblin() -> void:
         goblin_state = "Idle" if goblin_distance > GOBLIN_DETECTION else "In range"
         goblin.velocity = Vector3.ZERO
     goblin.move_and_slide()
+    if goblin.velocity.length_squared() > 0.001:
+        _turn_actor(goblin, goblin.velocity, get_physics_process_delta_time())
     if goblin_state == "In range" and randf() < 0.008:
         goblin.get_node("Animator").call("play_attack")
 
