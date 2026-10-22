@@ -35,6 +35,21 @@ func _ready() -> void:
     _create_wall("SecondCoverWall", SECOND_COVER_CENTER, SECOND_COVER_SIZE)
     _build_navigation()
     _setup_depth_sorting()
+    _add_doorframe(Vector2(400.0, 0.0))
+    _add_doorframe(Vector2(570.0, 0.0))
+
+func _process(delta: float) -> void:
+    var hero := get_node_or_null("Player") as Node2D
+    var camera := get_node_or_null("Camera2D") as Camera2D
+    if hero != null and camera != null:
+        camera.global_position = camera.global_position.lerp(hero.global_position, minf(1.0, delta * 5.0))
+
+func _add_doorframe(at: Vector2) -> void:
+    var frame := Node2D.new()
+    frame.set_script(preload("res://scripts/doorframe.gd"))
+    frame.position = at + Vector2(0, DOOR_HALF)
+    frame.z_index = 1
+    add_child(frame)
 
 func _setup_depth_sorting() -> void:
     y_sort_enabled = true
