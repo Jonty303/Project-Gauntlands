@@ -46,10 +46,17 @@ func _build_floor_grid() -> void:
     grid.name = "AuthoritativeFloorGrid"
     grid.mesh_library = library
     grid.cell_size = Vector3(CELL,CELL,CELL)
+    grid.cell_center_x = true
+    grid.cell_center_y = true
+    grid.cell_center_z = true
     add_child(grid)
     for key in occupied:
         var cell: Vector2i = key
-        grid.set_cell_item(Vector3i(cell.x,0,cell.y),0)
+        var map_cell := Vector3i(cell.x,0,cell.y)
+        grid.set_cell_item(map_cell,0)
+        var actual_center: Vector3 = grid.to_global(grid.map_to_local(map_cell))
+        var expected_center := Vector3(float(cell.x)*CELL,0,float(cell.y)*CELL)
+        assert(actual_center.distance_to(expected_center) < 0.001,"GridMap floor centre disagrees with wall coordinate convention")
 
 func _build_boundary_walls() -> void:
     # An edge exists if and only if one side is occupied and the other is void.
