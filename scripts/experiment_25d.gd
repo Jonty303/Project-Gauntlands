@@ -3,7 +3,9 @@ extends Node3D
 const SPEED := 5.0
 const GOBLIN_SPEED := 3.5
 const GOBLIN_DETECTION := 12.0
-const GOBLIN_STOP := 1.15
+const GOBLIN_STOP := 1.65
+const GOBLIN_ATTACK_COOLDOWN := 1.45
+const GOBLIN_WINDUP := 0.48
 const SPIKE_TRAP = preload("res://scripts/spike_trap_25d.gd")
 const CHARACTER_ANIMATION = preload("res://scripts/character_animation_25d.gd")
 const DEBUG_OVERLAY = preload("res://scripts/debug_overlay_25d.gd")
@@ -32,6 +34,8 @@ var attack_held := false
 var attack_timer := 0.0
 var combat_log := "Ready"
 var goblin_health: Dictionary = {}
+var goblin_home: Dictionary = {}
+var goblin_ai: Dictionary = {}
 var hero_health := 100
 var hero_dead := false
 var goblin_state := "Idle"
@@ -72,6 +76,8 @@ func _ready() -> void:
         goblins.append(goblin)
         _decorate_actor(goblin, false)
         goblin_health[goblin] = 35
+        goblin_home[goblin] = goblin.global_position
+        goblin_ai[goblin] = {"state":"Idle", "cooldown":0.5, "windup":-1.0, "last_seen":-100.0}
     goblins[2].reparent(chamber_root, true)
     _place_spike_trap(Vector3(5.5, 0, 1.0))
     _make_target_marker()
@@ -126,11 +132,15 @@ func _on_trap_triggered(victim: CharacterBody3D, amount: int) -> void:
     if not goblin_health.has(victim):
         return
     goblin_health[victim] = int(goblin_health[victim]) - amount
+    if goblin_ai.has(victim):
+        goblin_ai[victim]["windup"] = -1.0
     combat_log = "Spike trap hit goblin! -%d HP" % amount
     victim.get_node("Animator").call("play_hit")
     if int(goblin_health[victim]) <= 0:
         goblins.erase(victim)
         goblin_health.erase(victim)
+        goblin_home.erase(victim)
+        goblin_ai.erase(victim)
         if target == victim:
             target = null
             attack_timer = INF
@@ -145,7 +155,7 @@ func _take_hero_damage(amount: int) -> void:
     hero.get_node("Animator").call("play_hit")
     if hero_health <= 0:
         hero_dead = true
-        combat_log = "Hero defeated by trap"
+        combat_log = "Hero defeated"
         hero.velocity = Vector3.ZERO
 
 func _decorate_start_room() -> void:
@@ -260,7 +270,7 @@ func _physics_process(delta: float) -> void:
     hero.move_and_slide()
     _update_combat(delta)
     _update_camera_transform(false, delta)
-    _update_goblin()
+    _update_goblin(delta)
     _update_room_reveal()
     _update_wall_visibility()
     _animate_wall_windows(delta)
@@ -383,6 +393,8 @@ func _update_combat(delta: float) -> void:
         var fallen := target
         goblins.erase(fallen)
         goblin_health.erase(fallen)
+        goblin_home.erase(fallen)
+        goblin_ai.erase(fallen)
         fallen.queue_free()
         target = null
         target_marker.visible = false
@@ -447,26 +459,81 @@ func _turn_actor(actor: CharacterBody3D, facing: Vector3, delta: float) -> void:
     var desired := atan2(-facing.x, -facing.z)
     actor.rotation.y = rotate_toward(actor.rotation.y, desired, delta * 8.0)
 
-func _update_goblin() -> void:
-    if goblins.is_empty():
-        return
-    var goblin := goblins[0]
-    if not is_instance_valid(goblin):
-        return
-    var displacement := hero.global_position - goblin.global_position
-    displacement.y = 0.0
-    goblin_distance = displacement.length()
-    if goblin_distance <= GOBLIN_DETECTION and goblin_distance > GOBLIN_STOP:
-        goblin_state = "Chasing"
-        goblin.velocity = displacement.normalized() * GOBLIN_SPEED
-    else:
-        goblin_state = "Idle" if goblin_distance > GOBLIN_DETECTION else "In range"
-        goblin.velocity = Vector3.ZERO
-    goblin.move_and_slide()
-    if goblin.velocity.length_squared() > 0.001:
-        _turn_actor(goblin, goblin.velocity, get_physics_process_delta_time())
-    if goblin_state == "In range" and randf() < 0.008:
-        goblin.get_node("Animator").call("play_attack")
+func _goblin_sees_hero(goblin: CharacterBody3D) -> bool:
+    if not goblin.is_visible_in_tree() or hero_dead:
+        return false
+    if goblin.global_position.distance_to(hero.global_position) > GOBLIN_DETECTION:
+        return false
+    var from := goblin.global_position + Vector3.UP
+    var to := hero.global_position + Vector3.UP
+    var ray := PhysicsRayQueryParameters3D.create(from, to)
+    ray.collision_mask = 1
+    return get_world_3d().direct_space_state.intersect_ray(ray).is_empty()
+
+func _update_goblin(delta: float) -> void:
+    goblin_state = "Idle"
+    goblin_distance = 0.0
+    for goblin in goblins:
+        if not is_instance_valid(goblin) or not goblin.is_visible_in_tree():
+            continue
+        var ai: Dictionary = goblin_ai[goblin]
+        var displacement := hero.global_position - goblin.global_position
+        displacement.y = 0.0
+        var distance := displacement.length()
+        var home: Vector3 = goblin_home[goblin]
+        var sees := _goblin_sees_hero(goblin)
+        ai["cooldown"] = maxf(0.0, float(ai["cooldown"]) - delta)
+        var health := int(goblin_health.get(goblin, 0))
+        var retreating := health <= 10
+        var state := "Idle"
+        var velocity := Vector3.ZERO
+        if float(ai["windup"]) >= 0.0:
+            ai["windup"] = float(ai["windup"]) - delta
+            state = "Attacking"
+            if float(ai["windup"]) < 0.0 and sees and distance <= GOBLIN_STOP + 0.35 and not hero_dead:
+                var roll := randf()
+                if roll < 0.18:
+                    combat_log = "Goblin misses!"
+                else:
+                    var critical := roll > 0.94
+                    var damage := 16 if critical else 9
+                    _take_hero_damage(damage)
+                    combat_log = ("Goblin critical! " if critical else "Goblin hit! ") + str(damage)
+        elif retreating:
+            state = "Retreating"
+            var away := goblin.global_position - hero.global_position
+            away.y = 0.0
+            if sees and away.length_squared() > 0.01:
+                velocity = away.normalized() * GOBLIN_SPEED
+            elif goblin.global_position.distance_to(home) > 0.6:
+                velocity = (home - goblin.global_position).normalized() * GOBLIN_SPEED
+            else:
+                state = "Guarding"
+        elif sees:
+            ai["last_seen"] = Time.get_ticks_msec() / 1000.0
+            if distance > GOBLIN_STOP:
+                state = "Chasing"
+                velocity = displacement.normalized() * GOBLIN_SPEED
+            elif float(ai["cooldown"]) <= 0.0:
+                state = "Attacking"
+                ai["windup"] = GOBLIN_WINDUP
+                ai["cooldown"] = GOBLIN_ATTACK_COOLDOWN
+                goblin.get_node("Animator").call("play_attack")
+            else:
+                state = "In range"
+        elif goblin.global_position.distance_to(home) > 0.6:
+            state = "Returning"
+            velocity = (home - goblin.global_position).normalized() * GOBLIN_SPEED
+        goblin.velocity = velocity
+        goblin.move_and_slide()
+        if velocity.length_squared() > 0.001:
+            _turn_actor(goblin, velocity, delta)
+        elif state == "Attacking" and displacement.length_squared() > 0.001:
+            _turn_actor(goblin, displacement, delta)
+        ai["state"] = state
+        if goblin == goblins[0]:
+            goblin_state = state
+            goblin_distance = distance
 
 func _update_wall_visibility() -> void:
     # Fade foreground walls for the hero and for enemies with a clear
