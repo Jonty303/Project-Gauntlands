@@ -22,6 +22,7 @@ var faded_door_material: StandardMaterial3D
 var door_material: StandardMaterial3D
 var doors: Array[Dictionary] = []
 var floor_grid: GridMap
+var floor_visuals: Dictionary = {}
 var floor_origin: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
@@ -62,7 +63,12 @@ func _build_floor_grid() -> void:
     var tile := BoxMesh.new()
     tile.size = Vector3(CELL,0.18,CELL)
     tile.material = floor_material
-    library.set_item_mesh(0,tile)
+    # Collision-only GridMap tile: visible floor uses separate MeshInstance3D.
+    var collision_tile := BoxMesh.new()
+    collision_tile.size = Vector3(CELL,0.18,CELL)
+    collision_tile.material = _material(Color(0,0,0,0))
+    collision_tile.material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    library.set_item_mesh(0,collision_tile)
     var floor_shape := BoxShape3D.new()
     floor_shape.size = Vector3(CELL,0.18,CELL)
     library.set_item_shapes(0,[{"shape":floor_shape,"transform":Transform3D.IDENTITY}])
@@ -82,6 +88,12 @@ func _build_floor_grid() -> void:
         var cell: Vector2i = key
         var map_cell := Vector3i(cell.x,0,cell.y)
         grid.set_cell_item(map_cell,0)
+        # Floor mesh is rendered separately: GridMap remains permanent collision.
+        var floor_visual := MeshInstance3D.new()
+        floor_visual.mesh = tile
+        floor_visual.position = grid.map_to_local(map_cell)
+        grid.add_child(floor_visual)
+        floor_visuals[cell] = floor_visual
         var actual_center: Vector3 = grid.to_global(grid.map_to_local(map_cell))
         var expected_center := floor_origin+Vector3(float(cell.x)*CELL,0,float(cell.y)*CELL)
         assert(actual_center.distance_to(expected_center) < 0.001,"GridMap floor centre disagrees with wall coordinate convention")
@@ -326,7 +338,8 @@ func _refresh_discovery_visuals() -> void:
         var cell: Vector2i = key
         var room: int = room_by_cell[cell]
         var grid_cell := Vector3i(cell.x,0,cell.y)
-        floor_grid.set_cell_item(grid_cell,0 if discovered_rooms.has(room) else -1)
+        var floor_visual: MeshInstance3D = floor_visuals[cell]
+        floor_visual.visible = discovered_rooms.has(room)
     for record in wall_records:
         var visible_room: bool = false
         for owner in record["owners"]:
