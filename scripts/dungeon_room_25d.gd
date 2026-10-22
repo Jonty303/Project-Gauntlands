@@ -34,7 +34,7 @@ func _end_wall(side: String, x: float, opening: float) -> void:
     if segment <= 0.0:
         return
     for sign in [-1.0,1.0]:
-        var z := sign * (opening*0.5 + segment*0.5)
+        var z: float = sign * (opening * 0.5 + segment * 0.5)
         _box(side+"Wall", Vector3(x,1.55,z), Vector3(0.45,WALL_HEIGHT,segment), stone_color)
 
 func _box(label: String, location: Vector3, dimensions: Vector3, tint: Color, solid: bool = true) -> void:
