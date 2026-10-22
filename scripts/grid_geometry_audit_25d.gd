@@ -9,19 +9,31 @@ var wall_records: Array[Dictionary] = []
 var hero: CharacterBody3D
 var camera: Camera3D
 var camera_yaw: float = 45.0
-var cutaway: bool = false
+var cutaway: bool = true
 var top_down: bool = false
 var floor_material: StandardMaterial3D
 var wall_material: StandardMaterial3D
+var faded_wall_material: StandardMaterial3D
+var faded_door_material: StandardMaterial3D
+var door_material: StandardMaterial3D
+var doors: Array[Dictionary] = []
 var floor_grid: GridMap
 var floor_origin: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
     floor_material = _material(Color("#51524d"))
     wall_material = _material(Color("#8a8980"))
+    faded_wall_material = _material(Color(0.54,0.53,0.50,0.04))
+    faded_wall_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    faded_wall_material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
+    door_material = _material(Color("#5c4430"))
+    faded_door_material = _material(Color(0.36,0.27,0.19,0.28))
+    faded_door_material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+    faded_door_material.depth_draw_mode = BaseMaterial3D.DEPTH_DRAW_DISABLED
     _define_layout()
     _build_floor_grid()
     _build_boundary_walls()
+    _build_doors()
     _build_hero()
     _build_camera_and_light()
     _build_label()
@@ -131,6 +143,47 @@ func _wall_piece(at: Vector3,along_x: bool) -> void:
     solid.add_child(visual)
     wall_records.append({"visual":visual,"center":at})
 
+func _build_doors() -> void:
+    # Both door centres use the measured GridMap origin, as do the walls.
+    for x in [-3.0,3.0]:
+        var root := StaticBody3D.new()
+        root.position = floor_origin+Vector3(x,1.18,0)
+        root.name = "Door_%d" % int(x)
+        add_child(root)
+        var visual := MeshInstance3D.new()
+        var mesh := BoxMesh.new()
+        mesh.size = Vector3(0.13,2.36,1.75)
+        visual.mesh = mesh
+        visual.material_override = door_material
+        root.add_child(visual)
+        var collider := CollisionShape3D.new()
+        var box := BoxShape3D.new()
+        box.size = mesh.size
+        collider.shape = box
+        root.add_child(collider)
+        doors.append({"body":root,"visual":visual,"collider":collider,"closed":true,"center":root.position})
+
+func _room_index(x: float) -> int:
+    var local_x := x-floor_origin.x
+    if local_x < -3.0:
+        return 0
+    if local_x > 3.0:
+        return 2
+    return 1
+
+func _toggle_nearby_door() -> void:
+    for door in doors:
+        var centre: Vector3 = door["center"]
+        if hero.position.distance_to(centre-Vector3(0,1.18,0)) > 2.3:
+            continue
+        var now_closed: bool = not door["closed"]
+        door["closed"] = now_closed
+        var visual: MeshInstance3D = door["visual"]
+        var collider: CollisionShape3D = door["collider"]
+        visual.visible = now_closed
+        collider.set_deferred("disabled",not now_closed)
+        return
+
 func _build_hero() -> void:
     hero = CharacterBody3D.new()
     hero.position = Vector3(-10,0,0)
@@ -176,7 +229,7 @@ func _build_label() -> void:
     add_child(ui)
     var label := Label.new()
     label.position = Vector2(16,16)
-    label.text = "GEOMETRY AUDIT | WASD move | Q/E rotate | C hide foreground walls\nWalls and floors use identical integer grid coordinates. Cutaway starts OFF."
+    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nNear walls 4% opacity; closed near doors 28%. Wall collision unchanged."
     ui.add_child(label)
 
 func _material(color: Color) -> StandardMaterial3D:
@@ -206,16 +259,28 @@ func _update_camera() -> void:
     camera.look_at(hero.global_position+Vector3(0,0.8,0))
 
 func _update_visibility() -> void:
-    var toward_camera := camera.global_position-hero.global_position
+    var room: int = _room_index(hero.position.x)
+    var camera_direction := camera.global_position-hero.global_position
+    camera_direction.y = 0.0
     for record in wall_records:
         var position: Vector3 = record["center"]
         var visual: MeshInstance3D = record["visual"]
-        visual.visible = not (cutaway and (position-hero.global_position).dot(toward_camera)>0.0)
+        var same_room: bool = _room_index(position.x) == room
+        var in_front: bool = (position-hero.global_position).dot(camera_direction)>0.0
+        visual.material_override = faded_wall_material if cutaway and same_room and in_front else wall_material
+    for door in doors:
+        var position: Vector3 = door["center"]
+        var visual: MeshInstance3D = door["visual"]
+        var near_side: bool = (position-hero.global_position).dot(camera_direction)>0.0
+        var nearby_room: bool = absf(position.x-hero.position.x)<8.0
+        visual.material_override = faded_door_material if cutaway and near_side and nearby_room else door_material
 
 func _unhandled_key_input(event: InputEvent) -> void:
     if not event is InputEventKey or not event.pressed or event.echo:
         return
-    if event.keycode == KEY_Q:
+    if event.keycode == KEY_F:
+        _toggle_nearby_door()
+    elif event.keycode == KEY_Q:
         camera_yaw -= 45.0
     elif event.keycode == KEY_E:
         camera_yaw += 45.0
