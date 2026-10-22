@@ -17,8 +17,8 @@ var window_strengths: Dictionary = {}
 var doors: Array[Node3D] = []
 var corridor_revealed := false
 var chamber_revealed := false
-var hidden_corridor: Array[Node3D] = []
-var hidden_chamber: Array[Node3D] = []
+var corridor_root: Node3D
+var chamber_root: Node3D
 var goblin_state := "Idle"
 var goblin_distance := 0.0
 var light_enabled := true
@@ -116,31 +116,37 @@ func _physics_process(delta: float) -> void:
     _animate_wall_windows(delta)
 
 func _setup_room_concealment() -> void:
-    # Hide the unexplored corridor and chamber while retaining their collisions.
-    for label in ["CorridorFloor", "CorridorWall", "SecondDoorJamb", "DoubleDoorFrame"]:
-        for child in get_children():
-            if child is Node3D and child.name.begins_with(label):
-                hidden_corridor.append(child)
-    for label in ["SecondFloor", "SecondNorth", "SecondSouth", "SecondEast"]:
-        var child := get_node_or_null(label) as Node3D
-        if child != null:
-            hidden_chamber.append(child)
-    for item in hidden_corridor + hidden_chamber:
-        item.visible = false
-    _make_box("UnexploredCorridor", Vector3(16,-0.01,0), Vector3(6,0.02,5), Color("#12171c"), false)
-    _make_box("UnexploredChamber", Vector3(24.5,-0.01,0), Vector3(11,0.02,13), Color("#12171c"), false)
+    # Room ownership, not a collection of unrelated visibility toggles.
+    # Keep entrance wall and first door in the visible starting room.
+    corridor_root = Node3D.new()
+    corridor_root.name = "CorridorRoom"
+    add_child(corridor_root)
+    chamber_root = Node3D.new()
+    chamber_root.name = "EncounterRoom"
+    add_child(chamber_root)
+    _move_room_parts(corridor_root, ["CorridorFloor", "CorridorWall", "SecondDoorJamb"])
+    _move_room_parts(chamber_root, ["SecondFloor", "SecondNorth", "SecondSouth", "SecondEast"])
+    # The second doorway is only known once the corridor is discovered.
+    doors[1].reparent(corridor_root, true)
+    corridor_root.visible = false
+    chamber_root.visible = false
+
+func _move_room_parts(destination: Node3D, prefixes: Array[String]) -> void:
+    for child in get_children():
+        if not child is Node3D or child == destination:
+            continue
+        for prefix in prefixes:
+            if child.name.begins_with(prefix):
+                child.reparent(destination, true)
+                break
 
 func _update_room_reveal() -> void:
-    if not corridor_revealed and doors.size() > 0 and bool(doors[0].get("opened")):
+    if not corridor_revealed and bool(doors[0].get("opened")):
         corridor_revealed = true
-        for item in hidden_corridor:
-            item.visible = true
-        get_node("UnexploredCorridor").visible = false
-    if not chamber_revealed and doors.size() > 1 and bool(doors[1].get("opened")):
+        corridor_root.visible = true
+    if not chamber_revealed and corridor_revealed and bool(doors[1].get("opened")):
         chamber_revealed = true
-        for item in hidden_chamber:
-            item.visible = true
-        get_node("UnexploredChamber").visible = false
+        chamber_root.visible = true
     if goblins.size() > 2:
         goblins[2].visible = chamber_revealed
 
@@ -149,6 +155,8 @@ func _unhandled_key_input(event: InputEvent) -> void:
         var closest: Node3D = null
         var closest_distance := 2.5
         for candidate in doors:
+            if not candidate.is_visible_in_tree():
+                continue
             var distance := hero.global_position.distance_to(candidate.global_position)
             if distance < closest_distance:
                 closest_distance = distance
