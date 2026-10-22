@@ -4,6 +4,7 @@ const SPEED := 5.0
 const GOBLIN_SPEED := 3.5
 const GOBLIN_DETECTION := 12.0
 const GOBLIN_STOP := 1.15
+const CHARACTER_ANIMATION = preload("res://scripts/character_animation_25d.gd")
 const DEBUG_OVERLAY = preload("res://scripts/debug_overlay_25d.gd")
 const DUNGEON_DOOR = preload("res://scripts/dungeon_door_25d.gd")
 const START_ROOM = preload("res://scenes/rooms/starting_chamber.tscn")
@@ -157,6 +158,7 @@ func _decorate_actor(actor: CharacterBody3D, is_hero: bool) -> void:
         var leg_mesh := BoxMesh.new()
         leg_mesh.size = Vector3(0.23, 0.62, 0.29)
         leg.mesh = leg_mesh
+        leg.name = "LeftLeg" if side < 0.0 else "RightLeg"
         leg.position = Vector3(side * 0.18, 0.34, 0)
         var cloth := StandardMaterial3D.new()
         cloth.albedo_color = Color("#343b40") if is_hero else Color("#554634")
@@ -166,6 +168,7 @@ func _decorate_actor(actor: CharacterBody3D, is_hero: bool) -> void:
         var arm_mesh := BoxMesh.new()
         arm_mesh.size = Vector3(0.2, 0.65, 0.24)
         arm.mesh = arm_mesh
+        arm.name = "LeftArm" if side < 0.0 else "RightArm"
         arm.position = Vector3(side * 0.42, 1.04, 0)
         arm.material_override = torso_mat
         actor.add_child(arm)
@@ -188,6 +191,11 @@ func _decorate_actor(actor: CharacterBody3D, is_hero: bool) -> void:
         leather.albedo_color = Color("#6b4b31")
         pack.material_override = leather
         actor.add_child(pack)
+    var animator := Node3D.new()
+    animator.name = "Animator"
+    animator.set_script(CHARACTER_ANIMATION)
+    animator.set("is_hero", is_hero)
+    actor.add_child(animator)
 
 func _physics_process(delta: float) -> void:
     var direction := Input.get_vector("move_left","move_right","move_up","move_down")
@@ -311,6 +319,8 @@ func _update_combat(delta: float) -> void:
     if attack_timer > 0.0:
         return
     attack_timer = ATTACK_INTERVAL
+    hero.get_node("Animator").call("play_attack")
+    _spawn_arrow(target.global_position + Vector3(0, 1.05, 0))
     var roll := randf()
     if roll < 0.15:
         combat_log = "Miss!"
@@ -318,6 +328,7 @@ func _update_combat(delta: float) -> void:
     var critical := roll > 0.92
     var damage := 15 if critical else 8
     goblin_health[target] = int(goblin_health[target]) - damage
+    target.get_node("Animator").call("play_hit")
     combat_log = ("Critical! " if critical else "Hit! ") + str(damage)
     if int(goblin_health[target]) <= 0:
         var fallen := target
@@ -329,6 +340,24 @@ func _update_combat(delta: float) -> void:
         combat_log = "Goblin defeated"
         # Require button release before firing at a different target.
         attack_timer = INF
+
+func _spawn_arrow(destination: Vector3) -> void:
+    var arrow := MeshInstance3D.new()
+    arrow.name = "Arrow"
+    var shaft := CylinderMesh.new()
+    shaft.top_radius = 0.025
+    shaft.bottom_radius = 0.025
+    shaft.height = 0.65
+    arrow.mesh = shaft
+    var wood := StandardMaterial3D.new()
+    wood.albedo_color = Color("#b58b55")
+    arrow.material_override = wood
+    add_child(arrow)
+    var origin := hero.global_position + Vector3(0, 1.2, 0)
+    arrow.global_position = origin
+    var flight := create_tween()
+    flight.tween_property(arrow, "global_position", destination, 0.16)
+    flight.tween_callback(arrow.queue_free)
 
 func _update_goblin() -> void:
     if goblins.is_empty():
@@ -346,6 +375,8 @@ func _update_goblin() -> void:
         goblin_state = "Idle" if goblin_distance > GOBLIN_DETECTION else "In range"
         goblin.velocity = Vector3.ZERO
     goblin.move_and_slide()
+    if goblin_state == "In range" and randf() < 0.008:
+        goblin.get_node("Animator").call("play_attack")
 
 func _update_wall_visibility() -> void:
     # Fade foreground walls for the hero and for enemies with a clear
