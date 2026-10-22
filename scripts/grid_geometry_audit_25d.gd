@@ -13,6 +13,8 @@ var cutaway: bool = false
 var top_down: bool = false
 var floor_material: StandardMaterial3D
 var wall_material: StandardMaterial3D
+var floor_grid: GridMap
+var floor_origin: Vector3 = Vector3.ZERO
 
 func _ready() -> void:
     floor_material = _material(Color("#51524d"))
@@ -43,19 +45,23 @@ func _build_floor_grid() -> void:
     tile.material = floor_material
     library.set_item_mesh(0,tile)
     var grid := GridMap.new()
+    floor_grid = grid
     grid.name = "AuthoritativeFloorGrid"
     grid.mesh_library = library
     grid.cell_size = Vector3(CELL,CELL,CELL)
-    grid.cell_center_x = false
+    grid.cell_center_x = true
     grid.cell_center_y = true
-    grid.cell_center_z = false
+    grid.cell_center_z = true
     add_child(grid)
+    # Measure the actual GridMap transform instead of assuming its cell origin.
+    floor_origin = grid.to_global(grid.map_to_local(Vector3i.ZERO))
+    print("Measured GridMap origin: ", floor_origin)
     for key in occupied:
         var cell: Vector2i = key
         var map_cell := Vector3i(cell.x,0,cell.y)
         grid.set_cell_item(map_cell,0)
         var actual_center: Vector3 = grid.to_global(grid.map_to_local(map_cell))
-        var expected_center := Vector3(float(cell.x)*CELL,0,float(cell.y)*CELL)
+        var expected_center := floor_origin+Vector3(float(cell.x)*CELL,0,float(cell.y)*CELL)
         assert(actual_center.distance_to(expected_center) < 0.001,"GridMap floor centre disagrees with wall coordinate convention")
 
 func _build_boundary_walls() -> void:
@@ -76,7 +82,7 @@ func _build_boundary_walls() -> void:
             var edge_key := "%d:%d:%d" % [edge_x,edge_z,int(along_x)]
             assert(not unique_edges.has(edge_key),"Duplicate boundary edge")
             unique_edges[edge_key] = true
-            var midpoint := Vector3(float(edge_x)*CELL*0.5,0,float(edge_z)*CELL*0.5)
+            var midpoint := floor_origin+Vector3(float(edge_x)*CELL*0.5,0,float(edge_z)*CELL*0.5)
             _wall_piece(midpoint,along_x)
             # Corners are derived from wall edges, not independently placed.
             var tangent := Vector3(CELL*0.5,0,0) if along_x else Vector3(0,0,CELL*0.5)
