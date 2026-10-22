@@ -35,14 +35,14 @@ func _ready() -> void:
     _create_wall("SecondCoverWall", SECOND_COVER_CENTER, SECOND_COVER_SIZE)
     _build_navigation()
     _setup_depth_sorting()
-    # Camera-only diamond experiment: physics, collision and navigation stay in world coordinates.
+    # Closer tactical camera: character scale and wall elevation now read at play distance.
     var iso_camera := get_node_or_null("Camera2D") as Camera2D
     if iso_camera != null:
         # Camera2D ignores its rotation by default: explicitly enable it.
         iso_camera.ignore_rotation = false
         iso_camera.rotation = -PI / 4.0
         # Non-uniform scale compresses the diamond vertical axis.
-        iso_camera.zoom = Vector2(0.75, 0.56)
+        iso_camera.zoom = Vector2(1.06, 0.80)
     _add_doorframe(Vector2(400.0, 0.0))
     _add_doorframe(Vector2(570.0, 0.0))
 
