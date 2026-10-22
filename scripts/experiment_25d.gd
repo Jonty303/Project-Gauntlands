@@ -125,6 +125,24 @@ func _place_spike_trap(location: Vector3) -> void:
     trap.connect("triggered", Callable(self, "_on_trap_triggered"))
     add_child(trap)
 
+func _floating_combat_text(world_position: Vector3, message: String, tint: Color) -> void:
+    var label := Label3D.new()
+    label.name = "CombatText"
+    label.text = message
+    label.font_size = 48
+    label.pixel_size = 0.006
+    label.billboard = BaseMaterial3D.BILLBOARD_ENABLED
+    label.no_depth_test = true
+    label.outline_size = 8
+    label.modulate = tint
+    label.position = world_position + Vector3(randf_range(-0.22, 0.22), 2.05, 0)
+    add_child(label)
+    var drift := create_tween()
+    drift.set_parallel(true)
+    drift.tween_property(label, "position", label.position + Vector3(0, 1.1, 0), 0.9)
+    drift.tween_property(label, "modulate:a", 0.0, 0.9).set_delay(0.25)
+    drift.chain().tween_callback(label.queue_free)
+
 func _on_trap_triggered(victim: CharacterBody3D, amount: int) -> void:
     if victim == hero:
         _take_hero_damage(amount)
@@ -135,6 +153,7 @@ func _on_trap_triggered(victim: CharacterBody3D, amount: int) -> void:
     if goblin_ai.has(victim):
         goblin_ai[victim]["windup"] = -1.0
     combat_log = "Spike trap hit goblin! -%d HP" % amount
+    _floating_combat_text(victim.global_position, str(amount), Color("#ff9359"))
     victim.get_node("Animator").call("play_hit")
     if int(goblin_health[victim]) <= 0:
         goblins.erase(victim)
@@ -151,6 +170,7 @@ func _take_hero_damage(amount: int) -> void:
     if hero_dead:
         return
     hero_health = maxi(0, hero_health - amount)
+    _floating_combat_text(hero.global_position, "-%d" % amount, Color("#ff6565"))
     combat_log = "Spike trap! -%d HP" % amount
     hero.get_node("Animator").call("play_hit")
     if hero_health <= 0:
@@ -385,12 +405,14 @@ func _update_combat(delta: float) -> void:
     var roll := randf()
     if roll < 0.15:
         combat_log = "Miss!"
+        _floating_combat_text(target.global_position, "MISS", Color("#bfc6c9"))
         return
     var critical := roll > 0.92
     var damage := 15 if critical else 8
     goblin_health[target] = int(goblin_health[target]) - damage
     target.get_node("Animator").call("play_hit")
     combat_log = ("Critical! " if critical else "Hit! ") + str(damage)
+    _floating_combat_text(target.global_position, ("CRIT %d!" % damage) if critical else str(damage), Color("#ffca52") if critical else Color("#f5f1dc"))
     if int(goblin_health[target]) <= 0:
         var fallen := target
         goblins.erase(fallen)
@@ -496,6 +518,7 @@ func _update_goblin(delta: float) -> void:
                 var roll := randf()
                 if roll < 0.18:
                     combat_log = "Goblin misses!"
+                    _floating_combat_text(hero.global_position, "MISS", Color("#bfc6c9"))
                 else:
                     var critical := roll > 0.94
                     var damage := 16 if critical else 9
