@@ -222,7 +222,7 @@ func _update_animation(delta: float) -> void:
     shot_recoil = move_toward(shot_recoil, 0.0, delta * 5.0)
 
 func _draw() -> void:
-    draw_set_transform(Vector2.ZERO, -PI / 4.0)
+    draw_set_transform(Vector2.ZERO, -PI / 4.0, Vector2(1.55, 1.55))
     draw_rect(Rect2(-28, -45, 56, 6), Color("#402b2b"))
     draw_rect(Rect2(-28, -45, 56.0 * health / MAX_HEALTH, 6), Color("#c65d54"))
     if defeated:
@@ -249,7 +249,7 @@ func _draw() -> void:
 
     draw_set_transform(Vector2(0, 9), 0.0, Vector2(1.0, 0.4))
     draw_circle(Vector2.ZERO, 18.0, Color(0.03, 0.04, 0.05, 0.4))
-    draw_set_transform(Vector2.ZERO, -PI / 4.0)
+    draw_set_transform(Vector2.ZERO, -PI / 4.0, Vector2(1.55, 1.55))
     var torso_center := forward * (1.5 - shot_recoil * 2.5 - bounce) - Vector2(0, 5)
     draw_circle(torso_center, 11.0, Color("#64745a"))
     draw_line(torso_center - side * 7.0, torso_center + side * 7.0, Color("#394b3c"), 3.0)
