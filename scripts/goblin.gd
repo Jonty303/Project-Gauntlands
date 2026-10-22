@@ -174,16 +174,26 @@ func _draw() -> void:
             draw_line(Vector2.ZERO, to_local(player.global_position), Color("#72dca3") if _can_see_player() else Color("#a54b4b"), 1.0)
     if alive:
         draw_ellipse_shadow()
-        draw_circle(Vector2(2, -10), 14.0, Color("#385438"))
-        draw_circle(Vector2.ZERO + Vector2(0, -10), 12.0, Color("#b97b4a") if winding_up else Color("#618b51"))
-        draw_colored_polygon(PackedVector2Array([Vector2(-10, -16), Vector2(-21, -22), Vector2(-12, -7)]), Color("#537d46"))
-        draw_colored_polygon(PackedVector2Array([Vector2(10, -16), Vector2(21, -22), Vector2(12, -7)]), Color("#537d46"))
+        # Shaded leather-clad body with a raised head and grounded boots.
+        draw_colored_polygon(PackedVector2Array([
+            Vector2(-13, -8), Vector2(-13, -26), Vector2(-4, -33),
+            Vector2(11, -26), Vector2(14, -8), Vector2(5, -4)
+        ]), Color("#3d4932"))
+        draw_colored_polygon(PackedVector2Array([
+            Vector2(-11, -25), Vector2(-3, -30), Vector2(2, -9), Vector2(-9, -8)
+        ]), Color("#766345"))
+        draw_line(Vector2(-9, -5), Vector2(-11, 8), Color("#473b2d"), 7.0)
+        draw_line(Vector2(8, -5), Vector2(11, 8), Color("#473b2d"), 7.0)
+        draw_circle(Vector2(2, -28), 13.0, Color("#36563a"))
+        draw_circle(Vector2(0, -28), 11.0, Color("#b97b4a") if winding_up else Color("#618b51"))
+        draw_colored_polygon(PackedVector2Array([Vector2(-9, -32), Vector2(-23, -39), Vector2(-12, -22)]), Color("#537d46"))
+        draw_colored_polygon(PackedVector2Array([Vector2(9, -32), Vector2(23, -39), Vector2(12, -22)]), Color("#537d46"))
         draw_line(Vector2(-7, -4), Vector2(-9, 8), Color("#40372d"), 5.0)
         draw_line(Vector2(7, -4), Vector2(9, 8), Color("#40372d"), 5.0)
-        draw_circle(Vector2(-7, -13), 3.0, Color("#e0c88a"))
-        draw_circle(Vector2(7, -13), 3.0, Color("#e0c88a"))
-        draw_rect(Rect2(-19, -29, 38, 5), Color("#402b2b"))
-        draw_rect(Rect2(-19, -29, 38.0 * health / MAX_HEALTH, 5), Color("#a5c86c"))
+        draw_circle(Vector2(-6, -30), 2.5, Color("#e0c88a"))
+        draw_circle(Vector2(6, -30), 2.5, Color("#e0c88a"))
+        draw_rect(Rect2(-19, -49, 38, 5), Color("#402b2b"))
+        draw_rect(Rect2(-19, -49, 38.0 * health / MAX_HEALTH, 5), Color("#a5c86c"))
         if winding_up:
             draw_arc(Vector2.ZERO, 23.0, 0.0, TAU, 24, Color("#f4a35d"), 2.5)
 
