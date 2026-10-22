@@ -9,8 +9,8 @@ func _draw() -> void:
     var left := -wall_size.x * 0.5
     var right := wall_size.x * 0.5
     var back := -wall_size.y
-    # Counter-rotate the height vector so walls rise vertically on screen.
-    var rise := Vector2(0, -HEIGHT).rotated(PI / 4.0)
+    # Counter-rotate camera view: screen-vertical height is -45 degrees in world space.
+    var rise := Vector2(0, -HEIGHT).rotated(-PI / 4.0)
     draw_colored_polygon(PackedVector2Array([
         Vector2(left, 0), Vector2(right, 0),
         Vector2(right, 0) + rise, Vector2(left, 0) + rise
