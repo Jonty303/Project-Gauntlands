@@ -27,6 +27,11 @@ func _ready() -> void:
 
 func _setup_depth_sorting() -> void:
     y_sort_enabled = true
+    # The dungeon floor is drawn by this parent at z=0. Actors must be
+    # above it even when their Y coordinates are negative.
+    for actor in get_children():
+        if actor is CharacterBody2D:
+            actor.z_index = 1
     _add_wall_visual(COVER_CENTER, COVER_SIZE)
     _add_wall_visual(SECOND_COVER_CENTER, SECOND_COVER_SIZE)
 
@@ -35,6 +40,7 @@ func _add_wall_visual(center: Vector2, size: Vector2) -> void:
     visual.set_script(preload("res://scripts/raised_wall.gd"))
     visual.position = Vector2(center.x, center.y + size.y * 0.5)
     visual.set("wall_size", size)
+    visual.z_index = 1
     add_child(visual)
 
 func _build_navigation() -> void:
