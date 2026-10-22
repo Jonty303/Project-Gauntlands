@@ -23,6 +23,19 @@ func _ready() -> void:
     _create_wall("CoverWall", COVER_CENTER, COVER_SIZE)
     _create_wall("SecondCoverWall", SECOND_COVER_CENTER, SECOND_COVER_SIZE)
     _build_navigation()
+    _setup_depth_sorting()
+
+func _setup_depth_sorting() -> void:
+    y_sort_enabled = true
+    _add_wall_visual(COVER_CENTER, COVER_SIZE)
+    _add_wall_visual(SECOND_COVER_CENTER, SECOND_COVER_SIZE)
+
+func _add_wall_visual(center: Vector2, size: Vector2) -> void:
+    var visual := Node2D.new()
+    visual.set_script(preload("res://scripts/raised_wall.gd"))
+    visual.position = Vector2(center.x, center.y + size.y * 0.5)
+    visual.set("wall_size", size)
+    add_child(visual)
 
 func _build_navigation() -> void:
     navigation_grid = AStarGrid2D.new()
@@ -96,14 +109,3 @@ func _draw() -> void:
     draw_rect(Rect2(-half.x - t / 2.0, -half.y - t / 2.0, t, DUNGEON_SIZE.y + t), WALL_COLOR)
     draw_rect(Rect2(half.x - t / 2.0, -half.y - t / 2.0, t, DUNGEON_SIZE.y + t), WALL_COLOR)
     draw_rect(Rect2(COVER_CENTER - COVER_SIZE / 2.0, COVER_SIZE), WALL_COLOR)
-    _draw_raised_wall(COVER_CENTER, COVER_SIZE)
-    _draw_raised_wall(SECOND_COVER_CENTER, SECOND_COVER_SIZE)
-
-func _draw_raised_wall(center: Vector2, size: Vector2) -> void:
-    # Raised wall is visual only; existing 2D collision and navigation are unchanged.
-    var footprint := Rect2(center - size / 2.0, size)
-    var elevated := footprint.position - Vector2(0, WALL_HEIGHT)
-    draw_colored_polygon(PackedVector2Array([Vector2(footprint.position.x, footprint.end.y), footprint.end, footprint.end - Vector2(0, WALL_HEIGHT), Vector2(footprint.position.x, footprint.end.y - WALL_HEIGHT)]), WALL_FACE_COLOR)
-    draw_rect(Rect2(elevated, size), WALL_TOP_COLOR)
-
-
