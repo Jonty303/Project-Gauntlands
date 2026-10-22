@@ -68,7 +68,7 @@ func _set_value(property: String, value: float) -> void:
 
 func _reset() -> void:
     _set_value("size",13.0)
-    _set_value("camera_elevation",45.0)
+    _set_value("camera_elevation",24.0)
     _set_value("camera_yaw",45.0)
     _set_value("camera_distance",24.0)
     _set_value("camera_framing",0.7)
