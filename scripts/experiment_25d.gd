@@ -6,11 +6,14 @@ const GOBLIN_DETECTION := 12.0
 const GOBLIN_STOP := 1.15
 const DEBUG_OVERLAY = preload("res://scripts/debug_overlay_25d.gd")
 const WALL_HEIGHT := 3.1
+const CUTAWAY_HEIGHT := 0.65
+const CUTAWAY_SPEED := 7.0
 var hero: CharacterBody3D
 var camera: Camera3D
 var goblins: Array[CharacterBody3D] = []
 var wall_occluders: Array[StaticBody3D] = []
 var faded_walls: Dictionary = {}
+var wall_visual_heights: Dictionary = {}
 var goblin_state := "Idle"
 var goblin_distance := 0.0
 var light_enabled := true
@@ -88,6 +91,7 @@ func _physics_process(delta: float) -> void:
     _update_camera_transform(false, delta)
     _update_goblin()
     _update_wall_visibility()
+    _animate_cutaway_walls(delta)
 
 func _update_goblin() -> void:
     if goblins.is_empty():
@@ -120,19 +124,23 @@ func _update_wall_visibility() -> void:
         sight.collision_mask = 1
         if space.intersect_ray(sight).is_empty():
             _collect_camera_occluders(space,to,newly_faded)
-    for wall in wall_occluders:
-        var mesh := wall.get_node_or_null("Visual") as MeshInstance3D
-        if mesh == null:
-            continue
-        var material := mesh.material_override as StandardMaterial3D
-        var should_fade := newly_faded.has(wall)
-        if should_fade == faded_walls.has(wall):
-            continue
-        material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA if should_fade else BaseMaterial3D.TRANSPARENCY_DISABLED
-        var tint := material.albedo_color
-        tint.a = 0.18 if should_fade else 1.0
-        material.albedo_color = tint
     faded_walls = newly_faded
+
+func _animate_cutaway_walls(delta: float) -> void:
+    # Keep the physics collider unchanged; lower only the visual geometry.
+    for wall in wall_occluders:
+        var visual := wall.get_node_or_null("Visual") as MeshInstance3D
+        var edge := wall.get_node_or_null("StoneEdge") as MeshInstance3D
+        if visual == null or edge == null:
+            continue
+        var full_height: float = wall_visual_heights[wall]
+        var target_height := minf(CUTAWAY_HEIGHT, full_height) if faded_walls.has(wall) else full_height
+        var current_height := visual.scale.y * full_height
+        var height := move_toward(current_height, target_height, CUTAWAY_SPEED * delta)
+        visual.scale.y = height / full_height
+        visual.position.y = (height - full_height) * 0.5
+        edge.position.y = height - full_height * 0.5 + 0.045
+
 
 func _collect_camera_occluders(space: PhysicsDirectSpaceState3D, target: Vector3, result: Dictionary) -> void:
     var origin := camera.global_position
@@ -177,6 +185,18 @@ func _make_box(label: String, location: Vector3, size: Vector3, tint: Color, sol
     body.add_child(mesh)
     if solid:
         wall_occluders.append(body)
+        wall_visual_heights[body] = size.y
+        var edge := MeshInstance3D.new()
+        edge.name = "StoneEdge"
+        var cap := BoxMesh.new()
+        cap.size = Vector3(size.x + 0.06, 0.09, size.z + 0.06)
+        edge.mesh = cap
+        edge.position.y = size.y * 0.5 + 0.045
+        var edge_material := StandardMaterial3D.new()
+        edge_material.albedo_color = Color("#a4a59b")
+        edge_material.roughness = 1.0
+        edge.material_override = edge_material
+        body.add_child(edge)
         var collider := CollisionShape3D.new()
         var box := BoxShape3D.new()
         box.size = size
