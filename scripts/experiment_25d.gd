@@ -1,6 +1,7 @@
 extends Node3D
 ## Isolated 3D architecture test. Existing 2D scenes and combat remain untouched.
 const SPEED := 5.0
+const DEBUG_OVERLAY = preload("res://scripts/debug_overlay_25d.gd")
 const WALL_HEIGHT := 3.1
 var hero: CharacterBody3D
 var camera: Camera3D
@@ -33,6 +34,13 @@ func _ready() -> void:
     camera.size = 19.0
     camera.current = true
     add_child(camera)
+    camera.position = hero.global_position + Vector3(12,17,12)
+    camera.look_at(hero.global_position + Vector3(0,0.7,0), Vector3.UP)
+    var overlay := CanvasLayer.new()
+    overlay.name = "DeveloperOverlay"
+    overlay.set_script(DEBUG_OVERLAY)
+    overlay.call("configure", camera, hero)
+    add_child(overlay)
     var sun := DirectionalLight3D.new()
     sun.rotation_degrees = Vector3(-55,-35,0)
     sun.light_energy = 0.5
@@ -68,7 +76,6 @@ func _physics_process(delta: float) -> void:
     hero.move_and_slide()
     var target := hero.global_position + Vector3(12,17,12)
     camera.global_position = camera.global_position.lerp(target, minf(1.0,delta*7.0))
-    camera.look_at(hero.global_position + Vector3(0,0.7,0), Vector3.UP)
 
 func _make_box(label: String, location: Vector3, size: Vector3, tint: Color, solid: bool = true) -> void:
     var body := StaticBody3D.new()
