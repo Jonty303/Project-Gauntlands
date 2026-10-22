@@ -7,7 +7,7 @@ var input_buffer: float = 0.0
 var previous_attack_pressed: bool = false
 const ARROW_SCRIPT = preload("res://scripts/arrow.gd")
 const TARGET_ARC_DOT := 0.5 # 120-degree acquisition arc
-const MAX_TARGET_RANGE := 450.0
+const MAX_TARGET_RANGE := 850.0
 const FIRE_INTERVAL := 0.45
 const SWORD_INTERVAL := 0.65
 const SWORD_RANGE := 54.0
@@ -251,7 +251,29 @@ func _draw() -> void:
     draw_circle(Vector2.ZERO, 18.0, Color(0.03, 0.04, 0.05, 0.4))
     draw_set_transform(Vector2.ZERO, -PI / 4.0, Vector2(1.55, 1.55))
     var torso_center := forward * (1.5 - shot_recoil * 2.5 - bounce) - Vector2(0, 5)
-    draw_circle(torso_center, 11.0, Color("#64745a"))
+    # Three-quarter fantasy miniature: cloak, leather belt, metal cuirass and helm.
+    draw_colored_polygon(PackedVector2Array([
+        Vector2(-15, -5), Vector2(15, -5), Vector2(17, -24),
+        Vector2(0, -34), Vector2(-17, -24)
+    ]), Color("#343c35"))
+    draw_colored_polygon(PackedVector2Array([
+        Vector2(-12, -20), Vector2(0, -29), Vector2(12, -20),
+        Vector2(9, -7), Vector2(-9, -7)
+    ]), Color("#697968"))
+    draw_colored_polygon(PackedVector2Array([
+        Vector2(-12, -20), Vector2(0, -29), Vector2(0, -7), Vector2(-9, -7)
+    ]), Color("#94a08c"))
+    draw_line(Vector2(-10, -11), Vector2(10, -11), Color("#513e2d"), 3.0)
+    draw_rect(Rect2(-3, -14, 6, 5), Color("#c1a16a"))
+    draw_line(Vector2(-7, -5), Vector2(-8, 8), Color("#55473a"), 6.0)
+    draw_line(Vector2(7, -5), Vector2(8, 8), Color("#55473a"), 6.0)
+    draw_circle(Vector2(0, -32), 9.0, Color("#aeb1a4"))
+    draw_colored_polygon(PackedVector2Array([
+        Vector2(-10, -33), Vector2(-7, -41), Vector2(7, -41),
+        Vector2(11, -33), Vector2(7, -29), Vector2(-7, -29)
+    ]), Color("#565e63"))
+    draw_line(Vector2(-6, -33), Vector2(6, -33), Color("#20282c"), 3.0)
+    draw_circle(torso_center, 4.0, Color("#b9a47d"))
     draw_line(torso_center - side * 7.0, torso_center + side * 7.0, Color("#394b3c"), 3.0)
     draw_circle(torso_center + forward * 5.0, 6.5, Color("#d6bd83"))
     draw_circle(torso_center + forward * 9.0, 2.2, Color("#614d39"))
