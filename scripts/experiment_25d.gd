@@ -105,23 +105,21 @@ func _update_goblin() -> void:
     goblin.move_and_slide()
 
 func _update_wall_visibility() -> void:
-    # Raycast from the camera towards the hero, fading walls that block the view.
+    # Fade foreground walls for the hero and for enemies with a clear
+    # ground-level line of sight to the hero. Do not reveal enemies
+    # concealed by actual dungeon walls.
     var space := get_world_3d().direct_space_state
-    var origin := camera.global_position
-    var destination := hero.global_position + Vector3(0,0.9,0)
     var newly_faded: Dictionary = {}
-    for i in range(8):
-        var query := PhysicsRayQueryParameters3D.create(origin,destination)
-        query.collision_mask = 1
-        for body in newly_faded:
-            query.exclude.append(body.get_rid())
-        var hit := space.intersect_ray(query)
-        if hit.is_empty():
-            break
-        var wall: StaticBody3D = hit["collider"] as StaticBody3D
-        if wall == null or not wall_occluders.has(wall):
-            break
-        newly_faded[wall] = true
+    _collect_camera_occluders(space, hero.global_position + Vector3(0,0.9,0), newly_faded)
+    for goblin in goblins:
+        if not is_instance_valid(goblin):
+            continue
+        var from := hero.global_position + Vector3(0,0.9,0)
+        var to := goblin.global_position + Vector3(0,0.9,0)
+        var sight := PhysicsRayQueryParameters3D.create(from,to)
+        sight.collision_mask = 1
+        if space.intersect_ray(sight).is_empty():
+            _collect_camera_occluders(space,to,newly_faded)
     for wall in wall_occluders:
         var mesh := wall.get_node_or_null("Visual") as MeshInstance3D
         if mesh == null:
@@ -135,6 +133,22 @@ func _update_wall_visibility() -> void:
         tint.a = 0.18 if should_fade else 1.0
         material.albedo_color = tint
     faded_walls = newly_faded
+
+func _collect_camera_occluders(space: PhysicsDirectSpaceState3D, target: Vector3, result: Dictionary) -> void:
+    var origin := camera.global_position
+    var excluded: Array[RID] = []
+    for i in range(12):
+        var query := PhysicsRayQueryParameters3D.create(origin,target)
+        query.collision_mask = 1
+        query.exclude = excluded
+        var hit := space.intersect_ray(query)
+        if hit.is_empty():
+            break
+        var wall := hit["collider"] as StaticBody3D
+        if wall == null or not wall_occluders.has(wall):
+            break
+        result[wall] = true
+        excluded.append(wall.get_rid())
 
 func _update_camera_transform(immediate: bool, delta: float = 0.0) -> void:
     var yaw := deg_to_rad(camera_yaw)
