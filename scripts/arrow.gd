@@ -6,6 +6,11 @@ var direction: Vector2 = Vector2.RIGHT
 var speed: float = 420.0
 var lifetime: float = 2.8
 
+func _ready() -> void:
+    # Projectiles must not be buried beneath raised walls and floor geometry.
+    z_index = 2
+
+
 func _physics_process(delta: float) -> void:
     var previous: Vector2 = global_position
     var endpoint: Vector2 = previous + direction.normalized() * speed * delta
@@ -46,6 +51,11 @@ func _physics_process(delta: float) -> void:
     queue_redraw()
 
 func _draw() -> void:
+    # Compensate for the camera's rotation so the shaft remains readable.
+    draw_set_transform(Vector2.ZERO, -PI / 4.0)
     draw_line(-direction * 13.0, direction * 14.0, Color("#33271f"), 7.0)
     draw_line(-direction * 13.0, direction * 14.0, Color("#f4d28b"), 4.0)
     draw_line(direction * 12.0, direction * 21.0, Color("#f4f4e6"), 5.0)
+    draw_line(-direction * 12.0, -direction * 6.0 + direction.orthogonal() * 5.0, Color("#d2c8a8"), 2.0)
+    draw_line(-direction * 12.0, -direction * 6.0 - direction.orthogonal() * 5.0, Color("#d2c8a8"), 2.0)
+    draw_set_transform(Vector2.ZERO)
