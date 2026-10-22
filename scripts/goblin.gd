@@ -172,9 +172,15 @@ func _draw() -> void:
         if is_instance_valid(player):
             draw_line(Vector2.ZERO, to_local(player.global_position), Color("#72dca3") if _can_see_player() else Color("#a54b4b"), 1.0)
     if alive:
-        draw_circle(Vector2.ZERO, 15.0, Color("#b97b4a") if winding_up else Color("#618b51"))
-        draw_circle(Vector2(-7, -4), 3.0, Color("#e0c88a"))
-        draw_circle(Vector2(7, -4), 3.0, Color("#e0c88a"))
+        draw_ellipse_shadow()
+        draw_circle(Vector2(2, -10), 14.0, Color("#385438"))
+        draw_circle(Vector2.ZERO + Vector2(0, -10), 12.0, Color("#b97b4a") if winding_up else Color("#618b51"))
+        draw_colored_polygon(PackedVector2Array([Vector2(-10, -16), Vector2(-21, -22), Vector2(-12, -7)]), Color("#537d46"))
+        draw_colored_polygon(PackedVector2Array([Vector2(10, -16), Vector2(21, -22), Vector2(12, -7)]), Color("#537d46"))
+        draw_line(Vector2(-7, -4), Vector2(-9, 8), Color("#40372d"), 5.0)
+        draw_line(Vector2(7, -4), Vector2(9, 8), Color("#40372d"), 5.0)
+        draw_circle(Vector2(-7, -13), 3.0, Color("#e0c88a"))
+        draw_circle(Vector2(7, -13), 3.0, Color("#e0c88a"))
         draw_rect(Rect2(-19, -29, 38, 5), Color("#402b2b"))
         draw_rect(Rect2(-19, -29, 38.0 * health / MAX_HEALTH, 5), Color("#a5c86c"))
         if winding_up:
@@ -190,3 +196,8 @@ func _draw() -> void:
             13,
             Color("#f4d17d")
         )
+
+func draw_ellipse_shadow() -> void:
+    draw_set_transform(Vector2(0, 8), 0.0, Vector2(1.0, 0.38))
+    draw_circle(Vector2.ZERO, 18.0, Color(0.03, 0.04, 0.05, 0.45))
+    draw_set_transform(Vector2.ZERO)
