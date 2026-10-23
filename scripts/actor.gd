@@ -87,10 +87,10 @@ func take_damage(amount: int) -> void:
 		velocity = Vector2.ZERO
 		collision_layer = 0
 		collision_mask = 0
-		respawn_left = 5.0
-		arena.log_event(title + (" died; restart encounter" if title == "Player" else " died; respawn in 5.0s"))
+		arena.log_event(title + (" died; restart encounter" if title == "Player" else " died; use wall button to respawn"))
 		if title != "Player":
-			arena.player.targeting.validate(arena.goblins)
+			arena.drop_loot(self)
+			arena.player.targeting.validate(arena.eligible_targets())
 	update_art()
 
 func reset_actor() -> void:

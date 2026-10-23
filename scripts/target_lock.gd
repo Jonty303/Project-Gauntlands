@@ -23,6 +23,6 @@ func cycle(goblins: Array, direction: int) -> void:
 	target = choices[posmod(index + direction, choices.size())] if index >= 0 else choices[0]
 
 func validate(goblins: Array) -> void:
-	if target != null and target.hp <= 0:
+	if target != null and (target.hp <= 0 or target not in goblins):
 		var choices := living(goblins)
 		target = choices[0] if not choices.is_empty() else null

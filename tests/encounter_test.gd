@@ -33,10 +33,12 @@ func run() -> void:
 	arena = load("res://scenes/main.tscn").instantiate()
 	root.add_child(arena)
 	await frames(3)
+	for extra in arena.goblins.slice(2):
+		extra.set_physics_process(false)
 	var player = arena.player
 	var guard = arena.goblins[0]
 	var chaser = arena.goblins[1]
-	check(arena.goblins.size() == 2 and player.hp == 12 and arena.arrows == 5, "initial encounter / exactly two goblins")
+	check(arena.goblins.size() == 4 and player.hp == 12 and arena.arrows == 10, "initial encounter / four goblins")
 	# Keep AI out of the way while exercising actual input and physics.
 	guard.set_physics_process(false)
 	chaser.set_physics_process(false)
@@ -137,18 +139,18 @@ func run() -> void:
 	player.position = Vector2(200, 156)
 	player.facing = Vector2.RIGHT
 	await tap(KEY_K)
-	check(arena.arrows == 5 and arena.projectiles.get_child_count() == 0, "bow windup does not fire immediately")
+	check(arena.arrows == 10 and arena.projectiles.get_child_count() == 0, "bow windup does not fire immediately")
 	await frames(20)
-	check(arena.arrows == 4 and arena.projectiles.get_child_count() == 1, "bow release spawns projectile and consumes one arrow")
+	check(arena.arrows == 9 and arena.projectiles.get_child_count() == 1, "bow release spawns projectile and consumes one arrow")
 	await frames(70)
 	check(arena.roll_count == 1 and arena.projectiles.get_child_count() == 0, "swept arrow contacts guard and is removed")
 	player.facing = Vector2.LEFT
 	rolls = arena.roll_count
-	for shot in range(4):
+	for shot in range(9):
 		await tap(KEY_K)
 		await frames(45)
 	await frames(60)
-	check(arena.arrows == 0 and arena.roll_count == rolls, "five-arrow limit; wall misses do not roll")
+	check(arena.arrows == 0 and arena.roll_count == rolls, "ten-arrow limit; wall misses do not roll")
 	await tap(KEY_K)
 	await frames(45)
 	check(arena.arrows == 0 and arena.projectiles.get_child_count() == 0, "zero ammunition prevents projectile")
@@ -159,16 +161,10 @@ func run() -> void:
 	check(player.targeting.target == null, "last target death clears lock")
 	guard.set_physics_process(true)
 	chaser.set_physics_process(true)
-	# Stagger deaths to prove independent five-second timers.
-	chaser.respawn_left = 5.0
-	await frames(150)
-	chaser.respawn_left = 5.0
-	await frames(148)
-	check(guard.hp == 0, "no respawn before five seconds")
-	await frames(5)
-	check(guard.hp == 7 and guard.position == guard.spawn_point and chaser.hp == 0, "guard independently respawns at original location")
-	await frames(152)
-	check(chaser.hp == 7, "chaser independently respawns")
+	await frames(310)
+	check(guard.hp == 0 and chaser.hp == 0, "no automatic respawn after five seconds")
+	arena.request_respawns()
+	check(guard.hp == 7 and chaser.hp == 7, "explicit reset restores goblins")
 	arena.restart_encounter()
 	guard.set_physics_process(false)
 	var chaser_start: Vector2 = chaser.position
@@ -217,7 +213,7 @@ func run() -> void:
 	arena.projectiles.add_child(stray)
 	guard.take_damage(99)
 	await tap(KEY_R)
-	check(player.hp == 12 and player.position == player.spawn_point and arena.arrows == 5, "keyboard restart restores player HP/position/ammunition")
+	check(player.hp == 12 and player.position == player.spawn_point and arena.arrows == 10, "keyboard restart restores player HP/position/ammunition")
 	check(guard.hp == 7 and chaser.hp == 7 and player.targeting.target == null and arena.projectiles.get_child_count() == 0 and arena.roll_count == 0, "restart restores enemies and clears targets/projectiles/combat rolls")
 	guard.set_physics_process(false)
 	chaser.set_physics_process(false)
@@ -241,5 +237,5 @@ func run() -> void:
 		await RenderingServer.frame_post_draw
 		var result := root.get_texture().get_image().save_png(OS.get_environment("TEMP") + "/gauntlands-iteration01.png")
 		check(result == OK, "rendered encounter screenshot saved")
-	print("ITERATION 01 TEST RESULT: %d failures" % failures)
+	print("COMBAT REGRESSION TEST RESULT: %d failures" % failures)
 	quit(1 if failures > 0 else 0)

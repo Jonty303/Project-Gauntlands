@@ -7,12 +7,12 @@ func _physics_process(delta: float) -> void:
 	if hp <= 0:
 		return
 	if Input.is_action_just_pressed("lock_target"):
-		targeting.toggle(self, arena.goblins)
+		targeting.toggle(self, arena.eligible_targets())
 	if Input.is_action_just_pressed("target_left"):
-		targeting.cycle(arena.goblins, -1)
+		targeting.cycle(arena.eligible_targets(), -1)
 	if Input.is_action_just_pressed("target_right"):
-		targeting.cycle(arena.goblins, 1)
-	targeting.validate(arena.goblins)
+		targeting.cycle(arena.eligible_targets(), 1)
+	targeting.validate(arena.eligible_targets())
 	var movement := Input.get_vector("move_left", "move_right", "move_up", "move_down")
 	if targeting.target != null:
 		facing = global_position.direction_to(targeting.target.global_position)

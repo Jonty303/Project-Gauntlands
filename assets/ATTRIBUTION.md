@@ -18,3 +18,11 @@ All animation is selected from explicit simulation state and timing; the art
 does not drive damage timing. Nearest filtering and integer viewport scaling
 preserve the pixel grid. Shared goblin art intentionally identifies one enemy
 type, with role/health/state identified by the HUD.
+
+## Iteration 02 additions
+
+The second room and corridor reuse the original room texture and its floor /
+wall regions without altering the source image. Door timber, iron straps,
+masonry jambs, the brass wall switch, coins and arrow bundles are original
+pixel-aligned artwork drawn by `interactable.gd` and `pickup.gd` in the existing
+palette. No external assets or licence dependencies were introduced.
