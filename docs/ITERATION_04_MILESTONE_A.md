@@ -57,3 +57,23 @@ and the return to guard carefully; technical export checks do not sign those off
 
 Milestone B, adventurer production, effects and game integration have not begun.
 `main` remains untouched. Stop here for review.
+
+## Walk revision following user review — 2026-10-23
+
+The user reported that walking was not perceptible while the other actions
+looked okay. Replaced only the six walk poses with stronger strides, clearly
+lifted feet in passing poses and push-off poses. Preserved the character's
+equipment, right-facing view, fixed 96×96 canvas, (40,72) ground pivot and
+4/9-second cycle. All 24 non-walk PNGs remain byte-for-byte unchanged.
+
+The preview opens on Walk and offers **Show walking travel** to demonstrate the
+gait across the unchanged dungeon artwork at 54px/s; the enlarged view remains
+in-place for inspection. This is an offline presentation aid, not game integration.
+The GIF and contact sheet were rebuilt. The new source and exact prompt are
+retained with updated provenance.
+
+Validation: six revised PNGs checked for RGBA/binary alpha, 96×96 dimensions,
+unclipped bounds and the shared ground row. Standalone browser playback checked
+for frame advancement, travel, pause and in-place mode, with no page errors.
+No game runtime checks were needed; gameplay and the other action assets remain
+unchanged. Visual approval of this revision is still pending.

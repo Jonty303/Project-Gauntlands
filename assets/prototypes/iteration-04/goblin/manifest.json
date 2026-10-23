@@ -16,7 +16,7 @@
     1536,
     1024
   ],
-  "sampling": "One shared 1:4 nearest-neighbour grid, transparent threshold 128; translation only for foot alignment; no anatomy redrawing or interpolation",
+  "sampling": "Original source: 384x256 common grid (1:4). Revised walk source: 171x114 common grid (171/1536). Nearest-neighbour, alpha threshold 128; translation only for ground alignment; no per-pose scaling or interpolation",
   "clips": {
     "idle": {
       "loop": true,
@@ -140,6 +140,7 @@
   "exports": [
     {
       "file": "east/idle_000.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         0,
         0,
@@ -159,6 +160,7 @@
     },
     {
       "file": "east/idle_001.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         256,
         0,
@@ -178,6 +180,7 @@
     },
     {
       "file": "east/idle_002.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         512,
         0,
@@ -197,6 +200,7 @@
     },
     {
       "file": "east/idle_003.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         768,
         0,
@@ -216,6 +220,7 @@
     },
     {
       "file": "east/idle_004.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         1024,
         0,
@@ -235,6 +240,7 @@
     },
     {
       "file": "east/idle_005.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         1280,
         0,
@@ -254,120 +260,127 @@
     },
     {
       "file": "east/walk_000.png",
+      "source": "source/walk-revision.png",
       "source_bounds": [
         0,
-        204,
-        256,
-        204
+        0,
+        512,
+        512
       ],
       "sampled_ground_anchor": [
-        34,
-        99
+        29,
+        50
       ],
       "bounds": [
-        18,
-        58,
-        52,
-        98
+        11,
+        12,
+        48,
+        49
       ]
     },
     {
       "file": "east/walk_001.png",
+      "source": "source/walk-revision.png",
       "source_bounds": [
-        256,
-        204,
-        256,
-        204
+        512,
+        0,
+        512,
+        512
       ],
       "sampled_ground_anchor": [
-        94,
-        99
+        87,
+        49
       ],
       "bounds": [
-        79,
-        58,
-        113,
-        98
+        69,
+        12,
+        100,
+        48
       ]
     },
     {
       "file": "east/walk_002.png",
+      "source": "source/walk-revision.png",
       "source_bounds": [
+        1024,
+        0,
         512,
-        204,
-        256,
-        204
+        512
       ],
       "sampled_ground_anchor": [
-        156,
-        99
+        140,
+        50
       ],
       "bounds": [
-        140,
-        58,
-        175,
-        98
+        122,
+        12,
+        158,
+        49
       ]
     },
     {
       "file": "east/walk_003.png",
+      "source": "source/walk-revision.png",
       "source_bounds": [
-        768,
-        204,
-        256,
-        204
+        0,
+        512,
+        512,
+        512
       ],
       "sampled_ground_anchor": [
-        220,
-        99
+        32,
+        103
       ],
       "bounds": [
-        205,
-        60,
-        239,
-        98
+        12,
+        66,
+        50,
+        102
       ]
     },
     {
       "file": "east/walk_004.png",
+      "source": "source/walk-revision.png",
       "source_bounds": [
-        1024,
-        204,
-        256,
-        204
+        512,
+        512,
+        512,
+        512
       ],
       "sampled_ground_anchor": [
-        284,
-        99
+        89,
+        102
       ],
       "bounds": [
-        269,
-        58,
-        302,
-        98
+        70,
+        65,
+        101,
+        101
       ]
     },
     {
       "file": "east/walk_005.png",
+      "source": "source/walk-revision.png",
       "source_bounds": [
-        1280,
-        204,
-        256,
-        204
+        1024,
+        512,
+        512,
+        512
       ],
       "sampled_ground_anchor": [
-        348,
-        99
+        139,
+        103
       ],
       "bounds": [
-        332,
-        59,
-        366,
-        98
+        121,
+        65,
+        158,
+        102
       ]
     },
     {
       "file": "east/attack_000.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         0,
         408,
@@ -387,6 +400,7 @@
     },
     {
       "file": "east/attack_001.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         256,
         408,
@@ -406,6 +420,7 @@
     },
     {
       "file": "east/attack_002.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         512,
         408,
@@ -425,6 +440,7 @@
     },
     {
       "file": "east/attack_003.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         768,
         408,
@@ -444,6 +460,7 @@
     },
     {
       "file": "east/attack_004.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         1024,
         408,
@@ -463,6 +480,7 @@
     },
     {
       "file": "east/attack_005.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         1280,
         408,
@@ -482,6 +500,7 @@
     },
     {
       "file": "east/hurt_000.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         0,
         616,
@@ -501,6 +520,7 @@
     },
     {
       "file": "east/hurt_001.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         256,
         616,
@@ -520,6 +540,7 @@
     },
     {
       "file": "east/hurt_002.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         512,
         616,
@@ -539,6 +560,7 @@
     },
     {
       "file": "east/hurt_003.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         768,
         616,
@@ -558,6 +580,7 @@
     },
     {
       "file": "east/hurt_004.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         1024,
         616,
@@ -577,6 +600,7 @@
     },
     {
       "file": "east/hurt_005.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         1280,
         616,
@@ -596,6 +620,7 @@
     },
     {
       "file": "east/death_000.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         0,
         820,
@@ -615,6 +640,7 @@
     },
     {
       "file": "east/death_001.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         272,
         820,
@@ -634,6 +660,7 @@
     },
     {
       "file": "east/death_002.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         500,
         820,
@@ -653,6 +680,7 @@
     },
     {
       "file": "east/death_003.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         744,
         820,
@@ -672,6 +700,7 @@
     },
     {
       "file": "east/death_004.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         1000,
         820,
@@ -691,6 +720,7 @@
     },
     {
       "file": "east/death_005.png",
+      "source": "source/generated-atlas.png",
       "source_bounds": [
         1272,
         820,
