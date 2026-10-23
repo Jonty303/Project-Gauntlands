@@ -43,6 +43,7 @@ func _ready() -> void:
     _build_boundary_walls()
     _build_doorway_returns()
     _build_doors()
+    _build_door_frames()
     Occlusion.connect_panels(wall_records, WALL_THICKNESS)
     exterior_grid = ExteriorGrid.new()
     add_child(exterior_grid)
@@ -241,6 +242,39 @@ func _build_doors() -> void:
         root.add_child(collider)
         doors.append({"body":root,"visual":visual,"collider":collider,"closed":true,"center":root.position,"material":instance_material,"alpha":1.0,"normals":[Vector3.RIGHT,Vector3.LEFT],"rooms":[0,1] if x < 0.0 else [1,2]})
 
+func _build_door_frames() -> void:
+    # Decorative frame surfaces sit in front of existing solid returns. The
+    # header is above the existing leaf/opening; no collider or floor is added.
+    for door in doors:
+        var center: Vector3 = door["center"]
+        var opening: Vector3 = door["visual"].mesh.size
+        var frame_width := 0.30
+        for side in [-1.0,1.0]:
+            var jamb := Node3D.new()
+            jamb.name = "DoorFrameJamb"
+            jamb.position = Vector3(center.x, floor_origin.y + WALL_HEIGHT * 0.5, center.z + side * (opening.z * 0.5 + frame_width * 0.5))
+            add_child(jamb)
+            var visual := MeshInstance3D.new()
+            var mesh := BoxMesh.new()
+            mesh.size = Vector3(WALL_THICKNESS + 0.08,WALL_HEIGHT,frame_width)
+            visual.mesh = mesh
+            jamb.add_child(visual)
+            _register_wall(visual,jamb.position,[door["rooms"][0],door["rooms"][1]],door["normals"])
+            wall_records[-1]["material"].albedo_color = Color("#a5a59a")
+            wall_records[-1]["visual_only"] = true
+        var header := Node3D.new()
+        header.name = "DoorFrameHeader"
+        header.position = Vector3(center.x,floor_origin.y + (opening.y + WALL_HEIGHT) * 0.5,center.z)
+        add_child(header)
+        var top_visual := MeshInstance3D.new()
+        var top_mesh := BoxMesh.new()
+        top_mesh.size = Vector3(WALL_THICKNESS + 0.12,WALL_HEIGHT - opening.y,opening.z + frame_width * 2.0)
+        top_visual.mesh = top_mesh
+        header.add_child(top_visual)
+        _register_wall(top_visual,header.position,[door["rooms"][0],door["rooms"][1]],door["normals"])
+        wall_records[-1]["material"].albedo_color = Color("#a5a59a")
+        wall_records[-1]["visual_only"] = true
+
 func _current_room() -> int:
     return visibility.locate(floor_grid.to_local(hero.global_position), CELL)
 
@@ -340,29 +374,17 @@ func _update_camera() -> void:
     camera.look_at(hero.global_position+Vector3(0,0.8,0))
 
 func _refresh_discovery_visuals() -> void:
-    # Preview rays originate from the player, not the camera, and keep working
-    # through rotations. Camera cutaway never affects doorway sight blockers.
+    # Discovery and temporary doorway rendering remain independent. A valid
+    # aperture sightline renders the adjoining region as a complete structure.
     var eye := hero.global_position + Vector3(0,1.0,0)
-    visible_rooms = discovered_rooms.duplicate()
+    visible_rooms = RenderVisibility.rendered_rooms(discovered_rooms,visibility.current_room,eye,wall_records,doors)
     for cell in floor_visuals:
-        var room: int = room_by_cell[cell]
-        var target: Vector3 = floor_visuals[cell].global_position
-        target.y = eye.y
-        var show: bool = RenderVisibility.can_render([room], discovered_rooms) or RenderVisibility.preview_visible([room],target,eye,visibility.current_room,wall_records,doors)
-        floor_visuals[cell].visible = show
-        if show:
-            visible_rooms[room] = true
+        floor_visuals[cell].visible = RenderVisibility.can_render([room_by_cell[cell]],visible_rooms)
     exterior_grid.sync_background(floor_visuals)
     for record in wall_records:
-        var visual: MeshInstance3D = record["visual"]
-        var target := visual.global_position
-        target.y = eye.y
-        visual.visible = RenderVisibility.can_render(record["owners"], discovered_rooms) or RenderVisibility.preview_visible(record["owners"],target,eye,visibility.current_room,wall_records,doors,visual)
+        record["visual"].visible = RenderVisibility.can_render(record["owners"],visible_rooms)
     for door in doors:
-        var visual: MeshInstance3D = door["visual"]
-        var target := visual.global_position
-        target.y = eye.y
-        visual.visible = bool(door["closed"]) and (RenderVisibility.can_render(door["rooms"], discovered_rooms) or RenderVisibility.preview_visible(door["rooms"],target,eye,visibility.current_room,wall_records,doors,visual))
+        door["visual"].visible = bool(door["closed"]) and RenderVisibility.can_render(door["rooms"],visible_rooms)
 
 func _update_visibility(delta: float) -> void:
     var targets := Occlusion.player_targets(camera, hero.global_position)
@@ -387,6 +409,11 @@ func _transition_opacity(record: Dictionary, target: float, delta: float) -> voi
     var color := material.albedo_color
     color.a = record["alpha"]
     material.albedo_color = color
+    # Fully opaque panels need the opaque depth pass so coplanar panel edges
+    # cannot be reordered like translucent faces.
+    var mode := BaseMaterial3D.TRANSPARENCY_DISABLED if record["alpha"] >= 0.999 else BaseMaterial3D.TRANSPARENCY_ALPHA
+    if material.transparency != mode:
+        material.transparency = mode
 
 func _unhandled_key_input(event: InputEvent) -> void:
     if not event is InputEventKey or not event.pressed or event.echo:

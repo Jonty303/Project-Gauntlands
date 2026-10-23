@@ -42,6 +42,23 @@ static func clear_sight(eye: Vector3, target: Vector3, walls: Array[Dictionary],
             return false
     return true
 
+static func rendered_rooms(discovered: Dictionary, current_room: int, eye: Vector3, walls: Array[Dictionary], doors: Array[Dictionary]) -> Dictionary:
+    # Decide an entire room's rendering from the aperture sightline. Per-tile
+    # sight samples produced holes in the shared floor and isolated wall pieces.
+    var rooms := discovered.duplicate()
+    for door in doors:
+        if door["closed"]:
+            continue
+        var side: int = door["rooms"].find(current_room)
+        if side < 0:
+            continue
+        var adjoining: int = door["rooms"][1 - side]
+        var target: Vector3 = door["center"] + door["normals"][side] * 0.25
+        target.y = eye.y
+        if through_portal(eye, target, door) and clear_sight(eye, target, walls, doors):
+            rooms[adjoining] = true
+    return rooms
+
 static func preview_visible(owners: Array, target: Vector3, eye: Vector3, current_room: int, walls: Array[Dictionary], doors: Array[Dictionary], excluded: MeshInstance3D = null) -> bool:
     # Only direct portals from the player's current room. An open door elsewhere
     # cannot reveal unrelated rooms, and this does not recurse through door chains.

@@ -92,6 +92,8 @@ func edge_routes() -> void:
 func geometry() -> void:
     var bounds: Array[AABB] = []
     for record in lab.wall_records:
+        if record.get("visual_only",false):
+            continue
         var visual: MeshInstance3D = record.visual
         var body: StaticBody3D = visual.get_parent()
         var size: Vector3 = visual.mesh.size
@@ -152,6 +154,8 @@ func run() -> void:
             lab.cutaway = cutaway
             lab._update_visibility(1.0)
             for record in lab.wall_records:
+                if record.get("visual_only",false):
+                    continue
                 var body: StaticBody3D = record.visual.get_parent()
                 check(body.collision_layer == 1, "Visibility must preserve wall collision layer")
                 for child in body.get_children():
