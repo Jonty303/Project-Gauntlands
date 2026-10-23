@@ -66,12 +66,18 @@ Occlusion is a readability problem, not a reason to make the environment transpa
 Occlusion mechanics are not required in Iteration 01 because that room deliberately contains no pillars/doors/large foreground props.
 
 ## World model
-The visual tilemap is not the whole dungeon model. Future generation should represent logical rooms, corridors and door connections separately from rendered tiles. Discovery, enemy perception/LOS, collision/navigation and visual occlusion remain independent concerns.
+The visual tilemap is not the whole dungeon model. Future generation should represent logical rooms, corridors and door connections separately from rendered tiles. Discovery, enemy perception/LOS, collision/navigation, lighting and visual occlusion remain independent concerns. Discovery remembers static layout; current sight controls live information; lighting controls brightness and must not implicitly grant sight. The current fog is not a light source.
 
 ## Current milestone
 On `iteration-03`, the milestone is defined in [Iteration 03](docs/ITERATION_03.md), based on completed Iteration 02. It covers a compact five-room dungeon, discovery, size-aware pursuit, entrance escape, chests, one secret room and creature-neutral traps.
 
 Implementation was authorized separately and is recorded in [Iteration 03 validation](docs/ITERATION_03_VALIDATION.md). Preserve the existing combat and presentation baseline; the character/RPG expansion, procedural generation, inventory, town, save systems and Codex remain deferred. Trap damage should preserve physical-contact/resolution separation without introducing new RPG systems.
+
+## Pause and inventory
+
+During active play, Escape / Start and the HUD Pause button open a pause menu. Resume preserves simulation state; Restart Run requires confirmation. Death and escape screens retain direct restart. All gameplay timers and movement stop while a menu owns a pause.
+
+Inventory remains deferred, but its future opening must pause the game through the same shared mechanism. Closing one overlay must not release another overlay's pause. Menu input must not trigger attacks on resume.
 
 ## Longer-term progression
 The player should gain power both through character progression and through knowledge of enemies. The planned Codex can eventually expose learned weaknesses, behaviours and increasingly precise statistics, but the Codex itself is deferred.

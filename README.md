@@ -14,11 +14,12 @@ Character/RPG progression remains deferred.
 Four ordinary stone rooms and one optional secret room form a hand-authored
 return-and-escape loop. Room A retains the stationary Guard and slower Chaser;
 the bent corridor and Room B retain their goblins. Existing actor art, attack
-timing, free movement, finite ammunition and control bindings are preserved.
+timing, free movement and finite ammunition are preserved. Start now pauses during active play.
 
 Press F / Y near doors, chests, loose masonry or the entrance stairway. Opening
 a door reveals only space in sight; bends and closed doors conceal the rest.
-Explored static layout is remembered dimly; hidden creatures, pickups and
+Current sight follows wall and door geometry, with a 440px range independent of brightness.
+Explored static layout is remembered at 55% dimming; hidden creatures, pickups and
 interactive state are not shown. Mobile goblins detect within 360px, pursue
 through fitting open connections, search their last observation for 2.5s, then
 return home where reachable. They do not open doors or track hidden movement.
@@ -38,8 +39,9 @@ enemy-only reset and preserves exploration, rewards, doors, traps and loot.
 Each death drops one stack: 50% five gold, 50% one to three arrows. Walk within
 18px to collect it. The wall button resets all enemies, preserves loot and
 resources, and defers any spawn within 24px of the player until clear.
-Dead enemies never automatically respawn. Start / R starts a new encounter,
-resetting gold, ammunition, doors, loot, enemies and transient combat state.
+Dead enemies never automatically respawn. During play, Start / Escape opens Pause;
+Restart Run requires confirmation. R requests that confirmation directly.
+On death/escape screens, Start / R starts a new encounter.
 Starting ammunition is exported on the encounter, defaulting to 10 arrows.
 
 ### Controls
@@ -52,7 +54,10 @@ Starting ammunition is exported on the encounter, defaulting to 10 arrows.
 | Lock / unlock | R3 (right-stick click) | L |
 | Previous / next target | Right stick left / right | Q / E |
 | Interact / open chest / examine clue / escape | Y (top face button) | F |
-| Reset encounter, including after death | Start / Menu | R |
+| Pause / resume during play | Start / Menu | Escape (or HUD Pause button) |
+| Menu navigation / select / back | D-pad / A / B | Arrow keys / Enter / Escape |
+| Restart during play (confirmation) | Pause > Restart Run | R, or Pause > Restart Run |
+| Restart after death / escape | Start / Menu | R |
 
 Tap sword/bow for one attack. Holding a target-cycle direction switches once;
 return the stick to centre before switching again. Locking selects the nearest
@@ -60,6 +65,9 @@ visible living goblin; cycling follows stable enemy order. Selected target death
 selects the other living goblin, but never starts an attack automatically.
 Unlocked attacks follow movement facing; locked attacks face the target while
 allowing movement/backpedalling. Arrows travel straight and never home.
+
+Pause freezes the simulation, including projectiles and trap timers. Inventory remains
+deferred; its future UI will use the shared pause mechanism. This pass adds no lighting system.
 
 ### Timing and combat diagnostics
 
@@ -103,6 +111,7 @@ controller events; no controller hardware required):
 godot --headless --path . --script res://tests/encounter_test.gd
 godot --headless --path . --script res://tests/iteration_02_test.gd
 godot --headless --path . --fixed-fps 60 --script res://tests/iteration_03_test.gd
+godot --headless --path . --fixed-fps 60 --script res://tests/visibility_pause_test.gd
 ```
 
 On restricted Windows hosts, use `--log-file` with a writable temporary path

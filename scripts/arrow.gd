@@ -8,7 +8,7 @@ var lifetime := 0.0
 var finished := false
 
 func _physics_process(delta: float) -> void:
-	if arena.escaped or finished:
+	if arena.simulation_stopped() or finished:
 		return
 	var destination := position + direction * 290.0 * delta
 	var query := PhysicsRayQueryParameters2D.create(position, destination, 7 if hazard else 5)

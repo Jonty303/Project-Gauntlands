@@ -80,7 +80,7 @@ func tick_actor(delta: float) -> void:
 	update_art()
 
 func take_damage(amount: int) -> void:
-	if arena.escaped or hp <= 0:
+	if arena.simulation_stopped() or hp <= 0:
 		return
 	hp = maxi(0, hp - amount)
 	hurt_left = 0.16

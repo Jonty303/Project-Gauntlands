@@ -5,6 +5,7 @@ var summary: Label
 var log_label: Label
 var death_prompt: Label
 var interaction_prompt: Label
+var pause_button: Button
 
 func label_at(location: Vector2, size: int, color: Color) -> Label:
 	var label := Label.new()
@@ -15,26 +16,34 @@ func label_at(location: Vector2, size: int, color: Color) -> Label:
 	return label
 
 func _ready() -> void:
+	pause_button = Button.new()
+	pause_button.text = "Pause"
+	pause_button.position = Vector2(540, 8)
+	pause_button.size = Vector2(76, 30)
+	pause_button.focus_mode = Control.FOCUS_NONE
+	pause_button.pressed.connect(func(): arena.pause_menu.open_menu())
+	add_child(pause_button)
 	label_at(Vector2(32, 7), 18, Color("c8b996")).text = "GAUNTLANDS   /   THE FORGOTTEN HOLD"
 	label_at(Vector2(34, 31), 10, Color("837e70")).text = "ITERATION 03     •     DISCOVERY AND ESCAPE"
 	summary = label_at(Vector2(32, 389), 10, Color("d7cbb0"))
 	log_label = label_at(Vector2(32, 440), 11, Color("b8b7aa"))
 	label_at(Vector2(32, 525), 11, Color("a09b8c")).text = "MOVE  LS / WASD     SWORD  A / J     BOW  X / K     LOCK  R3 / L"
-	label_at(Vector2(32, 542), 11, Color("a09b8c")).text = "CYCLE RS / Q,E   INTERACT Y / F   RESTART Start / R"
+	label_at(Vector2(32, 542), 11, Color("a09b8c")).text = "CYCLE RS / Q,E   INTERACT Y / F   PAUSE Start / Esc"
 	interaction_prompt = label_at(Vector2(32, 365), 12, Color("eedbc0"))
 	death_prompt = label_at(Vector2(140, 205), 20, Color("eedbc0"))
 	death_prompt.text = "YOU DIED\nStart / R — restart encounter"
 
 func _process(_delta: float) -> void:
+	pause_button.visible = arena.player.hp > 0 and not arena.escaped
 	var player = arena.player
 	var target = player.targeting.target
-	if target != null and not arena.point_visible(target.position):
+	if target != null and not arena.actor_visible(target):
 		target = null
 	var target_name: String = target.title if target != null else "None"
 	summary.text = "HP %d / 12    ARROWS %d    GOLD %d    LOCK %s    [%s]\n" % [player.hp, arena.arrows, arena.gold, target_name, player.state]
 	for index in range(arena.goblins.size()):
 		var goblin = arena.goblins[index]
-		if not arena.point_visible(goblin.position):
+		if not arena.actor_visible(goblin):
 			continue
 		if index == 2:
 			summary.text += "\n"
@@ -55,13 +64,13 @@ func _draw() -> void:
 		draw_rect(Rect2(124, 197, 392, 76), Color(0.04, 0.035, 0.03, 0.95))
 		return
 	for actor in [arena.player] + arena.goblins:
-		if actor.hp <= 0 or (actor != arena.player and not arena.point_visible(actor.position)):
+		if actor.hp <= 0 or (actor != arena.player and not arena.actor_visible(actor)):
 			continue
 		var point: Vector2 = arena.get_canvas_transform() * actor.position + Vector2(-12, -39)
 		draw_rect(Rect2(point, Vector2(24, 3)), Color("1b1717"))
 		draw_rect(Rect2(point, Vector2(24.0 * actor.hp / actor.max_hp, 2)), Color("a57754") if actor == arena.player else Color("8e4842"))
 	var target = arena.player.targeting.target
-	if target != null and target.hp > 0 and arena.point_visible(target.position):
+	if target != null and target.hp > 0 and arena.actor_visible(target):
 		var point: Vector2 = arena.get_canvas_transform() * target.position + Vector2(0, -47)
 		draw_polyline(PackedVector2Array([point + Vector2(-4, -3), point + Vector2(0, 1), point + Vector2(4, -3)]), Color("e0c37d"), 1.0)
 		draw_arc(arena.get_canvas_transform() * target.position, 11.0, 0.0, TAU, 16, Color("bca66c"), 1.0)

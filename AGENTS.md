@@ -5,7 +5,7 @@
 - `main` is the authoritative 2D reboot. Do not migrate code from older 2D/2.5D/3D experiment branches unless the task explicitly asks for it.
 - Historical prototypes are reference material, not dependencies. The final 3D architecture prototype is preserved at `archive/prototype-3d-final`.
 - Read `DESIGN.md` before changing gameplay architecture or presentation rules.
-- On `iteration-03`, `docs/ITERATION_03.md` is the authoritative scope and future implementation contract, based on completed Iteration 02. This branch preparation is documentation only; do not implement gameplay until explicitly requested. Preserve earlier iteration contracts as history and stop at Iteration 03 acceptance criteria when implementation is authorized.
+- On `iteration-03`, `docs/ITERATION_03.md` is the authoritative scope and implementation contract, based on completed Iteration 02. Implementation and the visibility/pause refinement in section 11 were separately authorized. Preserve earlier iteration contracts as history and stop at the approved criteria.
 - Work only on the requested feature. Avoid unrelated refactors, speculative systems and broad rewrites.
 
 ## Product direction

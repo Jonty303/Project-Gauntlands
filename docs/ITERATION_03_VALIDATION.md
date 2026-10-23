@@ -94,3 +94,59 @@ secret clue subtlety and balance need human playtesting. Captures are scripted
 scene setups, not evidence of a complete human five-room playthrough. Full
 acceptance boxes in the original spec are intentionally not signed off solely
 from automation. No known failing automated check remains. No merge to main.
+
+
+## Approved visibility and pause refinement — 2026-10-23
+
+Implemented after explicit approval of the inspection plan, based on Iteration 03
+`5342451893811525df171e91833570b4b18d2275`.
+
+### Behaviour
+
+- `sight.gd` owns geometric observation: 440px configurable range, wall/door
+  corner rays, and a full-resolution polygon. It refreshes on player movement,
+  door revision or range change. Redundant collinear vertices are removed.
+- `exploration.gd` owns persistent static discovery and fog rendering. Memory
+  uses conservative 4px samples; the current mask is not restricted to that grid.
+  Remembered terrain is darkened by 55%, replacing the original 86%. Changing
+  this value cannot grant sight. No torch, falloff or illumination system exists.
+- Visible north-wall segments project into their existing tall artwork without
+  granting gameplay sight behind the wall. Five samples across an actor's
+  physical footprint allow partial observation; locks, HUD and actor rendering
+  use the same eligibility rule. Dynamic objects never enter memory.
+- `pause_menu.gd` keeps UI responsive while the SceneTree simulation is paused.
+  Named pause owners support a future inventory screen without introducing it.
+  Shared gameplay mutation paths also reject damage/actions during pause.
+- Escape, Start/Menu and the HUD Pause button open the menu. R requests restart
+  confirmation during active play. Start/R retain direct restart after death or
+  escape. Escape on an end screen does not restart. Restart confirmation defaults
+  to Cancel. Menu presses must release before simulation resumes.
+- Updated README, DESIGN, agent guidance and Iteration 03 status/requirements.
+
+### Validation actually performed
+
+Godot 4.5.2 stable, portable local runtime:
+
+- Headless editor import/GDScript validation: passed.
+- Existing combat suite: 40 checks, zero failures.
+- Existing Iteration 02 suite: 112 checks, zero failures.
+- Existing Iteration 03 suite: 50 checks, zero failures.
+- New `tests/visibility_pause_test.gd`: 29 checks, zero failures.
+- All four suites used `--headless --fixed-fps 60 --script res://tests/<suite>.gd`.
+- The new suite samples the aperture mask against blocked sight, checks corners,
+  wall memory seams, partial actor visibility/target eligibility, door revision,
+  range and brightness independence, restart memory, combat/AI/trap/projectile/
+  pickup/respawn freeze, overlapping inventory/menu pause reasons, restart
+  confirmation, controller navigation and input consumption on resume.
+- Fourteen renderer captures were produced. Start, aperture, corridor, secret,
+  chest states, traps, entrance/escape, pause, confirmation and remembered-space
+  views were inspected; wall-memory seams found in review were corrected.
+- A local 60-position Room A microbenchmark of observation plus memory refresh
+  measured about 6.3ms median / 6.8ms maximum after removing redundant tile-corner
+  rays and polygon vertices. This is not a full gameplay frame-rate benchmark.
+- `git diff --check`: passed.
+
+No physical controller was exercised. Human playtesting remains necessary for
+visual preference, controller feel and full-run performance. Rendered validation
+reported the same sandbox shader-cache warning as the original iteration; all
+captures succeeded. No code was imported from historical prototypes.
