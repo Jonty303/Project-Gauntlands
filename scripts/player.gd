@@ -1,24 +1,35 @@
-extends CharacterBody2D
+extends "res://scripts/actor.gd"
 
-@export var move_speed: float = 150.0
-@export var acceleration: float = 1100.0
-@export var deceleration: float = 1400.0
-
-var facing := Vector2.DOWN
-
-@onready var facing_line: Line2D = $Facing
+const Lock = preload("res://scripts/target_lock.gd")
+var targeting := Lock.new()
 
 func _physics_process(delta: float) -> void:
-    var input_vector := Input.get_vector("move_left", "move_right", "move_up", "move_down")
-    var target_velocity := input_vector * move_speed
-    var rate := acceleration if input_vector != Vector2.ZERO else deceleration
-    velocity = velocity.move_toward(target_velocity, rate * delta)
+	if hp <= 0:
+		return
+	if Input.is_action_just_pressed("lock_target"):
+		targeting.toggle(self, arena.goblins)
+	if Input.is_action_just_pressed("target_left"):
+		targeting.cycle(arena.goblins, -1)
+	if Input.is_action_just_pressed("target_right"):
+		targeting.cycle(arena.goblins, 1)
+	targeting.validate(arena.goblins)
+	var movement := Input.get_vector("move_left", "move_right", "move_up", "move_down")
+	if targeting.target != null:
+		facing = global_position.direction_to(targeting.target.global_position)
+	elif movement.length_squared() > 0.01:
+		facing = movement.normalized()
+	if state == "idle" or state == "walk":
+		if Input.is_action_just_pressed("sword"):
+			begin_attack("sword")
+		elif Input.is_action_just_pressed("bow"):
+			if arena.arrows > 0:
+				begin_attack("bow")
+			else:
+				arena.log_event("Bow: EMPTY — no arrow fired")
+	velocity = movement * 110.0 * (0.55 if is_attacking() else 1.0)
+	move_and_slide()
+	tick_actor(delta)
 
-    if input_vector != Vector2.ZERO:
-        facing = input_vector.normalized()
-
-    move_and_slide()
-    _update_facing_indicator()
-
-func _update_facing_indicator() -> void:
-    facing_line.points = PackedVector2Array([Vector2.ZERO, facing * 16.0])
+func reset_actor() -> void:
+	super.reset_actor()
+	targeting.target = null
