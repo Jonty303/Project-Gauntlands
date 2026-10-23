@@ -1,0 +1,2177 @@
+{
+  "status": "Milestone B four-direction review; awaiting user approval; no integration",
+  "milestone_a": "Approved by user after walk revision at b87e979d62abe5a547ee56ae9f1bcc11ac152aab; east PNGs unchanged",
+  "canvas_px": [
+    96,
+    96
+  ],
+  "ground_pivot_px": [
+    40,
+    72
+  ],
+  "format": "RGBA PNG, binary alpha, nearest-neighbour; no per-pose scaling",
+  "direction_selection": {
+    "source": "scripts/actor.gd update_art, unchanged",
+    "rule": "abs(x)>abs(y): east if x>0 else west; otherwise north if y<0 else south; diagonal ties use vertical direction",
+    "vectors": {
+      "south": [
+        0,
+        1
+      ],
+      "west": [
+        -1,
+        0
+      ],
+      "north": [
+        0,
+        -1
+      ],
+      "east": [
+        1,
+        0
+      ]
+    }
+  },
+  "timing": {
+    "idle": {
+      "loop": true,
+      "durations_ms": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "note": "Cosmetic 1.2-second breathing loop; existing idle has no gameplay duration."
+    },
+    "walk": {
+      "loop": true,
+      "durations_ms": [
+        74.07407407407408,
+        74.07407407407408,
+        74.07407407407408,
+        74.07407407407408,
+        74.07407407407408,
+        74.07407407407408
+      ],
+      "note": "Six samples over existing 4/9-second walk cycle. Existing movement remains 54 world px/s."
+    },
+    "attack": {
+      "loop": false,
+      "durations_ms": [
+        250,
+        250,
+        70,
+        70,
+        330,
+        330
+      ],
+      "phases": [
+        {
+          "name": "windup",
+          "start_ms": 0,
+          "end_ms": 500
+        },
+        {
+          "name": "contact",
+          "start_ms": 500,
+          "end_ms": 640
+        },
+        {
+          "name": "recovery",
+          "start_ms": 640,
+          "end_ms": 1300
+        }
+      ],
+      "note": "Existing goblin timings, not player timings. Preview replay is a review control only."
+    },
+    "hurt": {
+      "loop": false,
+      "durations_ms": [
+        26.666666666666668,
+        26.666666666666668,
+        26.666666666666668,
+        26.666666666666668,
+        26.666666666666668,
+        26.666666666666668
+      ],
+      "note": "Cosmetic 0.16-second reaction only; does not add a stun or cancel an attack."
+    },
+    "death": {
+      "loop": false,
+      "durations_ms": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        220
+      ],
+      "hold_last": true,
+      "note": "720ms offline presentation study only. Gameplay death/collision removal/loot remains immediate; no new corpse/respawn timer is proposed."
+    }
+  },
+  "frames": {
+    "south": {
+      "idle": [
+        "../south/idle_000.png",
+        "../south/idle_001.png",
+        "../south/idle_002.png",
+        "../south/idle_003.png",
+        "../south/idle_004.png",
+        "../south/idle_005.png"
+      ],
+      "walk": [
+        "../south/walk_000.png",
+        "../south/walk_001.png",
+        "../south/walk_002.png",
+        "../south/walk_003.png",
+        "../south/walk_004.png",
+        "../south/walk_005.png"
+      ],
+      "attack": [
+        "../south/attack_000.png",
+        "../south/attack_001.png",
+        "../south/attack_002.png",
+        "../south/attack_003.png",
+        "../south/attack_004.png",
+        "../south/attack_005.png"
+      ],
+      "hurt": [
+        "../south/hurt_000.png",
+        "../south/hurt_001.png",
+        "../south/hurt_002.png",
+        "../south/hurt_003.png",
+        "../south/hurt_004.png",
+        "../south/hurt_005.png"
+      ],
+      "death": [
+        "../south/death_000.png",
+        "../south/death_001.png",
+        "../south/death_002.png",
+        "../south/death_003.png",
+        "../south/death_004.png",
+        "../south/death_005.png"
+      ]
+    },
+    "west": {
+      "idle": [
+        "../west/idle_000.png",
+        "../west/idle_001.png",
+        "../west/idle_002.png",
+        "../west/idle_003.png",
+        "../west/idle_004.png",
+        "../west/idle_005.png"
+      ],
+      "walk": [
+        "../west/walk_000.png",
+        "../west/walk_001.png",
+        "../west/walk_002.png",
+        "../west/walk_003.png",
+        "../west/walk_004.png",
+        "../west/walk_005.png"
+      ],
+      "attack": [
+        "../west/attack_000.png",
+        "../west/attack_001.png",
+        "../west/attack_002.png",
+        "../west/attack_003.png",
+        "../west/attack_004.png",
+        "../west/attack_005.png"
+      ],
+      "hurt": [
+        "../west/hurt_000.png",
+        "../west/hurt_001.png",
+        "../west/hurt_002.png",
+        "../west/hurt_003.png",
+        "../west/hurt_004.png",
+        "../west/hurt_005.png"
+      ],
+      "death": [
+        "../west/death_000.png",
+        "../west/death_001.png",
+        "../west/death_002.png",
+        "../west/death_003.png",
+        "../west/death_004.png",
+        "../west/death_005.png"
+      ]
+    },
+    "north": {
+      "idle": [
+        "../north/idle_000.png",
+        "../north/idle_001.png",
+        "../north/idle_002.png",
+        "../north/idle_003.png",
+        "../north/idle_004.png",
+        "../north/idle_005.png"
+      ],
+      "walk": [
+        "../north/walk_000.png",
+        "../north/walk_001.png",
+        "../north/walk_002.png",
+        "../north/walk_003.png",
+        "../north/walk_004.png",
+        "../north/walk_005.png"
+      ],
+      "attack": [
+        "../north/attack_000.png",
+        "../north/attack_001.png",
+        "../north/attack_002.png",
+        "../north/attack_003.png",
+        "../north/attack_004.png",
+        "../north/attack_005.png"
+      ],
+      "hurt": [
+        "../north/hurt_000.png",
+        "../north/hurt_001.png",
+        "../north/hurt_002.png",
+        "../north/hurt_003.png",
+        "../north/hurt_004.png",
+        "../north/hurt_005.png"
+      ],
+      "death": [
+        "../north/death_000.png",
+        "../north/death_001.png",
+        "../north/death_002.png",
+        "../north/death_003.png",
+        "../north/death_004.png",
+        "../north/death_005.png"
+      ]
+    },
+    "east": {
+      "idle": [
+        "../east/idle_000.png",
+        "../east/idle_001.png",
+        "../east/idle_002.png",
+        "../east/idle_003.png",
+        "../east/idle_004.png",
+        "../east/idle_005.png"
+      ],
+      "walk": [
+        "../east/walk_000.png",
+        "../east/walk_001.png",
+        "../east/walk_002.png",
+        "../east/walk_003.png",
+        "../east/walk_004.png",
+        "../east/walk_005.png"
+      ],
+      "attack": [
+        "../east/attack_000.png",
+        "../east/attack_001.png",
+        "../east/attack_002.png",
+        "../east/attack_003.png",
+        "../east/attack_004.png",
+        "../east/attack_005.png"
+      ],
+      "hurt": [
+        "../east/hurt_000.png",
+        "../east/hurt_001.png",
+        "../east/hurt_002.png",
+        "../east/hurt_003.png",
+        "../east/hurt_004.png",
+        "../east/hurt_005.png"
+      ],
+      "death": [
+        "../east/death_000.png",
+        "../east/death_001.png",
+        "../east/death_002.png",
+        "../east/death_003.png",
+        "../east/death_004.png",
+        "../east/death_005.png"
+      ]
+    }
+  },
+  "exports": [
+    {
+      "file": "south/idle_000.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        0,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        33,
+        49
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        19,
+        11,
+        55,
+        48
+      ]
+    },
+    {
+      "file": "south/idle_001.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        256,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        93,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        79,
+        11,
+        115,
+        49
+      ]
+    },
+    {
+      "file": "south/idle_002.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        512,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        152,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        142,
+        11,
+        179,
+        49
+      ]
+    },
+    {
+      "file": "south/idle_003.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        768,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        229,
+        51
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        204,
+        11,
+        240,
+        50
+      ]
+    },
+    {
+      "file": "south/idle_004.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        1024,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        291,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        266,
+        11,
+        303,
+        49
+      ]
+    },
+    {
+      "file": "south/idle_005.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        1280,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        351,
+        51
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        326,
+        11,
+        363,
+        50
+      ]
+    },
+    {
+      "file": "south/walk_000.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        0,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        35,
+        100
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        19,
+        58,
+        56,
+        99
+      ]
+    },
+    {
+      "file": "south/walk_001.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        256,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        102,
+        98
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        78,
+        57,
+        116,
+        97
+      ]
+    },
+    {
+      "file": "south/walk_002.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        512,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        164,
+        100
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        143,
+        58,
+        178,
+        99
+      ]
+    },
+    {
+      "file": "south/walk_003.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        768,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        226,
+        100
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        205,
+        58,
+        240,
+        99
+      ]
+    },
+    {
+      "file": "south/walk_004.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        1024,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        284,
+        97
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        266,
+        58,
+        303,
+        96
+      ]
+    },
+    {
+      "file": "south/walk_005.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        1280,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        342,
+        99
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        326,
+        58,
+        363,
+        98
+      ]
+    },
+    {
+      "file": "south/attack_000.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        0,
+        400,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        34,
+        147
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        19,
+        107,
+        56,
+        146
+      ]
+    },
+    {
+      "file": "south/attack_001.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        256,
+        400,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        106,
+        147
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        80,
+        101,
+        119,
+        146
+      ]
+    },
+    {
+      "file": "south/attack_002.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        512,
+        400,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        168,
+        149
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        141,
+        109,
+        179,
+        148
+      ]
+    },
+    {
+      "file": "south/attack_003.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        768,
+        400,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        227,
+        149
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        200,
+        113,
+        239,
+        148
+      ]
+    },
+    {
+      "file": "south/attack_004.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        1024,
+        400,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        273,
+        147
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        263,
+        100,
+        302,
+        146
+      ]
+    },
+    {
+      "file": "south/attack_005.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        1280,
+        400,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        340,
+        147
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        326,
+        107,
+        363,
+        146
+      ]
+    },
+    {
+      "file": "south/hurt_000.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        0,
+        616,
+        256,
+        192
+      ],
+      "sampled_ground_anchor": [
+        31,
+        199
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        19,
+        156,
+        57,
+        198
+      ]
+    },
+    {
+      "file": "south/hurt_001.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        256,
+        616,
+        256,
+        192
+      ],
+      "sampled_ground_anchor": [
+        94,
+        199
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        79,
+        156,
+        121,
+        198
+      ]
+    },
+    {
+      "file": "south/hurt_002.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        512,
+        616,
+        256,
+        192
+      ],
+      "sampled_ground_anchor": [
+        153,
+        199
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        141,
+        155,
+        183,
+        198
+      ]
+    },
+    {
+      "file": "south/hurt_003.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        768,
+        616,
+        256,
+        192
+      ],
+      "sampled_ground_anchor": [
+        222,
+        197
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        204,
+        155,
+        241,
+        196
+      ]
+    },
+    {
+      "file": "south/hurt_004.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        1024,
+        616,
+        256,
+        192
+      ],
+      "sampled_ground_anchor": [
+        284,
+        198
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        266,
+        156,
+        303,
+        197
+      ]
+    },
+    {
+      "file": "south/hurt_005.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        1280,
+        616,
+        256,
+        192
+      ],
+      "sampled_ground_anchor": [
+        345,
+        197
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        327,
+        155,
+        364,
+        196
+      ]
+    },
+    {
+      "file": "south/death_000.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        0,
+        808,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        37,
+        243
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        19,
+        203,
+        57,
+        242
+      ]
+    },
+    {
+      "file": "south/death_001.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        256,
+        808,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        96,
+        244
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        81,
+        209,
+        118,
+        243
+      ]
+    },
+    {
+      "file": "south/death_002.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        512,
+        808,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        170,
+        243
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        135,
+        211,
+        183,
+        242
+      ]
+    },
+    {
+      "file": "south/death_003.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        768,
+        808,
+        248,
+        216
+      ],
+      "sampled_ground_anchor": [
+        225,
+        244
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        195,
+        215,
+        245,
+        243
+      ]
+    },
+    {
+      "file": "south/death_004.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        1016,
+        808,
+        240,
+        216
+      ],
+      "sampled_ground_anchor": [
+        290,
+        244
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        256,
+        218,
+        309,
+        243
+      ]
+    },
+    {
+      "file": "south/death_005.png",
+      "source": "source/milestone-b-south.png",
+      "source_bounds": [
+        1256,
+        808,
+        280,
+        216
+      ],
+      "sampled_ground_anchor": [
+        342,
+        243
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        316,
+        218,
+        371,
+        242
+      ]
+    },
+    {
+      "file": "west/idle_000.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        0,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        41,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        15,
+        12,
+        55,
+        49
+      ]
+    },
+    {
+      "file": "west/idle_001.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        256,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        100,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        76,
+        12,
+        115,
+        49
+      ]
+    },
+    {
+      "file": "west/idle_002.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        512,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        163,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        139,
+        12,
+        178,
+        49
+      ]
+    },
+    {
+      "file": "west/idle_003.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        768,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        225,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        203,
+        12,
+        241,
+        49
+      ]
+    },
+    {
+      "file": "west/idle_004.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        1024,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        292,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        267,
+        12,
+        306,
+        49
+      ]
+    },
+    {
+      "file": "west/idle_005.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        1280,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        354,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        331,
+        12,
+        370,
+        49
+      ]
+    },
+    {
+      "file": "west/walk_000.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        0,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        40,
+        97
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        14,
+        58,
+        56,
+        96
+      ]
+    },
+    {
+      "file": "west/walk_001.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        256,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        95,
+        97
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        77,
+        58,
+        116,
+        96
+      ]
+    },
+    {
+      "file": "west/walk_002.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        512,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        159,
+        98
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        138,
+        58,
+        177,
+        97
+      ]
+    },
+    {
+      "file": "west/walk_003.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        768,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        223,
+        98
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        199,
+        58,
+        239,
+        97
+      ]
+    },
+    {
+      "file": "west/walk_004.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        1024,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        282,
+        99
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        268,
+        58,
+        303,
+        98
+      ]
+    },
+    {
+      "file": "west/walk_005.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        1280,
+        204,
+        256,
+        196
+      ],
+      "sampled_ground_anchor": [
+        350,
+        98
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        326,
+        59,
+        366,
+        97
+      ]
+    },
+    {
+      "file": "west/attack_000.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        0,
+        400,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        41,
+        148
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        12,
+        109,
+        56,
+        147
+      ]
+    },
+    {
+      "file": "west/attack_001.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        256,
+        400,
+        244,
+        216
+      ],
+      "sampled_ground_anchor": [
+        101,
+        148
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        80,
+        101,
+        115,
+        147
+      ]
+    },
+    {
+      "file": "west/attack_002.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        500,
+        400,
+        268,
+        216
+      ],
+      "sampled_ground_anchor": [
+        165,
+        148
+      ],
+      "ground_anchor_adjustment_px": -4,
+      "sampled_bounds": [
+        127,
+        112,
+        187,
+        147
+      ]
+    },
+    {
+      "file": "west/attack_003.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        768,
+        400,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        233,
+        148
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        196,
+        114,
+        249,
+        147
+      ]
+    },
+    {
+      "file": "west/attack_004.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        1024,
+        400,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        291,
+        148
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        269,
+        106,
+        307,
+        147
+      ]
+    },
+    {
+      "file": "west/attack_005.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        1280,
+        400,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        352,
+        148
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        326,
+        109,
+        367,
+        147
+      ]
+    },
+    {
+      "file": "west/hurt_000.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        0,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        40,
+        197
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        13,
+        157,
+        56,
+        196
+      ]
+    },
+    {
+      "file": "west/hurt_001.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        256,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        99,
+        197
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        76,
+        156,
+        118,
+        196
+      ]
+    },
+    {
+      "file": "west/hurt_002.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        512,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        157,
+        197
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        141,
+        156,
+        179,
+        196
+      ]
+    },
+    {
+      "file": "west/hurt_003.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        768,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        229,
+        197
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        205,
+        158,
+        244,
+        196
+      ]
+    },
+    {
+      "file": "west/hurt_004.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        1024,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        288,
+        197
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        260,
+        156,
+        303,
+        196
+      ]
+    },
+    {
+      "file": "west/hurt_005.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        1280,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        350,
+        197
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        324,
+        157,
+        365,
+        196
+      ]
+    },
+    {
+      "file": "west/death_000.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        0,
+        820,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        40,
+        245
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        11,
+        207,
+        56,
+        244
+      ]
+    },
+    {
+      "file": "west/death_001.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        256,
+        820,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        97,
+        243
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        72,
+        213,
+        120,
+        242
+      ]
+    },
+    {
+      "file": "west/death_002.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        512,
+        820,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        169,
+        242
+      ],
+      "ground_anchor_adjustment_px": -6,
+      "sampled_bounds": [
+        131,
+        214,
+        190,
+        241
+      ]
+    },
+    {
+      "file": "west/death_003.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        768,
+        820,
+        244,
+        204
+      ],
+      "sampled_ground_anchor": [
+        232,
+        244
+      ],
+      "ground_anchor_adjustment_px": -2,
+      "sampled_bounds": [
+        194,
+        222,
+        247,
+        243
+      ]
+    },
+    {
+      "file": "west/death_004.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        1012,
+        820,
+        244,
+        204
+      ],
+      "sampled_ground_anchor": [
+        293,
+        242
+      ],
+      "ground_anchor_adjustment_px": -4,
+      "sampled_bounds": [
+        255,
+        220,
+        311,
+        241
+      ]
+    },
+    {
+      "file": "west/death_005.png",
+      "source": "source/milestone-b-west.png",
+      "source_bounds": [
+        1256,
+        820,
+        280,
+        204
+      ],
+      "sampled_ground_anchor": [
+        354,
+        242
+      ],
+      "ground_anchor_adjustment_px": -8,
+      "sampled_bounds": [
+        316,
+        221,
+        377,
+        241
+      ]
+    },
+    {
+      "file": "north/idle_000.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        0,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        42,
+        51
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        17,
+        9,
+        53,
+        50
+      ]
+    },
+    {
+      "file": "north/idle_001.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        256,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        102,
+        51
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        79,
+        9,
+        116,
+        50
+      ]
+    },
+    {
+      "file": "north/idle_002.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        512,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        164,
+        51
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        141,
+        9,
+        178,
+        50
+      ]
+    },
+    {
+      "file": "north/idle_003.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        768,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        223,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        206,
+        9,
+        242,
+        49
+      ]
+    },
+    {
+      "file": "north/idle_004.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        1024,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        288,
+        50
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        271,
+        9,
+        306,
+        49
+      ]
+    },
+    {
+      "file": "north/idle_005.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        1280,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        356,
+        51
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        333,
+        9,
+        371,
+        50
+      ]
+    },
+    {
+      "file": "north/walk_000.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        0,
+        204,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        30,
+        101
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        18,
+        59,
+        55,
+        100
+      ]
+    },
+    {
+      "file": "north/walk_001.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        256,
+        204,
+        256,
+        200
+      ],
+      "sampled_ground_anchor": [
+        95,
+        101
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        79,
+        58,
+        118,
+        100
+      ]
+    },
+    {
+      "file": "north/walk_002.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        512,
+        204,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        170,
+        103
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        142,
+        58,
+        188,
+        102
+      ]
+    },
+    {
+      "file": "north/walk_003.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        768,
+        204,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        228,
+        103
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        205,
+        58,
+        242,
+        102
+      ]
+    },
+    {
+      "file": "north/walk_004.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        1024,
+        204,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        281,
+        100
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        269,
+        57,
+        306,
+        99
+      ]
+    },
+    {
+      "file": "north/walk_005.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        1280,
+        204,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        343,
+        101
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        331,
+        58,
+        367,
+        100
+      ]
+    },
+    {
+      "file": "north/attack_000.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        0,
+        412,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        43,
+        152
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        17,
+        112,
+        56,
+        151
+      ]
+    },
+    {
+      "file": "north/attack_001.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        256,
+        404,
+        256,
+        216
+      ],
+      "sampled_ground_anchor": [
+        100,
+        153
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        78,
+        101,
+        117,
+        152
+      ]
+    },
+    {
+      "file": "north/attack_002.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        512,
+        412,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        174,
+        154
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        141,
+        103,
+        188,
+        153
+      ]
+    },
+    {
+      "file": "north/attack_003.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        768,
+        412,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        233,
+        155
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        201,
+        106,
+        242,
+        154
+      ]
+    },
+    {
+      "file": "north/attack_004.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        1024,
+        412,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        298,
+        153
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        266,
+        106,
+        307,
+        152
+      ]
+    },
+    {
+      "file": "north/attack_005.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        1280,
+        412,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        355,
+        152
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        331,
+        111,
+        370,
+        151
+      ]
+    },
+    {
+      "file": "north/hurt_000.png",
+      "source": "source/milestone-b-north-hurt.png",
+      "source_bounds": [
+        0,
+        0,
+        512,
+        512
+      ],
+      "sampled_ground_anchor": [
+        28,
+        53
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        12,
+        13,
+        48,
+        52
+      ]
+    },
+    {
+      "file": "north/hurt_001.png",
+      "source": "source/milestone-b-north-hurt.png",
+      "source_bounds": [
+        512,
+        0,
+        512,
+        512
+      ],
+      "sampled_ground_anchor": [
+        86,
+        53
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        69,
+        16,
+        104,
+        52
+      ]
+    },
+    {
+      "file": "north/hurt_002.png",
+      "source": "source/milestone-b-north-hurt.png",
+      "source_bounds": [
+        1024,
+        0,
+        512,
+        512
+      ],
+      "sampled_ground_anchor": [
+        142,
+        53
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        125,
+        24,
+        160,
+        52
+      ]
+    },
+    {
+      "file": "north/hurt_003.png",
+      "source": "source/milestone-b-north-hurt.png",
+      "source_bounds": [
+        0,
+        512,
+        512,
+        512
+      ],
+      "sampled_ground_anchor": [
+        29,
+        106
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        12,
+        72,
+        48,
+        105
+      ]
+    },
+    {
+      "file": "north/hurt_004.png",
+      "source": "source/milestone-b-north-hurt.png",
+      "source_bounds": [
+        512,
+        512,
+        512,
+        512
+      ],
+      "sampled_ground_anchor": [
+        85,
+        106
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        68,
+        67,
+        104,
+        105
+      ]
+    },
+    {
+      "file": "north/hurt_005.png",
+      "source": "source/milestone-b-north-hurt.png",
+      "source_bounds": [
+        1024,
+        512,
+        512,
+        512
+      ],
+      "sampled_ground_anchor": [
+        142,
+        106
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        125,
+        66,
+        161,
+        105
+      ]
+    },
+    {
+      "file": "north/death_000.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        0,
+        820,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        45,
+        248
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        20,
+        210,
+        59,
+        247
+      ]
+    },
+    {
+      "file": "north/death_001.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        256,
+        820,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        104,
+        248
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        76,
+        213,
+        117,
+        247
+      ]
+    },
+    {
+      "file": "north/death_002.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        512,
+        820,
+        244,
+        204
+      ],
+      "sampled_ground_anchor": [
+        159,
+        248
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        132,
+        216,
+        181,
+        247
+      ]
+    },
+    {
+      "file": "north/death_003.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        756,
+        820,
+        268,
+        204
+      ],
+      "sampled_ground_anchor": [
+        214,
+        245
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        191,
+        219,
+        250,
+        244
+      ]
+    },
+    {
+      "file": "north/death_004.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        1024,
+        820,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        281,
+        247
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        258,
+        222,
+        314,
+        246
+      ]
+    },
+    {
+      "file": "north/death_005.png",
+      "source": "source/milestone-b-north.png",
+      "source_bounds": [
+        1280,
+        820,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        347,
+        245
+      ],
+      "ground_anchor_adjustment_px": 0,
+      "sampled_bounds": [
+        322,
+        223,
+        378,
+        244
+      ]
+    }
+  ]
+}

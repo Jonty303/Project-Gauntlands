@@ -1,6 +1,6 @@
 # Iteration 04 — Milestone A review record
 
-Date: 2026-10-23. Status: **prototype delivered; user visual approval pending**.
+Date: 2026-10-23. Status: **user approved after the walk revision**.
 
 The user explicitly authorized Milestone A after committing the approved concept
 sheets. Read AGENTS.md, DESIGN.md, ITERATION_04.md, the Iteration 03 scope and its
@@ -77,3 +77,11 @@ unclipped bounds and the shared ground row. Standalone browser playback checked
 for frame advancement, travel, pause and in-place mode, with no page errors.
 No game runtime checks were needed; gameplay and the other action assets remain
 unchanged. Visual approval of this revision is still pending.
+
+## Subsequent approval
+
+After the walk revision at `b87e979d62abe5a547ee56ae9f1bcc11ac152aab`, the user
+said "looks good". Milestone A is therefore visually approved. The subsequent
+"go ahead" explicitly authorizes Milestone B, following the preceding assistant
+description of four-direction goblin animation. It does not authorize game
+integration, Milestone C or effects. See ITERATION_04_MILESTONE_B.md.

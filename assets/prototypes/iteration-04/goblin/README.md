@@ -1,6 +1,11 @@
 # Goblin — Milestone A review prototype
 
-**Awaiting user visual approval. One east-facing view only; no game integration.**
+**Milestone A approved by the user after the walk revision. No game integration.**
+
+The user said "looks good" after reviewing the revised walk at `b87e979`, then
+authorized Milestone B with "go ahead". The original A preview/manifest are kept
+as review history. See [the four-direction package](four-direction/README.md)
+for the new Milestone B review; all approved east PNGs are preserved unchanged.
 
 Open `preview.html` directly in a browser. Choose a clip, pause, scrub, step or
 slow playback to inspect the frames. `animation-preview.gif` is a convenient
