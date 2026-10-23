@@ -4,7 +4,11 @@ Gauntlands is a Godot 4.5.2 top-down 2D action-RPG project.
 
 The current main branch is the clean 2D reboot. Earlier prototypes remain preserved on archive/experiment branches, including `archive/prototype-3d-final`.
 
-## Iteration 01 — Two-Goblin Combat Room
+## Iteration 03 — planning only
+
+The `iteration-03` branch starts from completed Iteration 02 (`060a91288da3e63770d7f704478882a052662540`). No Iteration 03 gameplay is implemented yet. See the [Iteration 03 specification](docs/ITERATION_03.md) and [validation plan/status](docs/ITERATION_03_VALIDATION.md). The planned scope is discovery, pursuit, escape, chests, one secret room and traps in approximately five rooms; the character/RPG pass is deferred.
+
+## Playable baseline — Iteration 02: Rooms, Doors and Loot
 
 Two stone rooms connected by an L-shaped corridor, with framed doors at both
 ends. Room A retains the stationary Guard and slower Chaser; the corridor and
