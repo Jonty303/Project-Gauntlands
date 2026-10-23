@@ -22,7 +22,7 @@ func reset_actor() -> void:
 	route_revision = -1
 
 func _physics_process(delta: float) -> void:
-	if arena.escaped or hp <= 0:
+	if arena.simulation_stopped() or hp <= 0:
 		return
 	velocity = Vector2.ZERO
 	var sees_player: bool = arena.player.hp > 0 and position.distance_to(arena.player.position) <= detection_range and arena.clear_sight(position, arena.player.position)

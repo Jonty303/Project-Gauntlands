@@ -21,7 +21,7 @@ func overlaps(actor: CharacterBody2D) -> bool:
 	return actor.hp > 0 and actor.position.distance_to(actor.position.clamp(position - half, position + half)) <= actor.feet.shape.radius
 
 func _physics_process(delta: float) -> void:
-	if arena.escaped:
+	if arena.simulation_stopped():
 		return
 	var occupants: Array = ([arena.player] + arena.goblins).filter(overlaps)
 	if phase == "armed":

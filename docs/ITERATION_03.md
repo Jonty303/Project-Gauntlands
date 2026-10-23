@@ -4,7 +4,7 @@
 
 Plan a compact, hand-authored dungeon loop: explore about five rooms, discover connections, evade pursuing creatures, collect chest gold, survive traps and escape through the entrance.
 
-**Status: specification only. Gameplay implementation is not authorized by this preparation task.** All implementation acceptance boxes remain unchecked.
+**Status: implemented following separate authorization; visibility and pause refinement approved on 2026-10-23.** The original preparation was documentation-only. Acceptance boxes remain pending human playtesting; automated evidence is recorded in [validation](ITERATION_03_VALIDATION.md).
 
 Use Godot 4.5.2 stable. Read [agent instructions](../AGENTS.md), [design baseline](../DESIGN.md) and [Iteration 02](ITERATION_02.md). Preserve existing art, free movement, combat timing, targeting, HUD, finite ammunition and gamepad-first controls except for the explicit changes below.
 
@@ -135,9 +135,9 @@ Full restart resets the entire run as specified above. Trap deaths use the same 
 - [ ] Full restart clears all new state; enemy-only reset preserves exploration/rewards.
 - [ ] Existing combat, movement, art, ammunition, loot and controller bindings regressions pass.
 
-## 10. Future implementation sequence
+## 10. Original implementation sequence
 
-This is a handoff plan, not permission to implement during branch preparation.
+Historical handoff sequence from branch preparation; implementation was subsequently authorized.
 
 1. Inspect the baseline and keep existing working systems.
 2. Extend the hand-authored layout and minimal logical region/door connections.
@@ -149,3 +149,14 @@ This is a handoff plan, not permission to implement during branch preparation.
 8. Stop at these acceptance criteria; leave the character/RPG pass for a separate iteration.
 
 Tunable values (gold amounts, hazard damage/timing, sight/search distances) should be chosen during implementation/playtesting and recorded in validation. They do not authorize additional systems.
+
+## 11. Approved visibility and pause refinement — 2026-10-23
+
+- Discovery is persistent knowledge of static layout, reset only by a full restart.
+- Current line of sight is geometric observation through open apertures, bounded by a configurable range. Walls, closed doors and bends block it. Memory never grants target eligibility, live HUD information or interactive state updates.
+- Lighting is a separate brightness concern. This pass adds no light sources, falloff or light-dependent detection. Visible artwork keeps its existing brightness; remembered layout is dimmed independently.
+- Use geometry-clipped current visibility rather than the original 16px cell mask. Update on player movement, door revision and range changes. Wall-art projection may reveal only an observed wall face; it must never grant gameplay sight behind that wall.
+- Escape / Start / Menu and the HUD Pause button open a menu during active play. Resume returns to the same simulation state. Restart Run requires confirmation, initially focused on Cancel. R also requests confirmation during active play; R and Start retain direct restart on death/escape screens.
+- Pausing freezes movement, combat phases, projectiles, damage, AI/search, traps, pickups and pending respawns. Menus remain responsive. Resume must not advance timers by paused wall-clock time or reuse a menu press as an attack.
+- Controller menu navigation uses D-pad up/down, A to select, B to back/cancel. Keyboard uses arrow keys, Enter and Escape. Mouse buttons also work.
+- Future inventory must acquire its own pause reason when opened and release it when closed. Simulation resumes only after all pause reasons clear. No inventory, equipment or item-management system is added here.

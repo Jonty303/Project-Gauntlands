@@ -9,7 +9,7 @@ func prompt() -> String:
 	return "Escape dungeon" if kind == "entrance" else ("Empty chest" if opened else "Open chest")
 
 func activate() -> void:
-	if arena.escaped or arena.player.hp <= 0 or arena.player.position.distance_to(position) >= 48 or not arena.interaction_reachable(self):
+	if arena.simulation_stopped() or arena.player.hp <= 0 or arena.player.position.distance_to(position) >= 48 or not arena.interaction_reachable(self):
 		return
 	if kind == "entrance":
 		arena.escape_run()

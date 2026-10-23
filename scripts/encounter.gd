@@ -7,6 +7,9 @@ const Hud = preload("res://scripts/hud.gd")
 
 var dungeon: Node2D
 var exploration: Node2D
+var sight: Node2D
+var sight_blockers: Array[Rect2] = []
+var pause_menu: CanvasLayer
 var traps: Array = []
 var escaped := false
 var escaped_gold := 0
@@ -80,6 +83,9 @@ func _ready() -> void:
 	camera = Camera2D.new()
 	camera.position = Vector2(320, 280)
 	add_child(camera)
+	sight = preload("res://scripts/sight.gd").new()
+	sight.arena = self
+	add_child(sight)
 	exploration = preload("res://scripts/exploration.gd").new()
 	exploration.arena = self
 	exploration.z_index = 5
@@ -90,9 +96,20 @@ func _ready() -> void:
 	hud.arena = self
 	hud.z_index = 10
 	canvas.add_child(hud)
+	pause_menu = preload("res://scripts/pause_menu.gd").new()
+	pause_menu.arena = self
+	add_child(pause_menu)
+	# Observed dynamic art stays readable above the static fog.
+	actors.z_index = 6
+	loot.z_index = 6
+	projectiles.z_index = 6
+	for item in interactables + traps:
+		if item.get_parent() == self:
+			item.z_index = 6
 	restart_encounter()
 
 func wall(location: Vector2, dimensions: Vector2) -> void:
+	sight_blockers.append(Rect2(location - dimensions / 2, dimensions))
 	var body := StaticBody2D.new()
 	body.position = location
 	body.collision_layer = 1
@@ -106,8 +123,13 @@ func wall(location: Vector2, dimensions: Vector2) -> void:
 
 func _physics_process(_delta: float) -> void:
 	if Input.is_action_just_pressed("restart"):
-		restart_encounter()
-	if escaped:
+		if escaped or player.hp <= 0:
+			restart_encounter()
+		else:
+			pause_menu.open_menu()
+			pause_menu.request_restart()
+			return
+	if simulation_stopped():
 		return
 	camera.position = Vector2(maxf(320, player.position.x), maxf(280, player.position.y + 16))
 	for goblin in pending_respawns.duplicate():
@@ -120,6 +142,8 @@ func _physics_process(_delta: float) -> void:
 			item.activate()
 
 func restart_encounter() -> void:
+	if pause_menu != null:
+		pause_menu.reset()
 	escaped = false
 	escaped_gold = 0
 	for arrow in projectiles.get_children():
@@ -162,7 +186,7 @@ func melee_contacts(attacker: CharacterBody2D) -> void:
 			resolve_contact(attacker, defender, "Sword" if attacker == player else attacker.title + " swing")
 
 func resolve_contact(attacker: CharacterBody2D, defender: CharacterBody2D, weapon: String) -> void:
-	if escaped or attacker.hp <= 0 or defender.hp <= 0:
+	if simulation_stopped() or attacker.hp <= 0 or defender.hp <= 0:
 		return
 	roll_count += 1
 	var natural := rng.randi_range(1, 20)
@@ -180,7 +204,7 @@ func resolve_contact(attacker: CharacterBody2D, defender: CharacterBody2D, weapo
 	defender.take_damage(damage)
 
 func fire_arrow(shooter: CharacterBody2D) -> void:
-	if escaped or arrows <= 0 or shooter.hp <= 0:
+	if simulation_stopped() or arrows <= 0 or shooter.hp <= 0:
 		return
 	arrows -= 1
 	var arrow := Arrow.new()
@@ -198,7 +222,7 @@ func clear_sight(from: Vector2, to: Vector2) -> bool:
 	return get_world_2d().direct_space_state.intersect_ray(query).is_empty()
 
 func eligible_targets() -> Array:
-	return goblins.filter(func(g): return g.hp > 0 and point_visible(g.position))
+	return goblins.filter(func(g): return g.hp > 0 and actor_visible(g))
 
 func nearby_interactable():
 	var closest = null
@@ -221,7 +245,7 @@ func drop_loot(goblin: CharacterBody2D) -> void:
 	loot.add_child(drop)
 
 func request_respawns() -> void:
-	if escaped:
+	if simulation_stopped():
 		return
 	for goblin in goblins:
 		if player.position.distance_to(goblin.spawn_point) <= 24:
@@ -233,7 +257,10 @@ func request_respawns() -> void:
 	log_event("Goblins reset; occupied spawn points deferred")
 
 func point_visible(point: Vector2) -> bool:
-	return player != null and player.position.distance_to(point) <= 440.0 and clear_sight(player.position, point)
+	return player != null and sight.can_see(point)
+
+func actor_visible(actor: CharacterBody2D) -> bool:
+	return sight.actor_visible(actor)
 
 func interaction_reachable(item: Node2D) -> bool:
 	var query := PhysicsRayQueryParameters2D.create(player.position, item.position, 1)
@@ -242,7 +269,7 @@ func interaction_reachable(item: Node2D) -> bool:
 	return hit.is_empty() or hit.collider == item
 
 func interactable_visible(item: Node2D) -> bool:
-	if player.position.distance_to(item.position) > 440.0:
+	if player.position.distance_to(item.position) > sight.view_distance:
 		return false
 	return interaction_reachable(item)
 
@@ -271,7 +298,7 @@ func motion_clear(actor: CharacterBody2D, destination: Vector2) -> bool:
 	return result[0] >= 1.0
 
 func escape_run() -> void:
-	if escaped or player.hp <= 0:
+	if simulation_stopped() or player.hp <= 0:
 		return
 	escaped = true
 	escaped_gold = gold
@@ -281,7 +308,7 @@ func escape_run() -> void:
 	log_event("Escaped with %d gold" % escaped_gold)
 
 func resolve_hazard(source: Node2D, target: CharacterBody2D, damage_kind: String, base_amount: int) -> void:
-	if escaped or target.hp <= 0:
+	if simulation_stopped() or target.hp <= 0:
 		return
 	# Physical contact is established by the caller. This compact request is the
 	# future mitigation seam; hazard contacts never roll weapon accuracy.
@@ -305,3 +332,6 @@ func contact_event(defender: CharacterBody2D, message: String) -> void:
 		log_event(message)
 	else:
 		print(message)
+
+func simulation_stopped() -> bool:
+	return escaped or get_tree().paused

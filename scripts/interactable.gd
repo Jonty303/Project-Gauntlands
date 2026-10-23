@@ -25,7 +25,7 @@ func prompt() -> String:
 	return "Reset all goblins" if is_button else ("Close door" if opened else "Open door")
 
 func activate() -> void:
-	if arena.escaped or arena.player.hp <= 0:
+	if arena.simulation_stopped() or arena.player.hp <= 0:
 		return
 	if is_button:
 		arena.request_respawns()
