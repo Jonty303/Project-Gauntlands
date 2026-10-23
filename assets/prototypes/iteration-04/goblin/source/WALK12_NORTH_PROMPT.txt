@@ -1,0 +1,18 @@
+Use case: identity-preserve. This is a focused WALK ANIMATION REPAIR for the attached approved goblin. Create exactly TWELVE distinct sequential full-body walking poses in ONE direction. Keep the same goblin identity, pixel-art palette, anatomy, ears, red scarf, brown leather armour/boots, anatomical right-hand short sword and left-arm round wooden shield. The previous animation shuffled and its ears jittered: this must be a complete natural heel-to-toe walk with a stable head.
+LAYOUT:1536x1024 transparent RGBA, FOUR columns by THREE rows, twelve equally spaced cells of384x341.33. Read left-to-right top-to-bottom. Body head-to-ground about208 image pixels (39 native px after common export), grounded at cell-local y285, torso centred local x192. Constant scale in all12 cells. Lots of clear transparent margins; no background, checkerboard, shadows, text, grid, trails or particles. Crisp pixel clusters, not smooth painting. Same fixed three-quarter top-down camera.
+HEAD/EARS LOCK: treat the whole head and both ears as ONE RIGID identical sprite pasted unchanged into each pose. EXACT SAME ear root locations relative to skull, ear angles/lengths/silhouette, skull shape, eyes and face direction. NO ear flapping, size changes, head turning, perspective shifts or expression morphing. Head may translate vertically by just 1 native pixel with hip bob; its shape never changes. Torso/scarf/equipment also stable and proportional. Most motion must be in the articulated legs and hip weight transfer.
+The12 sequential gait frames:
+0 near foot heel contact forward, far foot trailing toe, broad natural stride;
+1 weight lowers onto near foot, far heel lifts;
+2 near supporting foot starts moving backward relative to body, far toe pushes off;
+3 far leg swings forward, knee bent, far boot clearly airborne passing support leg;
+4 far knee leads forward, support near leg straightens and hips rise slightly;
+5 far lower leg extends forward, heel approaching ground, near heel lifting;
+6 far heel contacts ahead, near foot trailing toe, opposite leading leg from0;
+7 weight lowers onto far foot, near heel lifts;
+8 far supporting foot moves backward under body, near toe pushes off;
+9 near leg swings forward, near knee bent and boot clearly airborne;
+10 near knee leads, far support leg straightens, hips rise slightly;
+11 near lower leg extends, heel approaches next contact0.
+Natural WALK, not a run: at least one foot supports body in each frame, no airborne whole body. Exactly TWO legs/two feet correctly attached. Supporting foot travels smoothly backward while planted as body passes it; swinging foot arcs above ground and lands ahead. Proper opposition, not three repeating standing poses. Gentle bob only. Sword lowered safely, shield stays strapped to left arm. Keep all12 complete poses in their cells. Make frame11 return smoothly into0, not a duplicate pause.
+Direction NORTH/UP/BACK view, walking away from viewer. Back of skull and red scarf visible, no face or eyes looking at camera. Shield left-arm on screen LEFT and sword right-hand on screen RIGHT throughout. Lifted boot soles/heels alternate. Maintain exactly the same back-of-head/ear silhouette in all12frames.

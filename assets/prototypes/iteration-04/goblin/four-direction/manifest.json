@@ -1,6 +1,6 @@
 {
   "status": "Milestone B four-direction review; awaiting user approval; no integration",
-  "milestone_a": "Approved by user after walk revision at b87e979d62abe5a547ee56ae9f1bcc11ac152aab; east PNGs unchanged",
+  "milestone_a": "Approved by user after walk revision at b87e979d62abe5a547ee56ae9f1bcc11ac152aab; east non-walk PNGs unchanged; user subsequently requested walking/ear revision",
   "canvas_px": [
     96,
     96
@@ -48,14 +48,20 @@
     "walk": {
       "loop": true,
       "durations_ms": [
-        74.07407407407408,
-        74.07407407407408,
-        74.07407407407408,
-        74.07407407407408,
-        74.07407407407408,
-        74.07407407407408
+        66.66666666666667,
+        66.66666666666667,
+        66.66666666666667,
+        66.66666666666667,
+        66.66666666666667,
+        66.66666666666667,
+        66.66666666666667,
+        66.66666666666667,
+        66.66666666666667,
+        66.66666666666667,
+        66.66666666666667,
+        66.66666666666667
       ],
-      "note": "Six samples over existing 4/9-second walk cycle. Existing movement remains 54 world px/s."
+      "note": "User-requested fluid walk revision: twelve poses over 800ms. Visual cadence only; movement remains 54px/s."
     },
     "attack": {
       "loop": false,
@@ -89,14 +95,15 @@
     "hurt": {
       "loop": false,
       "durations_ms": [
-        26.666666666666668,
-        26.666666666666668,
-        26.666666666666668,
-        26.666666666666668,
-        26.666666666666668,
-        26.666666666666668
+        40,
+        60,
+        100,
+        100,
+        60,
+        40
       ],
-      "note": "Cosmetic 0.16-second reaction only; does not add a stun or cancel an attack."
+      "gameplay_duration_ms": 160,
+      "note": "User-requested 400ms cosmetic preview. Existing gameplay hurt timer remains 160ms; no stun or attack cancellation is added."
     },
     "death": {
       "loop": false,
@@ -123,12 +130,18 @@
         "../south/idle_005.png"
       ],
       "walk": [
-        "../south/walk_000.png",
-        "../south/walk_001.png",
-        "../south/walk_002.png",
-        "../south/walk_003.png",
-        "../south/walk_004.png",
-        "../south/walk_005.png"
+        "../walk12/south/walk_000.png",
+        "../walk12/south/walk_001.png",
+        "../walk12/south/walk_002.png",
+        "../walk12/south/walk_003.png",
+        "../walk12/south/walk_004.png",
+        "../walk12/south/walk_005.png",
+        "../walk12/south/walk_006.png",
+        "../walk12/south/walk_007.png",
+        "../walk12/south/walk_008.png",
+        "../walk12/south/walk_009.png",
+        "../walk12/south/walk_010.png",
+        "../walk12/south/walk_011.png"
       ],
       "attack": [
         "../south/attack_000.png",
@@ -165,12 +178,18 @@
         "../west/idle_005.png"
       ],
       "walk": [
-        "../west/walk_000.png",
-        "../west/walk_001.png",
-        "../west/walk_002.png",
-        "../west/walk_003.png",
-        "../west/walk_004.png",
-        "../west/walk_005.png"
+        "../walk12/west/walk_000.png",
+        "../walk12/west/walk_001.png",
+        "../walk12/west/walk_002.png",
+        "../walk12/west/walk_003.png",
+        "../walk12/west/walk_004.png",
+        "../walk12/west/walk_005.png",
+        "../walk12/west/walk_006.png",
+        "../walk12/west/walk_007.png",
+        "../walk12/west/walk_008.png",
+        "../walk12/west/walk_009.png",
+        "../walk12/west/walk_010.png",
+        "../walk12/west/walk_011.png"
       ],
       "attack": [
         "../west/attack_000.png",
@@ -207,12 +226,18 @@
         "../north/idle_005.png"
       ],
       "walk": [
-        "../north/walk_000.png",
-        "../north/walk_001.png",
-        "../north/walk_002.png",
-        "../north/walk_003.png",
-        "../north/walk_004.png",
-        "../north/walk_005.png"
+        "../walk12/north/walk_000.png",
+        "../walk12/north/walk_001.png",
+        "../walk12/north/walk_002.png",
+        "../walk12/north/walk_003.png",
+        "../walk12/north/walk_004.png",
+        "../walk12/north/walk_005.png",
+        "../walk12/north/walk_006.png",
+        "../walk12/north/walk_007.png",
+        "../walk12/north/walk_008.png",
+        "../walk12/north/walk_009.png",
+        "../walk12/north/walk_010.png",
+        "../walk12/north/walk_011.png"
       ],
       "attack": [
         "../north/attack_000.png",
@@ -249,12 +274,18 @@
         "../east/idle_005.png"
       ],
       "walk": [
-        "../east/walk_000.png",
-        "../east/walk_001.png",
-        "../east/walk_002.png",
-        "../east/walk_003.png",
-        "../east/walk_004.png",
-        "../east/walk_005.png"
+        "../walk12/east/walk_000.png",
+        "../walk12/east/walk_001.png",
+        "../walk12/east/walk_002.png",
+        "../walk12/east/walk_003.png",
+        "../walk12/east/walk_004.png",
+        "../walk12/east/walk_005.png",
+        "../walk12/east/walk_006.png",
+        "../walk12/east/walk_007.png",
+        "../walk12/east/walk_008.png",
+        "../walk12/east/walk_009.png",
+        "../walk12/east/walk_010.png",
+        "../walk12/east/walk_011.png"
       ],
       "attack": [
         "../east/attack_000.png",
@@ -407,132 +438,6 @@
         11,
         363,
         50
-      ]
-    },
-    {
-      "file": "south/walk_000.png",
-      "source": "source/milestone-b-south.png",
-      "source_bounds": [
-        0,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        35,
-        100
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        19,
-        58,
-        56,
-        99
-      ]
-    },
-    {
-      "file": "south/walk_001.png",
-      "source": "source/milestone-b-south.png",
-      "source_bounds": [
-        256,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        102,
-        98
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        78,
-        57,
-        116,
-        97
-      ]
-    },
-    {
-      "file": "south/walk_002.png",
-      "source": "source/milestone-b-south.png",
-      "source_bounds": [
-        512,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        164,
-        100
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        143,
-        58,
-        178,
-        99
-      ]
-    },
-    {
-      "file": "south/walk_003.png",
-      "source": "source/milestone-b-south.png",
-      "source_bounds": [
-        768,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        226,
-        100
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        205,
-        58,
-        240,
-        99
-      ]
-    },
-    {
-      "file": "south/walk_004.png",
-      "source": "source/milestone-b-south.png",
-      "source_bounds": [
-        1024,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        284,
-        97
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        266,
-        58,
-        303,
-        96
-      ]
-    },
-    {
-      "file": "south/walk_005.png",
-      "source": "source/milestone-b-south.png",
-      "source_bounds": [
-        1280,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        342,
-        99
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        326,
-        58,
-        363,
-        98
       ]
     },
     {
@@ -914,6 +819,330 @@
       ]
     },
     {
+      "file": "walk12/south/walk_000.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        0,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        27,
+        44
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_001.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        384,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        78,
+        44
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_002.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        768,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        132,
+        44
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_003.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        1152,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        184,
+        44
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 39.5,
+        "width_px": 28,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_004.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        0,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        27,
+        89
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 39.5,
+        "width_px": 28,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_005.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        384,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        79,
+        89
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_006.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        768,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        132,
+        89
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_007.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        1152,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        185,
+        88
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_008.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        0,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        27,
+        133
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 39.5,
+        "width_px": 28,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_009.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        384,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        78,
+        132
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_010.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        768,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        131,
+        133
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 39.5,
+        "width_px": 28,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/south/walk_011.png",
+      "source": "source/walk12-south.png",
+      "source_bounds": [
+        1152,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        212,
+        141
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        184,
+        133
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 45,
+        "exported_centre_x": 39.5,
+        "width_px": 28,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
       "file": "west/idle_000.png",
       "source": "source/milestone-b-west.png",
       "source_bounds": [
@@ -1037,132 +1266,6 @@
         12,
         370,
         49
-      ]
-    },
-    {
-      "file": "west/walk_000.png",
-      "source": "source/milestone-b-west.png",
-      "source_bounds": [
-        0,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        40,
-        97
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        14,
-        58,
-        56,
-        96
-      ]
-    },
-    {
-      "file": "west/walk_001.png",
-      "source": "source/milestone-b-west.png",
-      "source_bounds": [
-        256,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        95,
-        97
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        77,
-        58,
-        116,
-        96
-      ]
-    },
-    {
-      "file": "west/walk_002.png",
-      "source": "source/milestone-b-west.png",
-      "source_bounds": [
-        512,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        159,
-        98
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        138,
-        58,
-        177,
-        97
-      ]
-    },
-    {
-      "file": "west/walk_003.png",
-      "source": "source/milestone-b-west.png",
-      "source_bounds": [
-        768,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        223,
-        98
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        199,
-        58,
-        239,
-        97
-      ]
-    },
-    {
-      "file": "west/walk_004.png",
-      "source": "source/milestone-b-west.png",
-      "source_bounds": [
-        1024,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        282,
-        99
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        268,
-        58,
-        303,
-        98
-      ]
-    },
-    {
-      "file": "west/walk_005.png",
-      "source": "source/milestone-b-west.png",
-      "source_bounds": [
-        1280,
-        204,
-        256,
-        196
-      ],
-      "sampled_ground_anchor": [
-        350,
-        98
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        326,
-        59,
-        366,
-        97
       ]
     },
     {
@@ -1544,6 +1647,330 @@
       ]
     },
     {
+      "file": "walk12/west/walk_000.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        0,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        31,
+        45
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 35.5,
+        "width_px": 26,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_001.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        384,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        86,
+        45
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 36,
+        "width_px": 25,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_002.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        768,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        144,
+        45
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 35.5,
+        "width_px": 26,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_003.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        1152,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        199,
+        45
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 35.5,
+        "width_px": 26,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_004.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        0,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        31,
+        93
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 35.5,
+        "width_px": 26,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_005.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        384,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        87,
+        93
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 35.5,
+        "width_px": 26,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_006.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        768,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        143,
+        92
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 35.5,
+        "width_px": 26,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_007.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        1152,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        199,
+        92
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 35.5,
+        "width_px": 26,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_008.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        0,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        31,
+        139
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 35.5,
+        "width_px": 26,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_009.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        384,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        86,
+        138
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 36,
+        "width_px": 27,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_010.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        768,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        143,
+        139
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 35.5,
+        "width_px": 26,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/west/walk_011.png",
+      "source": "source/walk12-west.png",
+      "source_bounds": [
+        1152,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        147
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        199,
+        139
+      ],
+      "head_registration": {
+        "target_centre_x": 36,
+        "old_idle_centre_x": 39,
+        "exported_centre_x": 35.5,
+        "width_px": 26,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
       "file": "north/idle_000.png",
       "source": "source/milestone-b-north.png",
       "source_bounds": [
@@ -1667,132 +2094,6 @@
         9,
         371,
         50
-      ]
-    },
-    {
-      "file": "north/walk_000.png",
-      "source": "source/milestone-b-north.png",
-      "source_bounds": [
-        0,
-        204,
-        256,
-        208
-      ],
-      "sampled_ground_anchor": [
-        30,
-        101
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        18,
-        59,
-        55,
-        100
-      ]
-    },
-    {
-      "file": "north/walk_001.png",
-      "source": "source/milestone-b-north.png",
-      "source_bounds": [
-        256,
-        204,
-        256,
-        200
-      ],
-      "sampled_ground_anchor": [
-        95,
-        101
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        79,
-        58,
-        118,
-        100
-      ]
-    },
-    {
-      "file": "north/walk_002.png",
-      "source": "source/milestone-b-north.png",
-      "source_bounds": [
-        512,
-        204,
-        256,
-        208
-      ],
-      "sampled_ground_anchor": [
-        170,
-        103
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        142,
-        58,
-        188,
-        102
-      ]
-    },
-    {
-      "file": "north/walk_003.png",
-      "source": "source/milestone-b-north.png",
-      "source_bounds": [
-        768,
-        204,
-        256,
-        208
-      ],
-      "sampled_ground_anchor": [
-        228,
-        103
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        205,
-        58,
-        242,
-        102
-      ]
-    },
-    {
-      "file": "north/walk_004.png",
-      "source": "source/milestone-b-north.png",
-      "source_bounds": [
-        1024,
-        204,
-        256,
-        208
-      ],
-      "sampled_ground_anchor": [
-        281,
-        100
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        269,
-        57,
-        306,
-        99
-      ]
-    },
-    {
-      "file": "north/walk_005.png",
-      "source": "source/milestone-b-north.png",
-      "source_bounds": [
-        1280,
-        204,
-        256,
-        208
-      ],
-      "sampled_ground_anchor": [
-        343,
-        101
-      ],
-      "ground_anchor_adjustment_px": 0,
-      "sampled_bounds": [
-        331,
-        58,
-        367,
-        100
       ]
     },
     {
@@ -2172,6 +2473,654 @@
         378,
         244
       ]
+    },
+    {
+      "file": "walk12/north/walk_000.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        0,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        30,
+        49
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_001.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        384,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        87,
+        49
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 39.5,
+        "width_px": 28,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_002.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        768,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        145,
+        50
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 39.5,
+        "width_px": 28,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_003.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        1152,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        202,
+        49
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 39.5,
+        "width_px": 28,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_004.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        0,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        29,
+        97
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_005.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        384,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        87,
+        97
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 39.5,
+        "width_px": 28,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_006.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        768,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        145,
+        97
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 39.5,
+        "width_px": 28,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_007.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        1152,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        202,
+        97
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_008.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        0,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        30,
+        146
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 39.5,
+        "width_px": 30,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_009.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        384,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        87,
+        144
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_010.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        768,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        144,
+        146
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/north/walk_011.png",
+      "source": "source/walk12-north.png",
+      "source_bounds": [
+        1152,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        232,
+        156
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        202,
+        146
+      ],
+      "head_registration": {
+        "target_centre_x": 40,
+        "old_idle_centre_x": 33,
+        "exported_centre_x": 40,
+        "width_px": 29,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_000.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        0,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        24,
+        47
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 44,
+        "width_px": 29,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_001.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        384,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        80,
+        47
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 43.5,
+        "width_px": 28,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_002.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        768,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        135,
+        48
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 44,
+        "width_px": 27,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_003.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        1152,
+        0,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        193,
+        48
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 44,
+        "width_px": 27,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_004.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        0,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        24,
+        95
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 43.5,
+        "width_px": 28,
+        "top_px": 34
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_005.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        384,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        80,
+        94
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 44,
+        "width_px": 27,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_006.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        768,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        136,
+        94
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 43.5,
+        "width_px": 28,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_007.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        1152,
+        341.3333333333333,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        193,
+        94
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 43.5,
+        "width_px": 28,
+        "top_px": 35
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_008.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        0,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        24,
+        142
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 43.5,
+        "width_px": 28,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_009.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        384,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        81,
+        142
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 43.5,
+        "width_px": 28,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_010.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        768,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        136,
+        142
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 43.5,
+        "width_px": 28,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
+    },
+    {
+      "file": "walk12/east/walk_011.png",
+      "source": "source/walk12-east.png",
+      "source_bounds": [
+        1152,
+        682.6666666666666,
+        384,
+        341.3333333333333
+      ],
+      "source_sampling_px": [
+        224,
+        150
+      ],
+      "approved_standing_height_px": 38,
+      "sampled_ground_anchor": [
+        193,
+        142
+      ],
+      "head_registration": {
+        "target_centre_x": 44,
+        "old_idle_centre_x": 44,
+        "exported_centre_x": 44,
+        "width_px": 27,
+        "top_px": 33
+      },
+      "note": "One common nearest-neighbour sampling grid per direction, all sized against the approved east idle height. Stable upper-head/ear silhouette registration: north/south centred on root, east/west 4px forward offset. Support foot remains grounded; no per-pose scaling."
     }
   ]
 }

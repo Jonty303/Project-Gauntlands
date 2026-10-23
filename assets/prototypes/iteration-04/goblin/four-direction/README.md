@@ -12,9 +12,11 @@ review reel; its centisecond-rounded delays are not a new timing specification.
 
 ## Files and frame format
 
-- `../south/`, `../west/`, `../north/`: 90 new RGBA PNGs, six per clip/direction.
-- `../east/`: the 30 approved PNGs, byte-for-byte unchanged.
-- `manifest.json`: all 120 frame paths, ordered clips, durations, source crops,
+- `../walk12/<direction>/`: 48 revised walk PNGs, twelve per direction.
+- `../south/`, `../west/`, `../north/`, `../east/`: all 120 previous PNGs,
+  byte-for-byte unchanged. Their six-pose walks are retained as earlier versions;
+  current playback uses `walk12/`. The 96 non-walk frames remain active.
+- `manifest.json`: all 144 active frame paths, ordered clips, durations, source crops,
   ground alignment adjustments and directional mapping.
 - `contact-<direction>.png`: all frames with phase labels/ground guides at 2×.
 - `animation-preview.gif`: synchronized four-view idle/walk/sword/hurt/death reel.
@@ -44,14 +46,15 @@ to collision. Review those stances and directional transitions at native scale.
 
 ## Timings and facing mapping
 
-The Milestone A timing contract is reused without modification:
+Sword timing remains unchanged. Walk cadence and cosmetic hurt playback were
+revised following explicit user feedback; gameplay timers remain unchanged:
 
 | Clip | Duration / behaviour |
 | --- | --- |
 | Idle | 6×200ms, cosmetic breathing loop. |
-| Walk | Six equal samples over 4/9 seconds, loops. |
+| Walk | Twelve equal samples over 800ms, loops. Visual cadence only; movement remains 54px/s. |
 | Sword | 500ms windup, 140ms contact, 660ms recovery; total 1300ms. |
-| Hurt | Six samples over 160ms; cosmetic, no added stun/cancellation. |
+| Hurt | Six frames over 400ms (40/60/100/100/60/40ms). Existing gameplay hurt timer remains 160ms; no added stun/cancellation. |
 | Death | 720ms offline visual study, holds final pose; gameplay death remains immediate. |
 
 Future selection must match the unchanged `scripts/actor.gd` rule:
@@ -59,6 +62,31 @@ Future selection must match the unchanged `scripts/actor.gd` rule:
 vectors select north for negative y and south otherwise. Diagonal ties select
 the vertical direction. South=(0,1), west=(-1,0), north=(0,-1), east=(1,0).
 Movement and combat vectors remain continuous. No selection code is integrated.
+
+## Twelve-pose walk and ear alignment revision
+
+The user rejected the initial gait as shuffling, requested more fluid/realistic
+walking, noted ear misalignment, and found hurt too quick. The current preview
+therefore uses twelve newly generated walking poses per direction and a slower
+800ms gait, rather than repeating/interpolating the six old poses. These are
+review assets, not a claim that natural walking has been accepted.
+
+All directions are scaled to the approved east idle standing height, using one
+common nearest-neighbour sampling grid per source sheet, never per-pose scaling.
+The exact grid is recorded in each walk export entry. Foot support stays at the
+shared ground row. Horizontal alignment follows the upper head/ear silhouette
+instead of the midpoint between changing foot positions: north/south use x=40,
+east x=44 and west x=36 to allow the side-facing forward head lean. Recorded
+head-band centres stay within 0.5px of those anchors; integer export necessarily
+rounds half-pixel centres. Small vertical bob and contour variation remain for
+human motion review; this does not claim identical ear pixels in every frame.
+
+The earlier six-pose sources and frame files remain intact for comparison.
+Idle, sword, hurt and death PNGs are unchanged. The 400ms hurt duration is a
+cosmetic preview decision only. A future integration must keep the 160ms
+simulation timer, input responsiveness, attack/contact timing and movement;
+it must allow cosmetic recovery to be interrupted by higher-priority actions
+without adding stun, cancellation or an input queue.
 
 ## Provenance
 
@@ -79,6 +107,18 @@ The initial north hurt poses changed shield sides. Those six poses were replaced
 by a targeted generation preserving shield on screen-left and sword on
 screen-right in the back view. The original source atlas is retained for audit;
 its faulty hurt row is not used by any exported clip.
+
+Four additional built-in imagegen calls on 2026-10-23 produced the twelve-pose
+walks. Each used its corresponding earlier direction atlas as visual reference.
+Exact prompts are in `../source/WALK12_<DIRECTION>_PROMPT.txt`; unmodified results
+are retained as `../source/walk12-<direction>.png`.
+
+| Revised walk source | Tool result identifier |
+| --- | --- |
+| South | `exec-acac3446-0a50-48ab-a44e-1e3cdfc32f9d.png` |
+| West | `exec-3ce8c17e-f5a2-41dc-908e-9039c5c84330.png` |
+| North | `exec-e85b6ae7-98b5-4865-81c2-f62ca96ea68e.png` |
+| East | `exec-88d92640-647f-46a7-82bf-c81968dee7b8.png` |
 
 Approved concept:
 `assets/concepts/wide_dark_pixel_art_game_asset_sheet_illustration.png`,

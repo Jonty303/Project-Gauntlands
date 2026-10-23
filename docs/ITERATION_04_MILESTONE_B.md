@@ -60,3 +60,41 @@ Passing export/playback checks does not imply production visual approval.
 Gameplay, existing combat timings, footprints, dungeon/visibility/pause/AI/traps,
 and controller bindings are preserved. Skeleton/troll remain reference only.
 No adventurer work, effects, integration or merge to main. Stop for review.
+
+## User-requested walk, ears and hurt revision — 2026-10-23
+
+The user reported that walking still shuffled, requested more fluid/realistic
+movement and more frames, noted ear alignment issues, and found hurt too quick.
+This explicitly revises the preview's visual cadence and reaction duration.
+
+- Added 48 new walk PNGs: twelve distinct poses for each facing, in a separate
+  `walk12/<direction>/` directory. No old frames were deleted or overwritten.
+- Preview now selects 144 active frames: 48 revised walks plus 96 unchanged
+  idle/sword/hurt/death frames. All 120 earlier PNGs remain byte-for-byte intact.
+- Gait lasts 800ms instead of 4/9 seconds. This is animation cadence; the
+  existing 54px/s movement and all combat/AI/trap/pause behaviour are unchanged.
+- Replaced per-pose foot-midpoint centring with stable upper head/ear silhouette
+  registration. All new views use the approved east standing height; north/south
+  head-band centres target x=40, east x=44, west x=36. Recorded horizontal
+  registration error is at most 0.5px, with small natural vertical bob. This is
+  not a claim that generated contours are pixel-identical.
+- Hurt preview lasts 400ms, while the manifest separately records the unchanged
+  gameplay hurt timer of 160ms. No new stun, attack interruption or input delay.
+  Future cosmetic playback must remain interruptible and cannot govern gameplay.
+- Sword remains 500ms windup, 140ms contact and 660ms recovery. The death preview
+  remains 720ms with immediate gameplay death.
+
+Validation actually performed: checked all 48 new PNGs for 96×96 RGBA, binary
+alpha, grounded row 72 and unclipped margins; compared every earlier PNG against
+the previous commit; verified twelve walk indices, 800ms gait and separate
+400ms/160ms hurt timings. Browser loaded 144 images without page errors, stepped
+through walk frames 0–11, held paused time, showed hurt still playing beyond
+160ms and ending at 400ms, and showed sword contact at 570ms as before. Inspected
+the rendered preview and contact sheet. The rebuilt GIF has 60 review frames,
+with its usual rounded timing precision. `git diff --check` passed before commit.
+
+Sources, exact prompts, global sampling grids and registration metadata are
+retained in the package. Earlier counts/timings above describe the original B
+submission; this section records the current revision. No game integration or
+runtime test rerun. Fluidity, foot planting and ear/head stability still require
+the user's visual approval in motion. Stop for that review.
