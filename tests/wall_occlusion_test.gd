@@ -48,6 +48,30 @@ func expected_obstruction(visual: MeshInstance3D) -> bool:
                 return true
     return false
 
+func oracle_window() -> Dictionary:
+    # Seeds still use the independent ray/slab oracle. Topology expansion is
+    # checked separately by hard-coded straight/corner/door-gap fixtures.
+    var seeds: Dictionary = {}
+    for index in range(lab.wall_records.size()):
+        if expected_obstruction(lab.wall_records[index].visual):
+            if lab.wall_records[index].join:
+                for panel in Occlusion.adjacent_panels(index,lab.wall_records):
+                    seeds[panel] = true
+            else:
+                seeds[index] = true
+    var result := seeds.duplicate()
+    for seed in seeds:
+        for panel in Occlusion.adjacent_panels(seed,lab.wall_records):
+            result[panel] = true
+    for panel in result.keys():
+        for neighbour in lab.wall_records[panel].neighbours:
+            if lab.wall_records[neighbour].join:
+                result[neighbour] = true
+    for index in result.keys():
+        if not lab.wall_records[index].visual.visible:
+            result.erase(index)
+    return result
+
 func collision_state(node: Node) -> Array:
     var result: Array = []
     if node is CollisionObject3D:
@@ -110,8 +134,10 @@ func run() -> void:
                     lab.camera_yaw = float(yaw)
                     lab._update_camera()
                     lab._update_visibility(0.22)
-                    for wall in lab.wall_records:
-                        var expected := 0.20 if expected_obstruction(wall.visual) else 1.0
+                    var expected_window := oracle_window()
+                    for index in range(lab.wall_records.size()):
+                        var wall: Dictionary = lab.wall_records[index]
+                        var expected := 0.20 if expected_window.has(index) else 1.0
                         check(is_equal_approx(wall.alpha,expected), "Per-segment obstruction at room %s, position %s, yaw %s" % [room,lab.hero.position,yaw])
                         check(is_equal_approx(wall.material.albedo_color.a,expected), "Material matches obstruction alpha")
                         check(wall.visual.visible == lab.RenderVisibility.can_render(wall.owners, discovered), "Fading never reveals hidden walls")

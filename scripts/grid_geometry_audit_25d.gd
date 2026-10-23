@@ -9,6 +9,9 @@ var room_by_cell: Dictionary = {}
 const RoomVisibility = preload("res://scripts/room_visibility_25d.gd")
 const RenderVisibility = preload("res://scripts/room_render_visibility_25d.gd")
 const Occlusion = preload("res://scripts/wall_occlusion_25d.gd")
+const ExteriorGrid = preload("res://scripts/exterior_grid_25d.gd")
+var exterior_grid: MeshInstance3D
+var visible_rooms: Dictionary = {}
 const WALL_OCCLUDED_ALPHA := 0.20
 const DOOR_OCCLUDED_ALPHA := 0.28
 const FADE_SECONDS := 0.22
@@ -40,6 +43,10 @@ func _ready() -> void:
     _build_boundary_walls()
     _build_doorway_returns()
     _build_doors()
+    Occlusion.connect_panels(wall_records, WALL_THICKNESS)
+    exterior_grid = ExteriorGrid.new()
+    add_child(exterior_grid)
+    exterior_grid.build(occupied, floor_origin, CELL)
     _build_hero()
     _build_camera_and_light()
     _build_label()
@@ -248,6 +255,7 @@ func _toggle_nearby_door() -> void:
         var collider: CollisionShape3D = door["collider"]
         visual.visible = now_closed and RenderVisibility.can_render(door["rooms"], discovered_rooms)
         collider.set_deferred("disabled",not now_closed)
+        _refresh_discovery_visuals()
         return
 
 func _build_hero() -> void:
@@ -296,7 +304,7 @@ func _build_label() -> void:
     add_child(ui)
     var label := Label.new()
     label.position = Vector2(16,16)
-    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nOnly walls obstructing the player fade; discovery and collision stay independent."
+    label.text = "VISIBILITY LAB | WASD move | Q/E rotate | F open door | C translucent walls | T top-down\nThree-panel cutaways | Open doors preview adjoining rooms without discovering them."
     ui.add_child(label)
 
 func _material(color: Color) -> StandardMaterial3D:
@@ -317,8 +325,8 @@ func _physics_process(_delta: float) -> void:
     hero.move_and_slide()
     _update_camera()
     _current_room()
-    if visibility.discover_current():
-        _refresh_discovery_visuals()
+    visibility.discover_current()
+    _refresh_discovery_visuals()
     _update_visibility(_delta)
 
 func _update_camera() -> void:
@@ -332,20 +340,36 @@ func _update_camera() -> void:
     camera.look_at(hero.global_position+Vector3(0,0.8,0))
 
 func _refresh_discovery_visuals() -> void:
-    # Rendering policy consumes discovery; neither opacity nor camera can reveal rooms.
+    # Preview rays originate from the player, not the camera, and keep working
+    # through rotations. Camera cutaway never affects doorway sight blockers.
+    var eye := hero.global_position + Vector3(0,1.0,0)
+    visible_rooms = discovered_rooms.duplicate()
     for cell in floor_visuals:
-        floor_visuals[cell].visible = RenderVisibility.can_render([room_by_cell[cell]], discovered_rooms)
+        var room: int = room_by_cell[cell]
+        var target: Vector3 = floor_visuals[cell].global_position
+        target.y = eye.y
+        var show: bool = RenderVisibility.can_render([room], discovered_rooms) or RenderVisibility.preview_visible([room],target,eye,visibility.current_room,wall_records,doors)
+        floor_visuals[cell].visible = show
+        if show:
+            visible_rooms[room] = true
+    exterior_grid.sync_background(floor_visuals)
     for record in wall_records:
-        record["visual"].visible = RenderVisibility.can_render(record["owners"], discovered_rooms)
+        var visual: MeshInstance3D = record["visual"]
+        var target := visual.global_position
+        target.y = eye.y
+        visual.visible = RenderVisibility.can_render(record["owners"], discovered_rooms) or RenderVisibility.preview_visible(record["owners"],target,eye,visibility.current_room,wall_records,doors,visual)
     for door in doors:
-        door["visual"].visible = bool(door["closed"]) and RenderVisibility.can_render(door["rooms"], discovered_rooms)
+        var visual: MeshInstance3D = door["visual"]
+        var target := visual.global_position
+        target.y = eye.y
+        visual.visible = bool(door["closed"]) and (RenderVisibility.can_render(door["rooms"], discovered_rooms) or RenderVisibility.preview_visible(door["rooms"],target,eye,visibility.current_room,wall_records,doors,visual))
 
 func _update_visibility(delta: float) -> void:
     var targets := Occlusion.player_targets(camera, hero.global_position)
     var segments := Occlusion.sight_segments(camera, targets)
-    for record in wall_records:
-        var fade: bool = cutaway and Occlusion.obstructs(record["visual"], segments)
-        _transition_opacity(record, WALL_OCCLUDED_ALPHA if fade else 1.0, delta)
+    var window := Occlusion.cutaway_window(wall_records, segments) if cutaway else {}
+    for index in range(wall_records.size()):
+        _transition_opacity(wall_records[index], WALL_OCCLUDED_ALPHA if window.has(index) else 1.0, delta)
     for door in doors:
         var fade: bool = cutaway and door["closed"] and Occlusion.obstructs(door["visual"], segments)
         _transition_opacity(door, DOOR_OCCLUDED_ALPHA if fade else 1.0, delta)
