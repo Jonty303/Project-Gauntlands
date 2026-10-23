@@ -69,9 +69,9 @@ Occlusion mechanics are not required in Iteration 01 because that room deliberat
 The visual tilemap is not the whole dungeon model. Future generation should represent logical rooms, corridors and door connections separately from rendered tiles. Discovery, enemy perception/LOS, collision/navigation and visual occlusion remain independent concerns.
 
 ## Current milestone
-On `iteration-03`, the planned milestone is defined in [Iteration 03](docs/ITERATION_03.md), based on completed Iteration 02. It covers a compact five-room dungeon, discovery, size-aware pursuit, entrance escape, chests, one secret room and creature-neutral traps.
+On `iteration-03`, the milestone is defined in [Iteration 03](docs/ITERATION_03.md), based on completed Iteration 02. It covers a compact five-room dungeon, discovery, size-aware pursuit, entrance escape, chests, one secret room and creature-neutral traps.
 
-This preparation changes documentation only. Gameplay implementation requires a separate request. Preserve the existing combat and presentation baseline; the character/RPG expansion, procedural generation, inventory, town, save systems and Codex remain deferred. Trap damage should preserve physical-contact/resolution separation without introducing new RPG systems.
+Implementation was authorized separately and is recorded in [Iteration 03 validation](docs/ITERATION_03_VALIDATION.md). Preserve the existing combat and presentation baseline; the character/RPG expansion, procedural generation, inventory, town, save systems and Codex remain deferred. Trap damage should preserve physical-contact/resolution separation without introducing new RPG systems.
 
 ## Longer-term progression
 The player should gain power both through character progression and through knowledge of enemies. The planned Codex can eventually expose learned weaknesses, behaviours and increasingly precise statistics, but the Codex itself is deferred.

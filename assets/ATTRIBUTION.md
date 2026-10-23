@@ -26,3 +26,10 @@ wall regions without altering the source image. Door timber, iron straps,
 masonry jambs, the brass wall switch, coins and arrow bundles are original
 pixel-aligned artwork drawn by `interactable.gd` and `pickup.gd` in the existing
 palette. No external assets or licence dependencies were introduced.
+
+## Iteration 03 additions
+
+Additional rooms reuse the unchanged original room texture. Chests, the entrance
+stairway, secret masonry, pressure plates and raised spikes use original
+pixel-aligned drawing in the existing stone/timber/iron palette. No external
+artwork, new asset pipeline or third-party licence dependencies were added.
