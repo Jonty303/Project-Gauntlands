@@ -5,11 +5,12 @@
 - `main` is the authoritative 2D reboot. Do not migrate code from older 2D/2.5D/3D experiment branches unless the task explicitly asks for it.
 - Historical prototypes are reference material, not dependencies. The final 3D architecture prototype is preserved at `archive/prototype-3d-final`.
 - Read `DESIGN.md` before changing gameplay architecture or presentation rules.
+- For the current combat-room pass, `docs/ITERATION_01.md` is the authoritative implementation contract. Implement its acceptance criteria and stop; do not expand into later milestones.
 - Work only on the requested feature. Avoid unrelated refactors, speculative systems and broad rewrites.
 
 ## Product direction
 - True **2D**, fixed 3/4 top-down presentation. Do not solve presentation with a 3D camera or 3D geometry.
-- Pixel-art visual language; initial design grid is **32x32 px**.
+- Pixel-art visual language with the proportions and grimy 3/4 dungeon direction defined in `DESIGN.md`; do not force the artwork to look tiny merely to satisfy a nominal grid size.
 - World authoring may be tile/grid based, but actor movement is **free**, not tile-step movement.
 - **Gamepad-first** controls; keyboard mirrors controller controls for development.
 - Prefer 8-direction actor presentation. Gameplay vectors may remain continuous; do not arbitrarily rotate character pixel art.
