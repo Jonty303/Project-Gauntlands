@@ -16,7 +16,8 @@ Five attributes: Strength (STR), Dexterity (DEX), Constitution (CON), Wisdom (WI
 - Starting character: roll **4d6 drop lowest** five times; sort descending.
 - Randomly assign highest and second-highest to STR/DEX with equal probability of which receives the highest; assign middle score to CON; randomly assign fourth and fifth to WIS/INT with equal probability of which receives fourth.
 - No player allocation or reroll in initial character creation. An optional randomisation button is a future idea, not a current requirement.
-- Attribute growth and full levelling rules are not decided.
+- Attribute growth and full levelling rules are not decided. A D&D 4E-inspired **level 1–20 progression schedule** is under consideration: occasional attribute increases, new powers, power upgrades and feat selections, plus HP advancement. Exact levels, counts and XP thresholds are **not agreed**.
+- **Power progression proposal:** each power has level/prerequisite eligibility; characters learn powers into a known-power library, then equip only what fits their active slots. Upgrades can branch or specialise known powers rather than always replacing them. A hybrid schedule (some guaranteed new-power unlocks plus flexible learn-or-upgrade opportunities) was suggested but **not selected**. Keep power learning, power upgrading, and equipping distinct.
 
 ## Combat modes and active actions
 There are seven player-facing actions: Attack (uses current weapon mode), Switch melee/ranged, Offensive power, Defensive power, Utility power, Movement power, Item/quick item, plus a separate Interact/Use action.
@@ -31,7 +32,10 @@ There are seven player-facing actions: Attack (uses current weapon mode), Switch
 Xbox-style example: left stick move; right stick directional target selection/cycling; R3 lock/unlock. Face buttons: A Attack, B Movement, X Interact/Use, Y Item. LB Defensive, RB Offensive, LT Utility, RT Switch mode. Keyboard mirrors controller for development. This is a proposal to playtest, not a final remap of existing controls. Attack and Switch placements may be reconsidered. Directional movement powers should use movement direction; target-lock behaviour should remain consistent with DESIGN.md.
 
 ## Power model
-- Four configurable class-power slots: **Offensive, Defensive, Utility, Movement**.
+- Four configurable class-power slots: **Offensive, Defensive, Utility, Movement**. These are the baseline slot categories, not necessarily immutable restrictions.
+- **Preferred future feat mechanic: slot-category flexibility.** A feat can broaden the categories accepted by an existing slot (e.g. Defensive accepts Defensive **or** Offensive), without removing its original category, changing its physical input, or granting another active slot. The player chooses which eligible power to equip when configuring a build; the feat never forces a conversion. Other possibilities include Utility/Defensive and Defensive/Movement flexibility, subject to balancing and prerequisites.
+- **Do not pursue mandatory item-driven slot conversion** as the default design. Equipment should primarily modify powers, grant conditional effects or enhance stats; a build should not be forced to abandon its normal slot category because it equips a useful item. Keep Movement and Item controls stable; any cross-category feat affecting Movement requires deliberate balance/testing.
+- Slot-flexibility feats consume normal feat choices and do not bypass power acquisition, cooldowns, prerequisites, or no-reconfiguration-during-combat rules. They change permitted loadout combinations, not the number of controller buttons.
 - Weapon/attack sources occupy the melee or ranged weapon slot and may be physical items, conjured weapons, or intrinsic attacks. At-will magical attacks such as Magic Missile and conjured blades can replace physical weapons and remain spammable/balanced against other basic attacks.
 - Conjured attacks occupying weapon slots do **not** automatically receive physical weapon item statistics. This is a meaningful trade-off; flexibility, effects, scaling or upgrades may compensate. Other powers may explicitly require and modify a physical weapon.
 - Powers may have individual cooldowns, charges, charge-recovery rules, duration, damage types, tags, prerequisites and branching upgrades. Cooldown is not determined by slot.
@@ -72,7 +76,7 @@ Every initial Fighter starts with the **same basic gear** irrespective of rolled
 ## Skills and feats
 - Skills should matter in dungeon exploration, not just dialogue: examples Perception, Athletics, Thievery, Arcana, Dungeoneering, Insight.
 - Skill investment could change the quality of hints and detection, not merely binary success/failure.
-- Feats customise builds, including weapon synergies, physical mobility, power modifications and possibly future multiclass access.
+- Feats customise builds, including weapon synergies, physical mobility, power modifications, **optional expansion of power-slot eligibility**, and possibly future multiclass access.
 - Specific skill lists, feat trees and progression remain open.
 
 ## Recovery and quick items
@@ -89,7 +93,7 @@ Every initial Fighter starts with the **same basic gear** irrespective of rolled
 - Do not implement tavern/recruitment/Guild progression in the first Fighter RPG prototype.
 
 ## Deferred design decisions
-Combat maths and scaling; hit/crit/miss and armour formula; exact power cooldowns, charge recovery and upgrades; passive affixes of inactive weapons/shields; weapon switch timing; power interruptions; two-handed and dual-wield combos; consumable and health attrition balancing; levelling and attribute increases; item UI and controller testing; precise class equipment permissions; multiclassing; recruitment unlocks.
+Combat maths and scaling; hit/crit/miss and armour formula; exact power cooldowns, charge recovery and upgrades; passive affixes of inactive weapons/shields; weapon switch timing; power interruptions; two-handed and dual-wield combos; consumable and health attrition balancing; exact progression schedule and whether power development is separate/shared/hybrid; feat-based slot flexibility prerequisites and balance; levelling and attribute increases; item UI and controller testing; precise class equipment permissions; multiclassing; recruitment unlocks.
 
 ## Delivery discipline
 Keep Iteration 03 focused on its dungeon/traps/enemies/escape contract. This document is design reference only. When RPG implementation is authorised, create a bounded docs/ITERATION_XX.md with explicit acceptance criteria and update AGENTS.md / DESIGN.md references deliberately rather than expanding current iterations.
