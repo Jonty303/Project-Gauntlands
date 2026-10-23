@@ -21,7 +21,12 @@ func key(code: Key, down: bool) -> void:
 	Input.parse_input_event(event)
 
 func tap(code: Key) -> void:
+	# Startup may run several catch-up physics ticks in one rendered frame.
+	# Give injected input a frame boundary before counting its physics ticks.
+	await process_frame
 	key(code, true)
+	Input.flush_buffered_events()
+	await process_frame
 	await frames(2)
 	key(code, false)
 	await frames(2)

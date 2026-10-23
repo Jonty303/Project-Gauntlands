@@ -6,7 +6,7 @@ var quantity := 5
 var collected := false
 
 func _physics_process(_delta: float) -> void:
-	if collected or arena.player.hp <= 0:
+	if arena.escaped or collected or arena.player.hp <= 0:
 		return
 	if position.distance_to(arena.player.position) <= 18 and arena.clear_sight(position, arena.player.position):
 		collected = true

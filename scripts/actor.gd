@@ -1,5 +1,7 @@
 extends CharacterBody2D
 
+var hazard_susceptible := true
+var pressure_sensitive := true
 var arena: Node2D
 var title := "Player"
 var max_hp := 12
@@ -70,7 +72,7 @@ func tick_actor(delta: float) -> void:
 			if elapsed >= active_end and not released:
 				released = true
 				if contacts.is_empty():
-					arena.log_event(title + " sword: PHYSICAL MISS (range/arc)")
+					arena.contact_event(self, title + " sword: PHYSICAL MISS (range/arc)")
 			if elapsed >= (0.68 if title == "Player" else 1.30):
 				state = "idle"
 	else:
@@ -78,7 +80,7 @@ func tick_actor(delta: float) -> void:
 	update_art()
 
 func take_damage(amount: int) -> void:
-	if hp <= 0:
+	if arena.escaped or hp <= 0:
 		return
 	hp = maxi(0, hp - amount)
 	hurt_left = 0.16
@@ -87,7 +89,8 @@ func take_damage(amount: int) -> void:
 		velocity = Vector2.ZERO
 		collision_layer = 0
 		collision_mask = 0
-		arena.log_event(title + (" died; restart encounter" if title == "Player" else " died; use wall button to respawn"))
+		if title == "Player" or arena.point_visible(position):
+			arena.log_event(title + (" died; restart encounter" if title == "Player" else " died; use wall button to respawn"))
 		if title != "Player":
 			arena.drop_loot(self)
 			arena.player.targeting.validate(arena.eligible_targets())

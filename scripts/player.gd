@@ -4,7 +4,7 @@ const Lock = preload("res://scripts/target_lock.gd")
 var targeting := Lock.new()
 
 func _physics_process(delta: float) -> void:
-	if hp <= 0:
+	if arena.escaped or hp <= 0:
 		return
 	if Input.is_action_just_pressed("lock_target"):
 		targeting.toggle(self, arena.eligible_targets())

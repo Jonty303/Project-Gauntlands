@@ -16,7 +16,7 @@ func label_at(location: Vector2, size: int, color: Color) -> Label:
 
 func _ready() -> void:
 	label_at(Vector2(32, 7), 18, Color("c8b996")).text = "GAUNTLANDS   /   THE FORGOTTEN HOLD"
-	label_at(Vector2(34, 31), 10, Color("837e70")).text = "ITERATION 02     •     ROOMS, DOORS AND LOOT"
+	label_at(Vector2(34, 31), 10, Color("837e70")).text = "ITERATION 03     •     DISCOVERY AND ESCAPE"
 	summary = label_at(Vector2(32, 389), 10, Color("d7cbb0"))
 	log_label = label_at(Vector2(32, 440), 11, Color("b8b7aa"))
 	label_at(Vector2(32, 525), 11, Color("a09b8c")).text = "MOVE  LS / WASD     SWORD  A / J     BOW  X / K     LOCK  R3 / L"
@@ -28,17 +28,22 @@ func _ready() -> void:
 func _process(_delta: float) -> void:
 	var player = arena.player
 	var target = player.targeting.target
+	if target != null and not arena.point_visible(target.position):
+		target = null
 	var target_name: String = target.title if target != null else "None"
 	summary.text = "HP %d / 12    ARROWS %d    GOLD %d    LOCK %s    [%s]\n" % [player.hp, arena.arrows, arena.gold, target_name, player.state]
 	for index in range(arena.goblins.size()):
 		var goblin = arena.goblins[index]
+		if not arena.point_visible(goblin.position):
+			continue
 		if index == 2:
 			summary.text += "\n"
 		summary.text += "%s %d/7 %s   " % [goblin.title, goblin.hp, goblin.state]
 	var item = arena.nearby_interactable()
-	interaction_prompt.text = "F / Y: " + item.prompt() if item != null and player.hp > 0 else ""
+	interaction_prompt.text = "F / Y: " + item.prompt() if item != null and player.hp > 0 and not arena.escaped else ""
 	log_label.text = "\n".join(arena.events)
-	death_prompt.visible = player.hp <= 0
+	death_prompt.visible = player.hp <= 0 or arena.escaped
+	death_prompt.text = "ESCAPED -- %d GOLD\nStart / R -- new run" % arena.escaped_gold if arena.escaped else "YOU DIED\nStart / R -- restart encounter"
 	queue_redraw()
 
 func _draw() -> void:
@@ -46,16 +51,17 @@ func _draw() -> void:
 	draw_rect(Rect2(0, 385, 640, 175), Color("080a0d"))
 	draw_rect(Rect2(24, 385, 592, 134), Color("101318"))
 	draw_line(Vector2(24, 385), Vector2(616, 385), Color("5a5040"))
-	if arena.player.hp <= 0:
+	if arena.player.hp <= 0 or arena.escaped:
 		draw_rect(Rect2(124, 197, 392, 76), Color(0.04, 0.035, 0.03, 0.95))
+		return
 	for actor in [arena.player] + arena.goblins:
-		if actor.hp <= 0:
+		if actor.hp <= 0 or (actor != arena.player and not arena.point_visible(actor.position)):
 			continue
 		var point: Vector2 = arena.get_canvas_transform() * actor.position + Vector2(-12, -39)
 		draw_rect(Rect2(point, Vector2(24, 3)), Color("1b1717"))
 		draw_rect(Rect2(point, Vector2(24.0 * actor.hp / actor.max_hp, 2)), Color("a57754") if actor == arena.player else Color("8e4842"))
 	var target = arena.player.targeting.target
-	if target != null and target.hp > 0:
+	if target != null and target.hp > 0 and arena.point_visible(target.position):
 		var point: Vector2 = arena.get_canvas_transform() * target.position + Vector2(0, -47)
 		draw_polyline(PackedVector2Array([point + Vector2(-4, -3), point + Vector2(0, 1), point + Vector2(4, -3)]), Color("e0c37d"), 1.0)
 		draw_arc(arena.get_canvas_transform() * target.position, 11.0, 0.0, TAU, 16, Color("bca66c"), 1.0)
