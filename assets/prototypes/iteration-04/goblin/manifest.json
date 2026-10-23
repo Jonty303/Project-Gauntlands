@@ -1,0 +1,712 @@
+{
+  "status": "Milestone A prototype; awaiting user visual approval; no integration",
+  "direction": "east (fixed right-facing three-quarter view)",
+  "canvas_px": [
+    96,
+    96
+  ],
+  "ground_pivot_px": [
+    40,
+    72
+  ],
+  "scale": "1 native image pixel = 1 world pixel in the 640px viewport; enlargement uses nearest neighbour",
+  "format": "RGBA PNG; binary alpha; identical canvas; no per-frame scaling",
+  "source": "source/generated-atlas.png",
+  "source_size_px": [
+    1536,
+    1024
+  ],
+  "sampling": "One shared 1:4 nearest-neighbour grid, transparent threshold 128; translation only for foot alignment; no anatomy redrawing or interpolation",
+  "clips": {
+    "idle": {
+      "loop": true,
+      "durations_ms": [
+        200,
+        200,
+        200,
+        200,
+        200,
+        200
+      ],
+      "note": "Cosmetic 1.2-second breathing loop; existing idle has no gameplay duration.",
+      "frames": [
+        "east/idle_000.png",
+        "east/idle_001.png",
+        "east/idle_002.png",
+        "east/idle_003.png",
+        "east/idle_004.png",
+        "east/idle_005.png"
+      ]
+    },
+    "walk": {
+      "loop": true,
+      "durations_ms": [
+        74.07407407407408,
+        74.07407407407408,
+        74.07407407407408,
+        74.07407407407408,
+        74.07407407407408,
+        74.07407407407408
+      ],
+      "note": "Six samples over existing 4/9-second walk cycle. Existing movement remains 54 world px/s.",
+      "frames": [
+        "east/walk_000.png",
+        "east/walk_001.png",
+        "east/walk_002.png",
+        "east/walk_003.png",
+        "east/walk_004.png",
+        "east/walk_005.png"
+      ]
+    },
+    "attack": {
+      "loop": false,
+      "durations_ms": [
+        250,
+        250,
+        70,
+        70,
+        330,
+        330
+      ],
+      "phases": [
+        {
+          "name": "windup",
+          "start_ms": 0,
+          "end_ms": 500
+        },
+        {
+          "name": "contact",
+          "start_ms": 500,
+          "end_ms": 640
+        },
+        {
+          "name": "recovery",
+          "start_ms": 640,
+          "end_ms": 1300
+        }
+      ],
+      "note": "Existing goblin timings, not player timings. Preview replay is a review control only.",
+      "frames": [
+        "east/attack_000.png",
+        "east/attack_001.png",
+        "east/attack_002.png",
+        "east/attack_003.png",
+        "east/attack_004.png",
+        "east/attack_005.png"
+      ]
+    },
+    "hurt": {
+      "loop": false,
+      "durations_ms": [
+        26.666666666666668,
+        26.666666666666668,
+        26.666666666666668,
+        26.666666666666668,
+        26.666666666666668,
+        26.666666666666668
+      ],
+      "note": "Cosmetic 0.16-second reaction only; does not add a stun or cancel an attack.",
+      "frames": [
+        "east/hurt_000.png",
+        "east/hurt_001.png",
+        "east/hurt_002.png",
+        "east/hurt_003.png",
+        "east/hurt_004.png",
+        "east/hurt_005.png"
+      ]
+    },
+    "death": {
+      "loop": false,
+      "durations_ms": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        220
+      ],
+      "hold_last": true,
+      "note": "720ms offline presentation study only. Gameplay death/collision removal/loot remains immediate; no new corpse/respawn timer is proposed.",
+      "frames": [
+        "east/death_000.png",
+        "east/death_001.png",
+        "east/death_002.png",
+        "east/death_003.png",
+        "east/death_004.png",
+        "east/death_005.png"
+      ]
+    }
+  },
+  "exports": [
+    {
+      "file": "east/idle_000.png",
+      "source_bounds": [
+        0,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        35,
+        50
+      ],
+      "bounds": [
+        19,
+        12,
+        53,
+        49
+      ]
+    },
+    {
+      "file": "east/idle_001.png",
+      "source_bounds": [
+        256,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        94,
+        50
+      ],
+      "bounds": [
+        78,
+        12,
+        112,
+        49
+      ]
+    },
+    {
+      "file": "east/idle_002.png",
+      "source_bounds": [
+        512,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        157,
+        50
+      ],
+      "bounds": [
+        142,
+        12,
+        174,
+        49
+      ]
+    },
+    {
+      "file": "east/idle_003.png",
+      "source_bounds": [
+        768,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        221,
+        50
+      ],
+      "bounds": [
+        205,
+        12,
+        239,
+        49
+      ]
+    },
+    {
+      "file": "east/idle_004.png",
+      "source_bounds": [
+        1024,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        286,
+        50
+      ],
+      "bounds": [
+        270,
+        12,
+        304,
+        49
+      ]
+    },
+    {
+      "file": "east/idle_005.png",
+      "source_bounds": [
+        1280,
+        0,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        348,
+        50
+      ],
+      "bounds": [
+        331,
+        11,
+        365,
+        49
+      ]
+    },
+    {
+      "file": "east/walk_000.png",
+      "source_bounds": [
+        0,
+        204,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        34,
+        99
+      ],
+      "bounds": [
+        18,
+        58,
+        52,
+        98
+      ]
+    },
+    {
+      "file": "east/walk_001.png",
+      "source_bounds": [
+        256,
+        204,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        94,
+        99
+      ],
+      "bounds": [
+        79,
+        58,
+        113,
+        98
+      ]
+    },
+    {
+      "file": "east/walk_002.png",
+      "source_bounds": [
+        512,
+        204,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        156,
+        99
+      ],
+      "bounds": [
+        140,
+        58,
+        175,
+        98
+      ]
+    },
+    {
+      "file": "east/walk_003.png",
+      "source_bounds": [
+        768,
+        204,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        220,
+        99
+      ],
+      "bounds": [
+        205,
+        60,
+        239,
+        98
+      ]
+    },
+    {
+      "file": "east/walk_004.png",
+      "source_bounds": [
+        1024,
+        204,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        284,
+        99
+      ],
+      "bounds": [
+        269,
+        58,
+        302,
+        98
+      ]
+    },
+    {
+      "file": "east/walk_005.png",
+      "source_bounds": [
+        1280,
+        204,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        348,
+        99
+      ],
+      "bounds": [
+        332,
+        59,
+        366,
+        98
+      ]
+    },
+    {
+      "file": "east/attack_000.png",
+      "source_bounds": [
+        0,
+        408,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        35,
+        149
+      ],
+      "bounds": [
+        19,
+        111,
+        54,
+        148
+      ]
+    },
+    {
+      "file": "east/attack_001.png",
+      "source_bounds": [
+        256,
+        408,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        95,
+        149
+      ],
+      "bounds": [
+        79,
+        104,
+        115,
+        148
+      ]
+    },
+    {
+      "file": "east/attack_002.png",
+      "source_bounds": [
+        512,
+        408,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        152,
+        149
+      ],
+      "bounds": [
+        135,
+        111,
+        190,
+        148
+      ]
+    },
+    {
+      "file": "east/attack_003.png",
+      "source_bounds": [
+        768,
+        408,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        214,
+        149
+      ],
+      "bounds": [
+        197,
+        116,
+        254,
+        148
+      ]
+    },
+    {
+      "file": "east/attack_004.png",
+      "source_bounds": [
+        1024,
+        408,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        284,
+        149
+      ],
+      "bounds": [
+        263,
+        105,
+        305,
+        148
+      ]
+    },
+    {
+      "file": "east/attack_005.png",
+      "source_bounds": [
+        1280,
+        408,
+        256,
+        208
+      ],
+      "sampled_ground_anchor": [
+        347,
+        149
+      ],
+      "bounds": [
+        332,
+        111,
+        366,
+        148
+      ]
+    },
+    {
+      "file": "east/hurt_000.png",
+      "source_bounds": [
+        0,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        34,
+        198
+      ],
+      "bounds": [
+        18,
+        158,
+        53,
+        197
+      ]
+    },
+    {
+      "file": "east/hurt_001.png",
+      "source_bounds": [
+        256,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        102,
+        198
+      ],
+      "bounds": [
+        79,
+        157,
+        121,
+        197
+      ]
+    },
+    {
+      "file": "east/hurt_002.png",
+      "source_bounds": [
+        512,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        164,
+        198
+      ],
+      "bounds": [
+        140,
+        159,
+        179,
+        197
+      ]
+    },
+    {
+      "file": "east/hurt_003.png",
+      "source_bounds": [
+        768,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        219,
+        198
+      ],
+      "bounds": [
+        204,
+        160,
+        239,
+        197
+      ]
+    },
+    {
+      "file": "east/hurt_004.png",
+      "source_bounds": [
+        1024,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        285,
+        198
+      ],
+      "bounds": [
+        269,
+        160,
+        304,
+        197
+      ]
+    },
+    {
+      "file": "east/hurt_005.png",
+      "source_bounds": [
+        1280,
+        616,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        347,
+        198
+      ],
+      "bounds": [
+        331,
+        158,
+        365,
+        197
+      ]
+    },
+    {
+      "file": "east/death_000.png",
+      "source_bounds": [
+        0,
+        820,
+        272,
+        204
+      ],
+      "sampled_ground_anchor": [
+        35,
+        244
+      ],
+      "bounds": [
+        20,
+        207,
+        56,
+        243
+      ]
+    },
+    {
+      "file": "east/death_001.png",
+      "source_bounds": [
+        272,
+        820,
+        228,
+        204
+      ],
+      "sampled_ground_anchor": [
+        96,
+        244
+      ],
+      "bounds": [
+        78,
+        212,
+        115,
+        243
+      ]
+    },
+    {
+      "file": "east/death_002.png",
+      "source_bounds": [
+        500,
+        820,
+        244,
+        204
+      ],
+      "sampled_ground_anchor": [
+        138,
+        243
+      ],
+      "bounds": [
+        130,
+        215,
+        177,
+        242
+      ]
+    },
+    {
+      "file": "east/death_003.png",
+      "source_bounds": [
+        744,
+        820,
+        256,
+        204
+      ],
+      "sampled_ground_anchor": [
+        201,
+        244
+      ],
+      "bounds": [
+        192,
+        220,
+        244,
+        243
+      ]
+    },
+    {
+      "file": "east/death_004.png",
+      "source_bounds": [
+        1000,
+        820,
+        272,
+        204
+      ],
+      "sampled_ground_anchor": [
+        262,
+        244
+      ],
+      "bounds": [
+        253,
+        223,
+        312,
+        243
+      ]
+    },
+    {
+      "file": "east/death_005.png",
+      "source_bounds": [
+        1272,
+        820,
+        264,
+        204
+      ],
+      "sampled_ground_anchor": [
+        330,
+        244
+      ],
+      "bounds": [
+        322,
+        223,
+        377,
+        243
+      ]
+    }
+  ]
+}
